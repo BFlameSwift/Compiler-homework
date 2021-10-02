@@ -1,6 +1,6 @@
-FROM openjdk:16
+FROM openjdk:16-alpine
 # 向容器内复制文件
-COPY ./src/Main.java  /app/
+COPY ./*  /app/
 # 编译程序
 WORKDIR /app/
 RUN javac -d ./output ./src/Main.java
