@@ -65,7 +65,7 @@ public class Main {
             else if (isSymbol(thisStr)){
 
                 if(line.charAt(j) == '='){
-                    if (j<lineLen && line.charAt(j+1) == '='){
+                    if (j < lineLen-1 && line.charAt(j+1) == '='){
                         j++;
                     }
                 }
