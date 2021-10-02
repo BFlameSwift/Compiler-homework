@@ -58,7 +58,7 @@ public class Main {
 
         int index = -1;
         if( isReservedWord(str)) {
-            System.out.println(str);
+//            System.out.println(str);
             index = reservedWordsBefore.indexOf(str);
             token = reservedWordsAfter.get(index);
         }
