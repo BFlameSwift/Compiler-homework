@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  */
 public class Main {
 
-    public static final String UNSIGN_NUMNBER = "^\\d+$";
+    public static final String UNSIGN_NUMNBER = "[0-9]+";
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
     public static List<String> reservedWordsBefore = Arrays.asList("if","else","while","break","continue","break","return");
     public static List<String> reservedWordsAfter = Arrays.asList("If","Else","While","Break","Continue","Break","Return");
@@ -49,7 +49,7 @@ public class Main {
 
                 }
                 if(token.equals("Err")){
-                    System.out.println(str);
+//                    System.out.println(str);
                     System.out.println("Err");
                     return true;
                 }
