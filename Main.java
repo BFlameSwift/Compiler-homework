@@ -49,7 +49,7 @@ public class Main {
 
                 }
                 if(token.equals("Err")){
-//                    System.out.println(str);
+                    System.out.println(str);
                     System.out.println("Err");
                     return true;
                 }
@@ -72,7 +72,7 @@ public class Main {
             token = signAfter.get(index);
         }
         else if (isUnsignNumnber(str)){
-            return "Number("+ Integer.parseInt(str) +")";
+            return "Number("+ str +")";
         }
         else if (isIdentifier(str)){
             return "Ident("+str+")";
