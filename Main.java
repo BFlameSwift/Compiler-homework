@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  */
 public class Main {
 
-    public static final String INTEGER = "^[-\\+]?[\\d]*$";
+    public static final String INTEGER = "^[\\d]*$";
     public static final String BLANK = "\\s+";
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
     public static List<String> reservedWordsBefore = Arrays.asList("if","else","while","break","continue","break","return");
