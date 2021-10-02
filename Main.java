@@ -31,6 +31,7 @@ public class Main {
 
     }
     public static Boolean processLine(String line){
+        line = line.strip();
         String[] strList = line.split("\\s+");
         for (String str :strList){
 //            System.out.println(str);
@@ -45,9 +46,13 @@ public class Main {
                         token = token1+"\n"+token2;
                         break;
                     }
+
+                }
+                if(token.equals("Err")){
+                    System.out.println(str);
+                    System.out.println("Err");
                     return true;
                 }
-
             }
             System.out.println(token);
         }
