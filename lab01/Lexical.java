@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-
+import Word.Number;
 /**
  * @author BFlame
  */
@@ -19,6 +19,11 @@ public class Lexical {
     public static List<String> reservedWordsAfter = Arrays.asList("If","Else","While","Break","Continue","Break","Return");
     public static List<String> signBefore = Arrays.asList("==","=",";","(",")","{","}","+","*","/","<",">");
     public static List<String> signAfter = Arrays.asList("Eq","Assign","Semicolon","LPar","RPar","LBrace","RBrace","Plus","Mult","Div","Lt","Gt");
+
+    public static final  String NONZERO_DIGHT = "[1-9]+";
+    public static final String octal_digit = "0[0-7]+";
+    public static final String HEXADECIMAL = "\\b0[xX][0-9a-fA-F]+\\b";
+
     public static void main(String[] args) throws FileNotFoundException {
         String filePath = args[0];
         ArrayList<String> words = new ArrayList<String>();
@@ -64,7 +69,7 @@ public class Lexical {
                     }
                 }j++;
             }
-            else if(isUnsignNumnber(thisStr)){
+            else if(Number.isNumber(thisStr)){
                 for(j = i+1;j<lineLen;j++){
                     if( ! (line.charAt(j) >= 48 && line.charAt(j) <= 57))
                         break;
@@ -88,22 +93,22 @@ public class Lexical {
             index = signBefore.indexOf(str);
             token = signAfter.get(index);
         }
-        else if (isUnsignNumnber(str)){return "Number("+ str +")";}
+        else if (Number.isNumber(str)){return "Number("+ str +")";}
         else if (isIdentifier(str)){return "Ident("+str+")";}
         else {return "Err";}
         return token;
     }
-    public static boolean isUnsignNumnber(String str) {
-        Pattern pattern = Pattern.compile(INTEGER);
-        return pattern.matcher(str).matches();
-    }
+
+
+
+
     public static boolean isIdentifier(String str){
         Pattern pattern = Pattern.compile(IDENTIFIER);
         return pattern.matcher(str).matches();
     }
     public static boolean isReservedWord(String str){return reservedWordsBefore.contains(str);}
     public static boolean isSymbol(String str){return signBefore.contains(str);}
-    public static boolean isLegalWord(String str){return isReservedWord(str) || isIdentifier(str) || isSymbol(str) || isUnsignNumnber(str);}
+    public static boolean isLegalWord(String str){return isReservedWord(str) || isIdentifier(str) || isSymbol(str); }
 }
 
 
