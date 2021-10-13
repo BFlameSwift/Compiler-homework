@@ -17,12 +17,10 @@ public class Lexical {
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
     public static List<String> reservedWordsBefore = Arrays.asList("if","else","while","break","continue","break","return");
     public static List<String> reservedWordsAfter = Arrays.asList("If","Else","While","Break","Continue","Break","Return");
-    public static List<String> signBefore = Arrays.asList("==","=",";","(",")","{","}","+","*","/","<",">");
-    public static List<String> signAfter = Arrays.asList("Eq","Assign","Semicolon","LPar","RPar","LBrace","RBrace","Plus","Mult","Div","Lt","Gt");
+    public static List<String> signBefore = Arrays.asList("==","=",";","(",")","{","}","[","]","+","*","/","<",">");
+    public static List<String> signAfter = Arrays.asList("Eq","Assign","Semicolon","LPar","RPar","LBrace","RBrace","LSqure","RSqure","Plus","Mult","Div","Lt","Gt");
 
-    public static final  String NONZERO_DIGHT = "[1-9]+";
-    public static final String octal_digit = "0[0-7]+";
-    public static final String HEXADECIMAL = "\\b0[xX][0-9a-fA-F]+\\b";
+
 
     public static void main(String[] args) throws FileNotFoundException {
         String filePath = args[0];
