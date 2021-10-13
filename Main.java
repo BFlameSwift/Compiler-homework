@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
  * @author BFlame
  */
 public class Main {
-
     public static final String INTEGER = "^[\\d]*$";
     public static final String BLANK = "\\s+";
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
@@ -14,7 +13,6 @@ public class Main {
     public static List<String> reservedWordsAfter = Arrays.asList("If","Else","While","Break","Continue","Break","Return");
     public static List<String> signBefore = Arrays.asList("==","=",";","(",")","{","}","+","*","/","<",">");
     public static List<String> signAfter = Arrays.asList("Eq","Assign","Semicolon","LPar","RPar","LBrace","RBrace","Plus","Mult","Div","Lt","Gt");
-    
     public static void main(String[] args) throws FileNotFoundException{
         String filePath = args[0];
         ArrayList<String> words = new ArrayList<String>();
@@ -30,7 +28,6 @@ public class Main {
 //            System.out.println(word+" "+word.length()+"  "+ tokenTran(word));
             System.out.println(tokenTran(word));
         }
-
     }
     public static Boolean processLine(String line,ArrayList<String> words){
         line = line.strip();
@@ -47,9 +44,7 @@ public class Main {
                 //TODO System.out.println(thisStr);
                 words.add("----");
                 return true;
-
             }
-
             if(isIdentifier(thisStr)){
                 for(j = i+1;j<lineLen;j++){
                     if( ! (line.charAt(j)>='a'&&line.charAt(j)<='z' || line.charAt(j)>='0' && line.charAt(j) <= '9' || line.charAt(j) >= 'A' && line.charAt(j) <= 'Z' || line.charAt(j) == '_'))
@@ -61,8 +56,7 @@ public class Main {
                     if (j < lineLen-1 && line.charAt(j+1) == '='){
                         j++;
                     }
-                }
-                j++;
+                }j++;
             }
             else if(isUnsignNumnber(thisStr)){
                 for(j = i+1;j<lineLen;j++){
@@ -74,12 +68,10 @@ public class Main {
                 words.add(line.substring(i,j));
                 i = j-1;
             }
-        }
-        return false;
+        }return false;
     }
     public static String tokenTran(String str){
         String token;
-
         int index = -1;
         if( isReservedWord(str)) {
 //            System.out.println(str);
@@ -90,18 +82,11 @@ public class Main {
             index = signBefore.indexOf(str);
             token = signAfter.get(index);
         }
-        else if (isUnsignNumnber(str)){
-            return "Number("+ str +")";
-        }
-        else if (isIdentifier(str)){
-            return "Ident("+str+")";
-        }
-        else {
-            return "Err";
-        }
+        else if (isUnsignNumnber(str)){return "Number("+ str +")";}
+        else if (isIdentifier(str)){return "Ident("+str+")";}
+        else {return "Err";}
         return token;
     }
-
     public static boolean isUnsignNumnber(String str) {
         Pattern pattern = Pattern.compile(INTEGER);
         return pattern.matcher(str).matches();
@@ -110,15 +95,9 @@ public class Main {
         Pattern pattern = Pattern.compile(IDENTIFIER);
         return pattern.matcher(str).matches();
     }
-    public static boolean isReservedWord(String str){
-        return reservedWordsBefore.contains(str);
-    }
-    public static boolean isSymbol(String str){
-        return signBefore.contains(str);
-    }
-    public static boolean isLegalWord(String str){
-        return isReservedWord(str) || isIdentifier(str) || isSymbol(str) || isUnsignNumnber(str);
-    }
+    public static boolean isReservedWord(String str){return reservedWordsBefore.contains(str);}
+    public static boolean isSymbol(String str){return signBefore.contains(str);}
+    public static boolean isLegalWord(String str){return isReservedWord(str) || isIdentifier(str) || isSymbol(str) || isUnsignNumnber(str);}
 }
 
 
