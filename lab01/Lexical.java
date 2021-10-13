@@ -1,11 +1,17 @@
+package lab01;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
+
 /**
  * @author BFlame
  */
-public class Main {
+public class Lexical {
     public static final String INTEGER = "^[\\d]*$";
     public static final String BLANK = "\\s+";
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
@@ -13,7 +19,7 @@ public class Main {
     public static List<String> reservedWordsAfter = Arrays.asList("If","Else","While","Break","Continue","Break","Return");
     public static List<String> signBefore = Arrays.asList("==","=",";","(",")","{","}","+","*","/","<",">");
     public static List<String> signAfter = Arrays.asList("Eq","Assign","Semicolon","LPar","RPar","LBrace","RBrace","Plus","Mult","Div","Lt","Gt");
-    public static void main(String[] args) throws FileNotFoundException{
+    public static void main(String[] args) throws FileNotFoundException {
         String filePath = args[0];
         ArrayList<String> words = new ArrayList<String>();
         Scanner scanner = null;
