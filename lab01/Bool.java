@@ -1,6 +1,5 @@
 package lab01;
-import Word.*;
-import Word.Number;
+import Word.MyNumber;
 
 /**
  * @author Bflame
@@ -13,7 +12,7 @@ public class Bool {
         return false;
     }
     public static Boolean Statements(String str){
-        if (Number.isNumber(str)){
+        if (MyNumber.isNumber(str)){
             return true;
         }
         else if (str.equals("return")){

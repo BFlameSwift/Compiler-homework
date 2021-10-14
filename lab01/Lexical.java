@@ -2,12 +2,9 @@ package lab01;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
-import Word.Number;
+import Word.MyNumber;
 /**
  * @author BFlame
  */
@@ -15,6 +12,8 @@ public class Lexical {
     public static final String INTEGER = "^[\\d]*$";
     public static final String BLANK = "\\s+";
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
+
+
 
     public static final int
         CONST_DEC = 1,INT_DEC = 2,VOID_DEC = 3,IF_DEC = 4,ELSE_DEC = 5,WHILE_DEC = 6,CONTINUE_DEC = 7,BREAK_DEC =8, RETURN_DEC = 9,
@@ -45,7 +44,7 @@ public class Lexical {
         }else if(isIdentifier(str)){
             return true;
         }
-        else if (Number.isNumber(str)){
+        else if (MyNumber.isNumber(str)){
             return true;
         }
         return false;
@@ -68,6 +67,7 @@ public class Lexical {
                     continue;
                 }// 跳过空白
                 //TODO System.out.println(thisStr);
+                System.out.println("无效word："+thisStr);
                 words.add("+inlegal+word"); // 错误
                 return true;
             }
@@ -84,7 +84,7 @@ public class Lexical {
                     }
                 }j++;
             }
-            else if(Number.isNumber(thisStr)){
+            else if(MyNumber.isNumber(thisStr)){
                 for(j = i+1;j<lineLen;j++){
                     if( ! (line.charAt(j) >= 48 && line.charAt(j) <= 57))
                         break;
@@ -97,39 +97,62 @@ public class Lexical {
         }return false;
     }
 
-    public static String tokenTran(String str){
+    public static String tokenTran(String str, ArrayList<String> lexicalList){
         String token;
         int index = SYMBOL_LIST.indexOf(str);
         if( SYMBOL_LIST.contains(str) &&  index<= RETURN_DEC && index >= CONST_DEC) {
 //            System.out.println(str);
             token = TOKEN_LIST.get(index);
+            lexicalList.add(String.valueOf(index));
         }
         else if(SYMBOL_LIST.contains(str) &&  index<= OR && index >= ASSIGN){
             token = TOKEN_LIST.get(index);
+            lexicalList.add(String.valueOf(index));
+            tokenList.add(SYMBOL_LIST.get(index));
         }
-        else if (Number.isNumber(str)){return "Number("+ str +")";}
-        else if (isIdentifier(str)){return "Ident("+str+")";}
-        else {return "Err";}
+        else if (MyNumber.isNumber(str)){
+            lexicalList.add(String.valueOf(DECIMAL_CONST));
+            tokenList.add(String.valueOf(MyNumber.toInteger(str)));
+//            tokens.put(DECIMAL_CONST,String.valueOf(MyNumber.toInteger(str)));
+            return "Number("+ str +")";
+        }
+        else if (isIdentifier(str)){
+            lexicalList.add(String.valueOf(IDENT));
+            return "@"+str;
+        }
+        else {
+            lexicalList.add(String.valueOf(-1));
+            tokenList.add("Err");
+            return "Err";
+        }
         return token;
     }
-
-    public static void main(String[] args) throws FileNotFoundException {
-//        for (int i=0;i<SYMBOL_LIST.size();i++){
-//            System.out.println(i+"   "+SYMBOL_NAMES[i]+"   "+TOKEN_NAMES[i]);
-//        }
-        String filePath = "./pre/main3.c";
+    public static  ArrayList<ArrayList<String>> getAllList(String filePath)  throws FileNotFoundException{
+//        String filePath = "./pre/main3.c";
         ArrayList<String> words = new ArrayList<String>();
+        ArrayList<String> tokenList = new ArrayList<String> ();
+        ArrayList<String> lexicalList = new ArrayList<String> ();
+        ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+        result.add(words); result.add(tokenList); result.add(lexicalList);
         Scanner scanner = null;
         scanner = new Scanner(new File(filePath));
         boolean hasError = false;
-        while (scanner.hasNextLine()&&!hasError)//逐行读取文件内容
-        {
+        while (scanner.hasNextLine()&&!hasError){//逐行读取文件内容
             String line = scanner.nextLine();
             hasError = processLine(line,words);
         }
         for (String word : words){
-//            System.out.println(word+" "+word.length()+"  "+ tokenTran(word));
-            System.out.println(tokenTran(word));
+//            tokenTran(word,lexicalList);
+            System.out.println(word+" "+"  "+ tokenTran(word,lexicalList,tokenList));
+        }
+        return result;
+    }
+    public static void main(String[] args) throws FileNotFoundException {
+
+        ArrayList<Integer> lexicalList = getLexicalList("./lab01/main3.c");
+
+        for(int key:lexicalList){
+            System.out.println(key);
         }
     }
 }
