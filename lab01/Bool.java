@@ -1,5 +1,4 @@
 package lab01;
-import Word.MyNumber;
 
 /**
  * @author Bflame

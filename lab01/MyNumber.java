@@ -1,4 +1,4 @@
-package Word;
+package lab01;
 
 import java.util.regex.Pattern;
 
@@ -29,7 +29,7 @@ public class MyNumber {
             throw new IllegalArgumentException("is not a number");
         }
         if(isHexadecimalDigit(str)){
-            return Integer.parseInt(str);
+            return Integer.valueOf(str.replaceAll("^0[x|X]", ""),16);
         }
         else if (isOctalDigit(str)){
             return Integer.valueOf(str,8);
@@ -40,6 +40,6 @@ public class MyNumber {
     }
 
     public static void main(String[] args) {
-        System.out.println(isNumber("012"));
+        System.out.println(toInteger("0x123"));
     }
 }

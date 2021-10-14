@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.regex.Pattern;
-import Word.MyNumber;
+
 /**
  * @author BFlame
  */
@@ -73,8 +73,9 @@ public class Lexical {
             }
             if(isIdentifier(thisStr)){
                 for(j = i+1;j<lineLen;j++){
-                    if( ! (line.charAt(j)>='a'&&line.charAt(j)<='z' || line.charAt(j)>='0' && line.charAt(j) <= '9' || line.charAt(j) >= 'A' && line.charAt(j) <= 'Z' || line.charAt(j) == '_'))
+                    if( ! (line.charAt(j)>='a'&&line.charAt(j)<='z' || line.charAt(j)>='0' && line.charAt(j) <= '9' || line.charAt(j) >= 'A' && line.charAt(j) <= 'Z' || line.charAt(j) == '_')) {
                         break;
+                    }
                 }
             }
             else if (SYMBOL_LIST.contains(thisStr) && SYMBOL_LIST.indexOf(thisStr) >= ASSIGN ){
@@ -86,8 +87,13 @@ public class Lexical {
             }
             else if(MyNumber.isNumber(thisStr)){
                 for(j = i+1;j<lineLen;j++){
-                    if( ! (line.charAt(j) >= 48 && line.charAt(j) <= 57))
+                    if( (line.charAt(j) >= 48 && line.charAt(j) <= 57)) {
+                        continue;
+                    } else if( (j==i+1)&&line.charAt(i)=='0'&&(line.charAt(j)=='x'||line.charAt(j)== 'X')) {
+                        continue;
+                    } else {
                         break;
+                    }
                 }
             }
             if (j>i)  {
@@ -97,43 +103,42 @@ public class Lexical {
         }return false;
     }
 
-    public static String tokenTran(String str, ArrayList<String> lexicalList){
+    public static String typeRecognition(String str, ArrayList<Integer> lexicalList,Boolean isAdd) {
         String token;
         int index = SYMBOL_LIST.indexOf(str);
         if( SYMBOL_LIST.contains(str) &&  index<= RETURN_DEC && index >= CONST_DEC) {
 //            System.out.println(str);
             token = TOKEN_LIST.get(index);
-            lexicalList.add(String.valueOf(index));
+            lexicalList.add(Integer.valueOf(index));
         }
         else if(SYMBOL_LIST.contains(str) &&  index<= OR && index >= ASSIGN){
             token = TOKEN_LIST.get(index);
-            lexicalList.add(String.valueOf(index));
-            tokenList.add(SYMBOL_LIST.get(index));
+            lexicalList.add(Integer.valueOf(index));
+//            tokenList.add(SYMBOL_LIST.get(index));
         }
         else if (MyNumber.isNumber(str)){
-            lexicalList.add(String.valueOf(DECIMAL_CONST));
-            tokenList.add(String.valueOf(MyNumber.toInteger(str)));
+            lexicalList.add(Integer.valueOf(DECIMAL_CONST));
+//            tokenList.add(String.valueOf(MyNumber.toInteger(str)));
 //            tokens.put(DECIMAL_CONST,String.valueOf(MyNumber.toInteger(str)));
-            return "Number("+ str +")";
+            token = "Number("+ String.valueOf(MyNumber.toInteger(str)) +")";
+
         }
         else if (isIdentifier(str)){
-            lexicalList.add(String.valueOf(IDENT));
-            return "@"+str;
+            lexicalList.add(Integer.valueOf(IDENT));
+            token  = "@"+str;
         }
         else {
-            lexicalList.add(String.valueOf(-1));
-            tokenList.add("Err");
-            return "Err";
+            lexicalList.add(Integer.valueOf(-1));
+            token = "Err";
+        }
+        if(isAdd == false) {
+            lexicalList.remove(lexicalList.size()-1);
         }
         return token;
     }
-    public static  ArrayList<ArrayList<String>> getAllList(String filePath)  throws FileNotFoundException{
+    public static ArrayList<Integer> getLexicalList(String filePath,ArrayList<String> words)  throws FileNotFoundException{
 //        String filePath = "./pre/main3.c";
-        ArrayList<String> words = new ArrayList<String>();
-        ArrayList<String> tokenList = new ArrayList<String> ();
-        ArrayList<String> lexicalList = new ArrayList<String> ();
-        ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
-        result.add(words); result.add(tokenList); result.add(lexicalList);
+        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         Scanner scanner = null;
         scanner = new Scanner(new File(filePath));
         boolean hasError = false;
@@ -142,18 +147,22 @@ public class Lexical {
             hasError = processLine(line,words);
         }
         for (String word : words){
-//            tokenTran(word,lexicalList);
-            System.out.println(word+" "+"  "+ tokenTran(word,lexicalList,tokenList));
+            typeRecognition(word,lexicalList,true);
+//            System.out.println(word+" "+"  "+ tokenTran(word,lexicalList));
         }
-        return result;
+        return lexicalList;
     }
     public static void main(String[] args) throws FileNotFoundException {
-
-        ArrayList<Integer> lexicalList = getLexicalList("./lab01/main3.c");
-
-        for(int key:lexicalList){
-            System.out.println(key);
+        ArrayList<String> words = new ArrayList<String>();
+        ArrayList<Integer> lexicalList = getLexicalList("./lab01/main3.c",words);
+        ArrayList<String> tokenList = new ArrayList<String>();
+        for (String word : words) {
+            tokenList.add(typeRecognition(word,lexicalList,false));
         }
+        for(int i=0;i<lexicalList.size();i++) {
+            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
+        }
+
     }
 }
 
