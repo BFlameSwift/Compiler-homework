@@ -15,11 +15,12 @@ public class Bool {
     public static Boolean Statements(String str){
         if (Number.isNumber(str)){
             return true;
+        }
         else if (str.equals("return")){
             return true;
         }
         // 分号结尾
         return false;
-
+    }
 }
 
