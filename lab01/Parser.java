@@ -86,8 +86,9 @@ public class Parser {
 
 
         for(String str : output){
-            System.out.println(str);
+            System.out.print(str+" ");
         }
+        
 
 //        while(lexicalIterator.hasNext()) {
 //            System.out.print(lexicalIterator.next());
