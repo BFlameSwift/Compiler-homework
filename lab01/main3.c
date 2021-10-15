@@ -1,3 +1,4 @@
 int main() {
-    return 0x123;
+    return 123;
+
 }

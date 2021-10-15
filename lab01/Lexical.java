@@ -103,7 +103,7 @@ public class Lexical {
         }return false;
     }
 
-    public static String typeRecognition(String str, ArrayList<Integer> lexicalList,Boolean isAdd) {
+    public static String typeRecognition(String str, ArrayList<Integer> lexicalList,Boolean isAdd) throws CompileException{
         String token;
         int index = SYMBOL_LIST.indexOf(str);
         if( SYMBOL_LIST.contains(str) &&  index<= RETURN_DEC && index >= CONST_DEC) {
@@ -120,7 +120,7 @@ public class Lexical {
             lexicalList.add(Integer.valueOf(DECIMAL_CONST));
 //            tokenList.add(String.valueOf(MyNumber.toInteger(str)));
 //            tokens.put(DECIMAL_CONST,String.valueOf(MyNumber.toInteger(str)));
-            token = "Number("+ String.valueOf(MyNumber.toInteger(str)) +")";
+            token =  String.valueOf(MyNumber.toInteger(str)) ;
 
         }
         else if (isIdentifier(str)){
@@ -129,14 +129,18 @@ public class Lexical {
         }
         else {
             lexicalList.add(Integer.valueOf(-1));
+
             token = "Err";
+
+            throw new CompileException("Lexical Error The String is "+str);
+
         }
         if(isAdd == false) {
             lexicalList.remove(lexicalList.size()-1);
         }
         return token;
     }
-    public static ArrayList<Integer> getLexicalList(String filePath,ArrayList<String> words)  throws FileNotFoundException{
+    public static ArrayList<Integer> getLexicalList(String filePath,ArrayList<String> words)  throws FileNotFoundException ,CompileException{
 //        String filePath = "./pre/main3.c";
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         Scanner scanner = null;
@@ -152,17 +156,25 @@ public class Lexical {
         }
         return lexicalList;
     }
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException ,CompileException{
         ArrayList<String> words = new ArrayList<String>();
-        ArrayList<Integer> lexicalList = getLexicalList("./lab01/main3.c",words);
+        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
+        try {
+            lexicalList = getLexicalList("./lab01/main3.c",words);
+        }catch (CompileException e){
+            System.out.println(e);
+            System.exit(-1);
+        }
+
         ArrayList<String> tokenList = new ArrayList<String>();
+
         for (String word : words) {
             tokenList.add(typeRecognition(word,lexicalList,false));
         }
         for(int i=0;i<lexicalList.size();i++) {
             System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
         }
-
+        System.exit(0);
     }
 }
 
