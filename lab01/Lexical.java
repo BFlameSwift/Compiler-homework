@@ -157,7 +157,7 @@ public class Lexical {
         return token;
     }
     public static ArrayList<Integer> getLexicalList(String filePath,ArrayList<String> words)  throws FileNotFoundException ,CompileException{
-//        String filePath = "./pre/main3.c";
+//        String filePath = "./pre/main.c";
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         Scanner scanner = null;
         scanner = new Scanner(new File(filePath));
@@ -176,7 +176,7 @@ public class Lexical {
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         try {
-            lexicalList = getLexicalList("./lab01/main3.c",words);
+            lexicalList = getLexicalList("lab01/main.c",words);
         }catch (CompileException e){
             System.out.println(e);
             System.exit(-1);

@@ -104,12 +104,9 @@ public class Parser {
             System.out.println(e);
             System.exit(-1);
         }
-
-
         for(String str : output){
             System.out.println(str);
         }
-
         System.exit(0);
     }
 }

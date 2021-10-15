@@ -1,4 +1,4 @@
-FROM openjdk:16-alpine
+FROM openjdk:16-
 # 向容器内复制文件
 
 # 编译程序
