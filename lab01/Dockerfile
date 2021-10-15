@@ -3,6 +3,6 @@ FROM openjdk:16-alpine
 COPY ./lab01/* ./
 # 编译程序
 WORKDIR /app/
-RUN javac  -encoding UTF-8 -d ./output ./*.java
+RUN javac  -encoding UTF-8 -d  ./output ./*.java
 # 将当前目录设为 /app/output
 WORKDIR /app/output
