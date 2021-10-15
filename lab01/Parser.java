@@ -69,7 +69,7 @@ public class Parser {
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         ArrayList<String> tokenList = new ArrayList<String>();
         try {
-            lexicalList = Lexical.getLexicalList("./lab01/main3.c",words);
+            lexicalList = Lexical.getLexicalList(args[0],words);
         }catch (CompileException e){
             System.exit(-1);
         }for (String word : words) {
