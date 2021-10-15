@@ -104,7 +104,11 @@ public class Lexical {
                     if( (line.charAt(j) >= 48 && line.charAt(j) <= 57)) {
                         continue;
                     } else if( (j==i+1)&&line.charAt(i)=='0'&&(line.charAt(j)=='x'||line.charAt(j)== 'X')) {
-                        continue;
+                        for (k=j+2;k<lineLen;k++){
+                            if(!((line.charAt(k)>='0'&&line.charAt(k)<='9') ||(line.charAt(k)>='a'&&line.charAt(k)<='f') ||(line.charAt(k)>='A'&&line.charAt(k)<='F')))
+                                break;
+                        }
+                        j=k-1;
                     } else {
                         break;
                     }

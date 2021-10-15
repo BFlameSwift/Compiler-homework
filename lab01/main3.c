@@ -1,3 +1,1 @@
-int main() {
-    return 00;
-}
+int main(){return 0xFF;}
