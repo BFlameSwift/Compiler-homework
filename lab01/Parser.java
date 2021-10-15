@@ -88,8 +88,10 @@ public class Parser {
         try {
             lexicalList = Lexical.getLexicalList(args[0],words);
         }catch (CompileException e){
+            System.out.println(e);
             System.exit(-1);
         }for (String word : words) {
+
             tokenList.add(Lexical.typeRecognition(word,lexicalList,false));
 //            System.out.println(word);
         }
@@ -108,15 +110,6 @@ public class Parser {
             System.out.println(str);
         }
 
-
-//        while(lexicalIterator.hasNext()) {
-//            System.out.print(lexicalIterator.next());
-//            System.out.println(tokenIterator.next());
-//        }
-
-//        for(int i=0;i<lexicalList.size();i++) {
-//            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
-//        }
         System.exit(0);
     }
 }

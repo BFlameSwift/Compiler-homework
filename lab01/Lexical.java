@@ -145,9 +145,7 @@ public class Lexical {
             lexicalList.add(Integer.valueOf(-1));
 
             token = "Err";
-
             throw new CompileException("Lexical Error The String is "+str);
-
         }
         if(isAdd == false) {
             lexicalList.remove(lexicalList.size()-1);
