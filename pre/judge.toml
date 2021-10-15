@@ -10,4 +10,5 @@ image = { source = "dockerfile", path = "." }
 run = [
   # 运行程序
   "java Main $input",
+  "lli $ir"
 ]
