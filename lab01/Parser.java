@@ -64,7 +64,7 @@ public class Parser {
         output.add("}");
     }
 
-    public static void deleteComment(ArrayList<Integer> lexicalList, ArrayList<String> tokenList ){
+    public static void deleteComment(ArrayList<Integer> lexicalList, ArrayList<String> tokenList )throws CompileException{
         int listSize = lexicalList.size();
         int[] mark = new int[listSize];
         int i,j;
@@ -78,6 +78,10 @@ public class Parser {
                 tokenList.remove(i);
                 i=i-1;
             }
+        }
+        for (i=0; i<lexicalList.size(); i++) {
+            if (lexicalList.get(i)<0)
+                throw new CompileException("Lexical Error The String is "+tokenList.get(i));
         }
 
     }

@@ -67,9 +67,9 @@ public class Lexical {
                     continue;
                 }// 跳过空白
                 //TODO System.out.println(thisStr);
-                System.out.println("无效word："+thisStr);
-                words.add("100"); // 错误非法欧五
-                return true;
+//                System.out.println("无效word："+thisStr);
+                words.add("0x"); //  必定非法的字符
+                return false;
             }
             if(isIdentifier(thisStr)){
                 for(j = i+1;j<lineLen;j++){
@@ -149,7 +149,8 @@ public class Lexical {
             lexicalList.add(Integer.valueOf(-1));
 
             token = "Err";
-            throw new CompileException("Lexical Error The String is "+str);
+
+//            throw new CompileException("Lexical Error The String is "+str);
         }
         if(isAdd == false) {
             lexicalList.remove(lexicalList.size()-1);
@@ -187,7 +188,8 @@ public class Lexical {
         for (String word : words) {
             tokenList.add(typeRecognition(word,lexicalList,false));
         }
-        Parser.deleteComment(lexicalList,tokenList);
+//        Parser.deleteComment(lexicalList,tokenList);
+        System.out.println(tokenList.size()+""+lexicalList.size());
         for(int i=0;i<lexicalList.size();i++) {
             System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
         }
