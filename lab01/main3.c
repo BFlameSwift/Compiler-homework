@@ -1,9 +1,3 @@
-int
-main
-(
-)
-{
-return 000
-;
-
-}+inlegal+word
+int main() {
+    return 00;
+}

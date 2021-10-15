@@ -45,7 +45,7 @@ public class Parser {
 
         if(!MyBool.isRBrace(lexicalIterator.next())){
             throw new CompileException("Parser Error is not a } ");
-        }tokenIterator.next();output.add("}");
+        }tokenIterator.next();
     }
     public static void parseStmt(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException{
         if (!MyBool.isReturn(lexicalIterator.next())){
