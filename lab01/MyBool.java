@@ -19,6 +19,9 @@ public class MyBool {
     public static Boolean isReturn(int type){return type == Lexical.RETURN_DEC;}
     public static Boolean isNumber(int type){return type == Lexical.DECIMAL_CONST;}
     public static Boolean isSemicolon(int type){return type == Lexical.SEMICOLON;}
+    public static Boolean isLBlockComment(int type){return type == Lexical.LBLOCK_COMMENT;}
+    public static Boolean isRBlockComment(int type){return type == Lexical.RBLOCK_COMMENT;}
+
 
 //    public static Boolean Statements(String str){
 //        if (MyNumber.isNumber(str)){

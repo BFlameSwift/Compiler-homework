@@ -21,20 +21,20 @@ public class Lexical {
         IDENT = 22,DECIMAL_CONST = 23,
         OCTAL_CONST = 24,HEXADECIMAL_CONST = 25,
         PLUS = 26,MINUS = 27,MUL = 28,DIV = 29,MOD = 30, NOT = 31,EQUALS = 32,NEQUALS = 33,COMMA = 34,
-        SINGLE_QUOTE = 35,DOUBLE_QUOTE = 36,SINGLE_COMMENT = 37,BLOCK_COMMENT = 38,AND = 39,OR = 40;
+        SINGLE_QUOTE = 35,DOUBLE_QUOTE = 36,SINGLE_COMMENT = 37,LBLOCK_COMMENT = 38,RBLOCK_COMMENT = 39,AND = 40,OR = 41;
     public static final String[] SYMBOL_NAMES = {
             null,"const","int","void","if","else","while","continue","break","return",
             "=",";","(",")","[","]","{","}","<",">","<=",">=",
             null,null,null,null,
             "+","-","*","/","%","!","==","!=", "," ,
-            "'","\"","\\\\",null,"&&","||"
+            "'","\"","\\\\","/*","*/","&&","||"
     };
     public static final String[] TOKEN_NAMES = {
             null,"Const","Int","Void" ,"If" ,"Else" ,"While" ,"Continue" ,"Break", "Return",
             "Assign","Semicolon","LParen","RParen","LBracket","RBracket","LBrace","RBrace","Lt","Gt","Le","Ge",
             "Ident","Decimal","Octal","Hexadecimal",
             "Plus" ,"Minus" ,"Mul","Div","Mod", "Not","Equals","NEquals","Comma",
-            "SingleQuote" ,"DoubleQuote" ,"SingleComment" ,"BlockComment","And","Or"
+            "SingleQuote" ,"DoubleQuote" ,"SingleComment" ,"LBlockComment","RBlockComment","And","Or"
     };
     public static List<String> TOKEN_LIST = Arrays.asList(TOKEN_NAMES);
     public static List<String> SYMBOL_LIST = Arrays.asList(SYMBOL_NAMES);
@@ -83,7 +83,21 @@ public class Lexical {
                     if (j < lineLen-1 && line.charAt(j+1) == '='){
                         j++;
                     }
-                }j++;
+                }else if(line.charAt(j) == '/'){
+                    if (j < lineLen-1 && line.charAt(j+1) == '/'){
+                        // 关于单行注释
+                        return false;
+                    }
+                    else if (j < lineLen-1 && line.charAt(j+1) == '*'){
+                        j++;
+                    }
+                }else if(line.charAt(j) == '*'){
+                    if (j < lineLen-1 && line.charAt(j+1) == '/'){
+                        j++; // 多行注释
+                    }
+                }
+
+                j++;
             }
             else if(MyNumber.isNumber(thisStr)){
                 for(j = i+1;j<lineLen;j++){
@@ -156,26 +170,27 @@ public class Lexical {
         }
         return lexicalList;
     }
-//    public static void main(String[] args) throws FileNotFoundException ,CompileException{
-//        ArrayList<String> words = new ArrayList<String>();
-//        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
-//        try {
-//            lexicalList = getLexicalList("./lab01/main3.c",words);
-//        }catch (CompileException e){
-//            System.out.println(e);
-//            System.exit(-1);
-//        }
-//
-//        ArrayList<String> tokenList = new ArrayList<String>();
-//
-//        for (String word : words) {
-//            tokenList.add(typeRecognition(word,lexicalList,false));
-//        }
-//        for(int i=0;i<lexicalList.size();i++) {
-//            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
-//        }
-//        System.exit(0);
-//    }
+    public static void main(String[] args) throws FileNotFoundException ,CompileException{
+        ArrayList<String> words = new ArrayList<String>();
+        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
+        try {
+            lexicalList = getLexicalList("./lab01/main3.c",words);
+        }catch (CompileException e){
+            System.out.println(e);
+            System.exit(-1);
+        }
+
+        ArrayList<String> tokenList = new ArrayList<String>();
+
+        for (String word : words) {
+            tokenList.add(typeRecognition(word,lexicalList,false));
+        }
+        Parser.deleteComment(lexicalList,tokenList);
+        for(int i=0;i<lexicalList.size();i++) {
+            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
+        }
+        System.exit(0);
+    }
 }
 
 

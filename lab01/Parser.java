@@ -64,6 +64,23 @@ public class Parser {
         output.add("}");
     }
 
+    public static void deleteComment(ArrayList<Integer> lexicalList, ArrayList<String> tokenList ){
+        int listSize = lexicalList.size();
+        int[] mark = new int[listSize];
+        int i,j;
+        for (i=0;i<lexicalList.size();i++){
+            if(MyBool.isLBlockComment(lexicalList.get(i))){
+                while(! MyBool.isRBlockComment(lexicalList.get(i))){
+                    lexicalList.remove(i);
+                    tokenList.remove(i);
+                }
+                lexicalList.remove(i);
+                tokenList.remove(i);
+                i=i-1;
+            }
+        }
+
+    }
     public static void main(String[] args) throws FileNotFoundException,CompileException{
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
@@ -74,7 +91,9 @@ public class Parser {
             System.exit(-1);
         }for (String word : words) {
             tokenList.add(Lexical.typeRecognition(word,lexicalList,false));
+            System.out.println(word);
         }
+        deleteComment(lexicalList,tokenList);
         ListIterator<Integer> lexicalIterator = lexicalList.listIterator();
         ListIterator<String> tokenIterator = tokenList.listIterator();
         try {
@@ -86,9 +105,9 @@ public class Parser {
 
 
         for(String str : output){
-            System.out.print(str+" ");
+            System.out.println(str);
         }
-        
+
 
 //        while(lexicalIterator.hasNext()) {
 //            System.out.print(lexicalIterator.next());
