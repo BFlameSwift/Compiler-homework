@@ -91,7 +91,7 @@ public class Parser {
             System.exit(-1);
         }for (String word : words) {
             tokenList.add(Lexical.typeRecognition(word,lexicalList,false));
-            System.out.println(word);
+//            System.out.println(word);
         }
         deleteComment(lexicalList,tokenList);
         ListIterator<Integer> lexicalIterator = lexicalList.listIterator();
