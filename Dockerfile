@@ -6,4 +6,4 @@ WORKDIR /app/
 RUN javac -encoding UTF-8 -d ./output ./lab01/*.java
 
 # 将当前目录设为 /app/output
-WORKDIR /app/output
+#WORKDIR /app/output
