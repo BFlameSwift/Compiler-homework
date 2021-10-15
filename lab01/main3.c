@@ -3,6 +3,7 @@ main
 (
 )
 {
-return 100
+return 000
 ;
-}
+
+}+inlegal+word

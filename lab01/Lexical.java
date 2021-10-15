@@ -68,7 +68,7 @@ public class Lexical {
                 }// 跳过空白
                 //TODO System.out.println(thisStr);
                 System.out.println("无效word："+thisStr);
-                words.add("+inlegal+word"); // 错误
+                words.add("100"); // 错误非法欧五
                 return true;
             }
             if(isIdentifier(thisStr)){
