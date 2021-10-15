@@ -1,6 +1,6 @@
 package lab01;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.ListIterator;
 import lab01.CompileException;
@@ -85,6 +85,28 @@ public class Parser {
         }
 
     }
+    public static void outputFile(String file,ArrayList<String> array)  {
+
+        BufferedWriter out = null;
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(file, true)));
+//            out.write(conent+"\r\n");
+            for(int i=0;i<output.size();i++){
+                out.write(output.get(i));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
     public static void main(String[] args) throws FileNotFoundException,CompileException{
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
@@ -111,6 +133,7 @@ public class Parser {
         for(String str : output){
             System.out.println(str);
         }
+        outputFile(args[1],output );
         System.exit(0);
     }
 }
