@@ -8,5 +8,5 @@ image = { source = "dockerfile", path = "." }
 
 # 假如你用的是 Java
 run = [
-  "java lab01.Parser $input $ir",
+  "java lab01.Data $input $ir",
 ]
