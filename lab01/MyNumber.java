@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
  * @author BFlame
  */
 public class MyNumber {
-    public static final  String NONZERO_DIGIT = "[1-9]+";
+    public static final  String NONZERO_DIGIT = "[1-9]\\d*";
     public static final String OCTAL_DIGIT = "0[0-7]*";
     public static final String HEXADECIMAL = "\\b0[xX][0-9a-fA-F]+\\b";
     public static Boolean isNonZeroDigit(String str){
