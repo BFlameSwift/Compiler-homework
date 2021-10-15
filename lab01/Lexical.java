@@ -156,26 +156,26 @@ public class Lexical {
         }
         return lexicalList;
     }
-    public static void main(String[] args) throws FileNotFoundException ,CompileException{
-        ArrayList<String> words = new ArrayList<String>();
-        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
-        try {
-            lexicalList = getLexicalList("./lab01/main3.c",words);
-        }catch (CompileException e){
-            System.out.println(e);
-            System.exit(-1);
-        }
-
-        ArrayList<String> tokenList = new ArrayList<String>();
-
-        for (String word : words) {
-            tokenList.add(typeRecognition(word,lexicalList,false));
-        }
-        for(int i=0;i<lexicalList.size();i++) {
-            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
-        }
-        System.exit(0);
-    }
+//    public static void main(String[] args) throws FileNotFoundException ,CompileException{
+//        ArrayList<String> words = new ArrayList<String>();
+//        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
+//        try {
+//            lexicalList = getLexicalList("./lab01/main3.c",words);
+//        }catch (CompileException e){
+//            System.out.println(e);
+//            System.exit(-1);
+//        }
+//
+//        ArrayList<String> tokenList = new ArrayList<String>();
+//
+//        for (String word : words) {
+//            tokenList.add(typeRecognition(word,lexicalList,false));
+//        }
+//        for(int i=0;i<lexicalList.size();i++) {
+//            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
+//        }
+//        System.exit(0);
+//    }
 }
 
 
