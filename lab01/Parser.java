@@ -93,7 +93,7 @@ public class Parser {
                     new FileOutputStream(file, true)));
 //            out.write(conent+"\r\n");
             for(int i=0;i<output.size();i++){
-                out.write(output.get(i));
+                out.write(output.get(i)+"\r\n");
             }
         } catch (Exception e) {
             e.printStackTrace();
