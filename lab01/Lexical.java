@@ -13,8 +13,6 @@ public class Lexical {
     public static final String BLANK = "\\s+";
     public static final String IDENTIFIER = "[a-zA-Z_$][a-zA-Z_0-9$]*";
 
-
-
     public static final int
         CONST_DEC = 1,INT_DEC = 2,VOID_DEC = 3,IF_DEC = 4,ELSE_DEC = 5,WHILE_DEC = 6,CONTINUE_DEC = 7,BREAK_DEC =8, RETURN_DEC = 9,
         ASSIGN = 10,SEMICOLON = 11,LPAREN = 12,RPAREN = 13,LBRACKET = 14,RBRACKET = 15,LBRACE = 16,RBRACE = 17,LT = 18,GT = 19,LE = 20,GE = 21,
@@ -81,7 +79,7 @@ public class Lexical {
             else if (SYMBOL_LIST.contains(thisStr) && SYMBOL_LIST.indexOf(thisStr) >= ASSIGN ){
                 if(line.charAt(j) == '='){
                     if (j < lineLen-1 && line.charAt(j+1) == '='){
-                        j++;
+                        j++;// ==
                     }
                 }else if(line.charAt(j) == '/'){
                     if (j < lineLen-1 && line.charAt(j+1) == '/'){
@@ -95,7 +93,15 @@ public class Lexical {
                     if (j < lineLen-1 && line.charAt(j+1) == '/'){
                         j++; // 多行注释
                     }
+                }else if(line.charAt(j) == '<' &&j < lineLen-1 && line.charAt(j+1) == '='){
+                    j++;//<=
+                }else if(line.charAt(j) == '>' &&j < lineLen-1 && line.charAt(j+1) == '='){
+                    j++;//>=
+                }else if(line.charAt(j) == '!' &&j < lineLen-1 && line.charAt(j+1) == '='){
+                    j++; // !=
                 }
+
+
 
                 j++;
             }
@@ -177,7 +183,7 @@ public class Lexical {
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         try {
-            lexicalList = getLexicalList("lab01/main.c",words);
+            lexicalList = getLexicalList("./lab01/main.c",words);
         }catch (CompileException e){
             System.out.println(e);
             System.exit(-1);
