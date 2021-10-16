@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.regex.Pattern;
+import lab01.CompileException;
 
 /**
  * @author BFlame
@@ -47,6 +48,9 @@ public class Lexical {
         else if (MyNumber.isNumber(str)){
             return true;
         }
+        else if (str.startsWith("&") || str.startsWith("|")){
+            return true;
+        }// 设计不佳。。导致这两个特殊字符要单独处理。。
         return false;
     }
     public static boolean isIdentifier(String str){
@@ -68,7 +72,7 @@ public class Lexical {
                 }// 跳过空白
                 //TODO System.out.println(thisStr);
 //                System.out.println("无效word："+thisStr);
-                words.add("0x"); //  必定非法的字符
+                words.add("非法字符"); //  必定非法的字符
                 return false;
             }
             if(isIdentifier(thisStr)){
@@ -79,9 +83,9 @@ public class Lexical {
                 }
             }
             else if (SYMBOL_LIST.contains(thisStr) && SYMBOL_LIST.indexOf(thisStr) >= ASSIGN ){
-                if(line.charAt(j) == '='){
+                if(line.charAt(j) == '=' || line.charAt(j) == '!'|| line.charAt(j) == '<'|| line.charAt(j) == '>'){
                     if (j < lineLen-1 && line.charAt(j+1) == '='){
-                        j++;
+                        j++; // == != <= >=
                     }
                 }else if(line.charAt(j) == '/'){
                     if (j < lineLen-1 && line.charAt(j+1) == '/'){
@@ -113,6 +117,10 @@ public class Lexical {
                         break;
                     }
                 }
+            }else if(line.charAt(j) == '&' || line.charAt(j)=='|'){
+                if (j < lineLen-1 && line.charAt(j+1) == line.charAt(j)){
+                    j++; // && || 的录入
+                }j++;
             }
             if (j>i)  {
                 words.add(line.substring(i,j));
@@ -148,7 +156,7 @@ public class Lexical {
         else {
             lexicalList.add(Integer.valueOf(-1));
 
-            token = "Err";
+            token = str;
 
 //            throw new CompileException("Lexical Error The String is "+str);
         }
@@ -182,15 +190,14 @@ public class Lexical {
             System.out.println(e);
             System.exit(-1);
         }
-
         ArrayList<String> tokenList = new ArrayList<String>();
 
         for (String word : words) {
             tokenList.add(typeRecognition(word,lexicalList,false));
         }
-//        Parser.deleteComment(lexicalList,tokenList);
-        System.out.println(tokenList.size()+""+lexicalList.size());
-        for(int i=0;i<lexicalList.size();i++) {
+        Parser.deleteComment(lexicalList,tokenList);
+//        System.out.println(tokenList.size()+""+lexicalList.size());
+        for(int i=0;i<lexicalList.size();i++){
             System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
         }
         System.exit(0);

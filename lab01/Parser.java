@@ -133,7 +133,7 @@ public class Parser {
         for(String str : output){
             System.out.println(str);
         }
-        outputFile(args[1],output );
+//        outputFile(args[1],output );
         System.exit(0);
     }
 }
