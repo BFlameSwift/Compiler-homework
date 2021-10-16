@@ -69,8 +69,8 @@ public class Parser {
         int[] mark = new int[listSize];
         int i,j;
         for (i=0;i<lexicalList.size();i++){
-            if(MyBool.isLBlockComment(lexicalList.get(i))){
-                while(! MyBool.isRBlockComment(lexicalList.get(i))){
+            if(i<lexicalList.size() && MyBool.isLBlockComment(lexicalList.get(i))){
+                while(i<lexicalList.size()-1 && ! MyBool.isRBlockComment(lexicalList.get(i))){
                     lexicalList.remove(i);
                     tokenList.remove(i);
                 }
@@ -83,7 +83,6 @@ public class Parser {
             if (lexicalList.get(i)<0)
                 throw new CompileException("Lexical Error The String is "+tokenList.get(i));
         }
-
     }
     public static void outputFile(String file,ArrayList<String> array)  {
 
