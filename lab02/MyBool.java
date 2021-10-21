@@ -23,6 +23,7 @@ public class MyBool {
     public static Boolean isRBlockComment(int type){return type == Lexical.RBLOCK_COMMENT;}
     public static Boolean isPlus(int type){return type == Lexical.PLUS;}
     public static Boolean isMinus(int type){return type == Lexical.MINUS;}
+    public static Boolean isUnaryOp(int type){return isPlus(type) || isMinus(type);}
 
 
 

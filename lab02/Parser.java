@@ -3,7 +3,7 @@ package lab02;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.ListIterator;
-
+//TODO 修改架构： gettoken get lexcial 中间内置抛出异常
 public class Parser {
     public static ArrayList<String> output = new ArrayList<String>();
     public static void parseCompUnit(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
@@ -75,7 +75,12 @@ public class Parser {
 //    TODO
     }
     public static void parsePrimaryExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-//    TODO
+        if(lexicalIterator.hasNext()){
+
+        }else{
+            throw new CompileException("dont has next Primary");
+        }
+
     }
     // Plus return + Minux return false
     public static Boolean parseUnaryOp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
