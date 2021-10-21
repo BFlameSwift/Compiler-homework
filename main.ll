@@ -1,1 +1,0 @@
-define dso_local i32@main(){reti32 100}define dso_local i32@main(){reti32 100}
