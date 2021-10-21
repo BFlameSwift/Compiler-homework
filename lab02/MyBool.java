@@ -1,5 +1,5 @@
-package lab01;
-;
+package lab02;
+
 /**
  * @author Bflame
  */

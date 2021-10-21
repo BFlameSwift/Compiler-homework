@@ -1,8 +1,11 @@
-package lab01;
+package lab02;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 /**
@@ -134,7 +137,7 @@ public class Lexical {
         }return false;
     }
 
-    public static String typeRecognition(String str, ArrayList<Integer> lexicalList,Boolean isAdd) throws CompileException{
+    public static String typeRecognition(String str, ArrayList<Integer> lexicalList,Boolean isAdd) throws CompileException {
         String token;
         int index = SYMBOL_LIST.indexOf(str);
         if( SYMBOL_LIST.contains(str) &&  index<= RETURN_DEC && index >= CONST_DEC) {
@@ -170,7 +173,7 @@ public class Lexical {
         }
         return token;
     }
-    public static ArrayList<Integer> getLexicalList(String filePath,ArrayList<String> words)  throws FileNotFoundException ,CompileException{
+    public static ArrayList<Integer> getLexicalList(String filePath,ArrayList<String> words)  throws FileNotFoundException , CompileException {
 //        String filePath = "./pre/main.c";
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         Scanner scanner = null;
@@ -186,7 +189,7 @@ public class Lexical {
         }
         return lexicalList;
     }
-    public static void main(String[] args) throws FileNotFoundException ,CompileException{
+    public static void main(String[] args) throws FileNotFoundException , CompileException {
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         try {
