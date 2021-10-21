@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-
+import lab02.Utils.*;
 /**
  * @author BFlame
  */
@@ -191,19 +191,19 @@ public class Lexical {
     }
     public static void main(String[] args) throws FileNotFoundException , CompileException {
         ArrayList<String> words = new ArrayList<String>();
-        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
+        ArrayList<Integer> lexicalList = Utils.getLexicalList();
         try {
             lexicalList = getLexicalList("./lab01/main.c",words);
         }catch (CompileException e){
             System.out.println(e);
             System.exit(-1);
         }
-        ArrayList<String> tokenList = new ArrayList<String>();
+        ArrayList<String> tokenList = Utils.getTokenList();
 
         for (String word : words) {
             tokenList.add(typeRecognition(word,lexicalList,false));
         }
-        Parser.deleteComment(lexicalList,tokenList);
+        Parser.deleteComment();
 //        System.out.println(tokenList.size()+""+lexicalList.size());
         for(int i=0;i<lexicalList.size();i++){
             System.out.println(tokenList.get(i)+" "+lexicalList.get(i));

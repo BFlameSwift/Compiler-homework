@@ -6,76 +6,76 @@ import java.util.ListIterator;
 //TODO 修改架构： gettoken get lexcial 中间内置抛出异常
 public class Parser {
     public static ArrayList<String> output = new ArrayList<String>();
-    public static void parseCompUnit(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        parseFuncDef(lexicalIterator,tokenIterator);
+    public static void parseCompUnit( )throws CompileException {
+        parseFuncDef();
     }
 
-    public static void parseFuncDef(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        if (! MyBool.isFuncType(lexicalIterator.next())){
-            throw new CompileException("Parser Error is not a FuncType");
-        }
-        String thisToken = tokenIterator.next();
+    public static void parseFuncDef()throws CompileException {
+//        if (! MyBool.isFuncType(lexicalIterator.next())){
+//            throw new CompileException("Parser Error is not a FuncType");
+//        }
+        Utils.getLexical("Func def int");
+        String thisToken = Utils.getToken("FuncDef");
         output.add("define dso_local i32");
-        parseIdent(lexicalIterator, tokenIterator);
-        if(!MyBool.isLParen(lexicalIterator.next()) || !MyBool.isRParen(lexicalIterator.next())){
+        parseIdent();
+        if(!MyBool.isLParen(Utils.getLexical("(")) || !MyBool.isRParen(Utils.getLexical(")"))){
             throw new CompileException("Parser Error is not ()");
-        }tokenIterator.next();tokenIterator.next(); //jump ()
+        }Utils.getToken("(");Utils.getToken(")"); //jump ()
 
         output.add("()");
 
-        parseBlock(lexicalIterator,tokenIterator);
+        parseBlock();
         //TOOD
     }
-    public static void parseIdent(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        if (lexicalIterator.hasNext()){
-            if (! MyBool.isIdent(lexicalIterator.next())){
-                throw new CompileException("Parser Error is not a Ident");
-            }
-            String thisToken = tokenIterator.next();
-            output.add(thisToken);
+    public static void parseIdent()throws CompileException {
+        if (! MyBool.isIdent(Utils.getLexical("Ident"))){
+            throw new CompileException("Parser Error is not a Ident");
         }
+        output.add(Utils.getToken("Ident"));
+
     }
-    public static void parseBlock(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        if(!MyBool.isLBrace(lexicalIterator.next())){
+    public static void parseBlock()throws CompileException {
+        if(!MyBool.isLBrace(Utils.getLexical("{"))){
             throw new CompileException("Parser Error is not a { ");
-        }tokenIterator.next(); output.add("{");
+        }Utils.getToken("{"); output.add("{");
 
-        parseStmt(lexicalIterator,tokenIterator);
+        parseStmt();
 
-        if(!MyBool.isRBrace(lexicalIterator.next())){
+        if(!MyBool.isLBrace(Utils.getLexical("}"))){
             throw new CompileException("Parser Error is not a } ");
-        }tokenIterator.next();
+        }Utils.getToken("}"); output.add("}");
+  ;
     }
-    public static void parseStmt(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        if (!MyBool.isReturn(lexicalIterator.next())){
+    public static void parseStmt()throws CompileException {
+        if (!MyBool.isReturn(Utils.getLexical("return"))){
             throw new CompileException("Parser Error is not a Return ");
-        }tokenIterator.next();
+        }Utils.getToken("return");
         output.add("ret");
 
-        if(!MyBool.isNumber(lexicalIterator.next())){
+        if(!MyBool.isNumber(Utils.getLexical("number"))){
             throw new CompileException("Parser Error is not a Number ");
         };
-        output.add("i32 "+tokenIterator.next());
-
-        if(lexicalIterator.hasNext() && !MyBool.isSemicolon(lexicalIterator.next())){
+        output.add("i32 "+Utils.getToken("number"));
+        if(!MyBool.isSemicolon(Utils.getLexical(";"))){
             throw new CompileException("Parser Error is not a ; ");
-        }tokenIterator.next();
+        }Utils.getToken(";");
+
         output.add("}");
     }
-    public static void parseExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        parseAddExp(lexicalIterator,tokenIterator);
+    public static void parseExp()throws CompileException {
+        parseAddExp();
     }
-    public static void parseAddExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        parseMulExp(lexicalIterator,tokenIterator);
+    public static void parseAddExp()throws CompileException {
+        parseMulExp();
     }
-    public static void parseMulExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        parseUnaryExp(lexicalIterator,tokenIterator);
+    public static void parseMulExp()throws CompileException {
+        parseUnaryExp();
     }
-    public static void parseUnaryExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+    public static void parseUnaryExp()throws CompileException {
 //    TODO
     }
-    public static void parsePrimaryExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-        if(lexicalIterator.hasNext()){
+    public static void parsePrimaryExp() throws CompileException {
+        if(true){
 
         }else{
             throw new CompileException("dont has next Primary");
@@ -96,7 +96,9 @@ public class Parser {
         throw new CompileException("dont has next Option");
     }
 
-        public static void deleteComment(ArrayList<Integer> lexicalList, ArrayList<String> tokenList )throws CompileException {
+    public static void deleteComment()throws CompileException {
+        ArrayList<Integer> lexicalList = Utils.getLexicalList();
+        ArrayList<String> tokenList = Utils.getTokenList();
         int listSize = lexicalList.size();
         int[] mark = new int[listSize];
         int i,j;
@@ -104,7 +106,7 @@ public class Parser {
             if(i<lexicalList.size() && MyBool.isLBlockComment(lexicalList.get(i))){
                 while(i<lexicalList.size()-1 && ! MyBool.isRBlockComment(lexicalList.get(i))){
                     lexicalList.remove(i);
-                    tokenList.remove(i);
+                    lexicalList.remove(i);
                 }
                 lexicalList.remove(i);
                 tokenList.remove(i);
@@ -140,23 +142,22 @@ public class Parser {
     }
     public static void main(String[] args) throws FileNotFoundException, CompileException {
         ArrayList<String> words = new ArrayList<String>();
-        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
-        ArrayList<String> tokenList = new ArrayList<String>();
+        ArrayList<Integer> lexicalList = Utils.getLexicalList();
+        ArrayList<String> tokenList = Utils.getTokenList();
         try {
             lexicalList = Lexical.getLexicalList(args[0],words);
+            Utils.setLexicalList(lexicalList);
         }catch (CompileException e){
             System.out.println(e);
             System.exit(-1);
         }for (String word : words) {
-
             tokenList.add(Lexical.typeRecognition(word,lexicalList,false));
 //            System.out.println(word);
-        }
-        deleteComment(lexicalList,tokenList);
-        ListIterator<Integer> lexicalIterator = lexicalList.listIterator();
-        ListIterator<String> tokenIterator = tokenList.listIterator();
+        }Utils.setTokenList(tokenList);
+        System.out.println(Utils.getLexicalList().size());
+        deleteComment();
         try {
-            parseCompUnit(lexicalIterator,tokenIterator);
+            parseCompUnit();
         }catch (CompileException e){
             System.out.println(e);
             System.exit(-1);
