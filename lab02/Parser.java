@@ -62,8 +62,36 @@ public class Parser {
         }tokenIterator.next();
         output.add("}");
     }
+    public static void parseExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+        parseAddExp(lexicalIterator,tokenIterator);
+    }
+    public static void parseAddExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+        parseMulExp(lexicalIterator,tokenIterator);
+    }
+    public static void parseMulExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+        parseUnaryExp(lexicalIterator,tokenIterator);
+    }
+    public static void parseUnaryExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+//    TODO
+    }
+    public static void parsePrimaryExp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+//    TODO
+    }
+    // Plus return + Minux return false
+    public static Boolean parseUnaryOp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
+    //TODO
+        if(lexicalIterator.hasNext()){
+            int op = lexicalIterator.next();
+            tokenIterator.next();
+            if((MyBool.isPlus(op) || MyBool.isMinus(op))){
+                throw new CompileException("Unary op is not + or -");
+            }
+            return MyBool.isPlus(op);
+        }
+        throw new CompileException("dont has next Option");
+    }
 
-    public static void deleteComment(ArrayList<Integer> lexicalList, ArrayList<String> tokenList )throws CompileException {
+        public static void deleteComment(ArrayList<Integer> lexicalList, ArrayList<String> tokenList )throws CompileException {
         int listSize = lexicalList.size();
         int[] mark = new int[listSize];
         int i,j;

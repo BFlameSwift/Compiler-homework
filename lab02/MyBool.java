@@ -21,6 +21,9 @@ public class MyBool {
     public static Boolean isSemicolon(int type){return type == Lexical.SEMICOLON;}
     public static Boolean isLBlockComment(int type){return type == Lexical.LBLOCK_COMMENT;}
     public static Boolean isRBlockComment(int type){return type == Lexical.RBLOCK_COMMENT;}
+    public static Boolean isPlus(int type){return type == Lexical.PLUS;}
+    public static Boolean isMinus(int type){return type == Lexical.MINUS;}
+
 
 
 //    public static Boolean Statements(String str){
