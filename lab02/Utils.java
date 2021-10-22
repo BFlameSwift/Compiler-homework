@@ -38,8 +38,15 @@ public class Utils {
         }else{
             throw new CompileException("TokenList has not next element Expect"+ expect);
         }
-
     }
+    public static String getToken() throws CompileException{
+        if(tokenIterator.hasNext()){
+            return tokenIterator.next();
+        }else{
+            throw new CompileException("TokenList has not next element");
+        }
+    }
+
     public static void backLexcial() throws CompileException{
         if(lexicalIterator.hasPrevious()){
             lexicalIterator.previous();
@@ -54,6 +61,14 @@ public class Utils {
             throw new CompileException("Token no last element!");
         }
     }
-
+    public static int getTokenIndex(){
+        return tokenIterator.nextIndex();
+    }
+    public static int getLexicalIndex(){
+        return lexicalIterator.nextIndex();
+    }
+    public static String getTwoListIndex(){
+        return Utils.getLexicalIndex() + " "+Utils.getTokenIndex();
+    }
 
 }

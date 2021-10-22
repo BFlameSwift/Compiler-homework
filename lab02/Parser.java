@@ -46,56 +46,79 @@ public class Parser {
         if(!MyBool.isRBrace(Utils.getLexical("}"))){
             throw new CompileException("Parser Error is not a } ");
         }Utils.getToken("}"); output.add("}");
-  ;
     }
+
     public static void parseStmt()throws CompileException {
         if (!MyBool.isReturn(Utils.getLexical("return"))){
             throw new CompileException("Parser Error is not a Return ");
         }Utils.getToken("return");
         output.add("ret");
 
-        if(!MyBool.isNumber(Utils.getLexical("number"))){
-            throw new CompileException("Parser Error is not a Number ");
-        };
-        output.add("i32 "+Utils.getToken("number"));
+        int expNum = parseExp();
+//        if(!MyBool.isNumber(Utils.getLexical("number"))){
+//            throw new CompileException("Parser Error is not a Number ");
+//        };
+        output.add("i32 "+expNum);
         if(!MyBool.isSemicolon(Utils.getLexical(";"))){
             throw new CompileException("Parser Error is not a ; ");
         }Utils.getToken(";");
 
-        
-    }
-    public static void parseExp()throws CompileException {
-        parseAddExp();
-    }
-    public static void parseAddExp()throws CompileException {
-        parseMulExp();
-    }
-    public static void parseMulExp()throws CompileException {
-        parseUnaryExp();
-    }
-    public static void parseUnaryExp()throws CompileException {
-//    TODO
-    }
-    public static void parsePrimaryExp() throws CompileException {
-        if(true){
 
+    }
+    public static int parseExp()throws CompileException {
+        return parseAddExp();
+    }
+    public static int parseAddExp()throws CompileException {
+        return parseMulExp();
+    }
+    public static int parseMulExp()throws CompileException {
+        return parseUnaryExp();
+    }
+    public static int parseUnaryExp()throws CompileException {
+        int thisLexcial = Utils.getLexical("( or Op");
+        Utils.getToken();
+        if(MyBool.isUnaryOp(thisLexcial)){
+            int coefficient = 1;
+            while(MyBool.isUnaryOp(thisLexcial)){
+                coefficient *= parseUnaryOp(thisLexcial);
+                thisLexcial = Utils.getLexical("UnaryOp");
+                Utils.getToken();
+            }Utils.backLexcial(); Utils.backToken();
+            return coefficient * parsePrimaryExp();
         }else{
-            throw new CompileException("dont has next Primary");
+            return parsePrimaryExp();
+        }
+    }
+
+    public static int parsePrimaryExp() throws CompileException {
+        int morpheme = Utils.getLexical("( or Number in PrimaryExp");
+        String token = Utils.getToken();
+        if( MyBool.isLParen(morpheme)){
+
+            int num = parseExp();
+
+            if(!MyBool.isRParen(Utils.getLexical(")"))){
+                throw new CompileException("Parser Error is not )");
+            }Utils.getToken();
+            return num;
+
+        }else if(MyBool.isNumber(morpheme)){
+            return Integer.parseInt(token);
+        }
+        else{
+            throw new CompileException("Parser Error is not ( or Number in PrimaryExp");
         }
 
     }
     // Plus return + Minux return false
-    public static Boolean parseUnaryOp(ListIterator<Integer> lexicalIterator,ListIterator<String> tokenIterator )throws CompileException {
-    //TODO
-        if(lexicalIterator.hasNext()){
-            int op = lexicalIterator.next();
-            tokenIterator.next();
-            if((MyBool.isPlus(op) || MyBool.isMinus(op))){
-                throw new CompileException("Unary op is not + or -");
-            }
-            return MyBool.isPlus(op);
+    public static int parseUnaryOp(int morpheme)throws CompileException {
+        int op = morpheme;
+
+        if(!(MyBool.isPlus(op) || MyBool.isMinus(op))){
+            throw new CompileException("Unary op is not + or -");
         }
-        throw new CompileException("dont has next Option");
+        return MyBool.isPlus(op)?1:-1;
+
     }
 
     public static void deleteComment()throws CompileException {
@@ -168,8 +191,9 @@ public class Parser {
         try {
             parseCompUnit();
         }catch (CompileException e){
-            System.out.println(e);
-//            e.printStackTrace();
+//            System.out.println(e);
+            e.printStackTrace();
+            System.out.println(Utils.getLexicalList().size()+" "+Utils.getTokenList().size());
             System.exit(-1);
         }
         for(String str : output){
