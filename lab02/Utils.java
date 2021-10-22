@@ -12,12 +12,17 @@ public class Utils {
 
     public static void setLexicalList(ArrayList<Integer> lexicalList) {
         Utils.lexicalList = lexicalList;
+//        lexicalIterator = lexicalList.listIterator();
+    }
+    public static void initIterator(){
+        Utils.tokenIterator = Utils.tokenList.listIterator();
+        Utils.lexicalIterator = Utils.lexicalList.listIterator();
     }
 
     private static ArrayList<String> tokenList = new ArrayList<String>();
     private static ArrayList<Integer> lexicalList = new ArrayList<Integer>();
-    public static ListIterator<Integer> lexicalIterator = lexicalList.listIterator();
-    public static ListIterator<String> tokenIterator = tokenList.listIterator();
+    private static ListIterator<Integer> lexicalIterator ;
+    private static ListIterator<String> tokenIterator ;
 
 
     public static int getLexical(String expect) throws CompileException{
