@@ -62,7 +62,7 @@ public class Parser {
             throw new CompileException("Parser Error is not a ; ");
         }Utils.getToken(";");
 
-        output.add("}");
+        
     }
     public static void parseExp()throws CompileException {
         parseAddExp();
