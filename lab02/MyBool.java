@@ -24,6 +24,11 @@ public class MyBool {
     public static Boolean isPlus(int type){return type == Lexical.PLUS;}
     public static Boolean isMinus(int type){return type == Lexical.MINUS;}
     public static Boolean isUnaryOp(int type){return isPlus(type) || isMinus(type);}
+    public static Boolean isMultiply(int type){return type == Lexical.MUL;}
+    public static Boolean isDiv(int type){return type == Lexical.DIV;}
+    public static Boolean isMod(int type){return type == Lexical.MOD;}
+    public static Boolean isLevel3Operator(int type){return isMod(type)|| isMultiply(type) || isDiv(type);}
+
 
 
 

@@ -26,6 +26,7 @@ public class Utils {
 
 
     public static int getLexical(String expect) throws CompileException{
+//        System.out.println("lex next"+lexicalIterator.nextIndex()+"except"+expect);
         if(lexicalIterator.hasNext()){
             return lexicalIterator.next();
         }else{
@@ -33,6 +34,7 @@ public class Utils {
         }
     }
     public static String getToken(String expect) throws CompileException{
+//        System.out.println("token next"+tokenIterator.nextIndex()+"except"+expect);
         if(tokenIterator.hasNext()){
             return tokenIterator.next();
         }else{
@@ -40,6 +42,7 @@ public class Utils {
         }
     }
     public static String getToken() throws CompileException{
+//        System.out.println("token next"+tokenIterator.nextIndex()+"except"+"");
         if(tokenIterator.hasNext()){
             return tokenIterator.next();
         }else{

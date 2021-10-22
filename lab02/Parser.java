@@ -70,11 +70,38 @@ public class Parser {
         return parseAddExp();
     }
     public static int parseAddExp()throws CompileException {
-        return parseMulExp();
+        int mulExpNum = parseMulExp();
+
+        while(MyBool.isUnaryOp(Utils.getLexical("+ or -"))){
+            String op = Utils.getToken("+ or -");
+            System.out.println("this op:"+op);
+            if(op.equals("Plus")) {
+                mulExpNum += parseMulExp();
+            }else if (op.equals("Minus")) {
+                mulExpNum -= parseMulExp();
+            }else{
+                throw new IllegalArgumentException("not - +");
+            }
+        }Utils.backLexcial();
+        return mulExpNum;
     }
     public static int parseMulExp()throws CompileException {
 //        System.out.println("get UnaryExp");
-        return parseUnaryExp();
+        int unaryExpNum = parseUnaryExp();
+        while(MyBool.isLevel3Operator(Utils.getLexical("* / %"))){
+            String op = Utils.getToken("* / %");
+            if(op.equals("Mul")) {
+                unaryExpNum *= parseUnaryExp();
+            }else if(op.equals("Div")) {
+                unaryExpNum /= parseUnaryExp();
+            }else if(op.equals("Mod")){
+                unaryExpNum %= parseUnaryExp();
+            }else{
+                throw new IllegalArgumentException("not * / %");
+            }
+        }
+        Utils.backLexcial();
+        return unaryExpNum;
     }
     public static int parseUnaryExp()throws CompileException {
 
@@ -126,7 +153,6 @@ public class Parser {
             throw new CompileException("Unary op is not + or -");
         }
         return MyBool.isPlus(op)?1:-1;
-
     }
 
     public static void deleteComment()throws CompileException {
