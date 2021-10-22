@@ -66,15 +66,18 @@ public class Parser {
 
     }
     public static int parseExp()throws CompileException {
+//        System.out.println("get Exp");
         return parseAddExp();
     }
     public static int parseAddExp()throws CompileException {
         return parseMulExp();
     }
     public static int parseMulExp()throws CompileException {
+//        System.out.println("get UnaryExp");
         return parseUnaryExp();
     }
     public static int parseUnaryExp()throws CompileException {
+
         int thisLexcial = Utils.getLexical("( or Op");
         Utils.getToken();
         if(MyBool.isUnaryOp(thisLexcial)){
@@ -84,8 +87,10 @@ public class Parser {
                 thisLexcial = Utils.getLexical("UnaryOp");
                 Utils.getToken();
             }Utils.backLexcial(); Utils.backToken();
+
             return coefficient * parsePrimaryExp();
         }else{
+            Utils.backLexcial(); Utils.backToken();
             return parsePrimaryExp();
         }
     }
@@ -93,6 +98,8 @@ public class Parser {
     public static int parsePrimaryExp() throws CompileException {
         int morpheme = Utils.getLexical("( or Number in PrimaryExp");
         String token = Utils.getToken();
+        
+
         if( MyBool.isLParen(morpheme)){
 
             int num = parseExp();
@@ -106,6 +113,7 @@ public class Parser {
             return Integer.parseInt(token);
         }
         else{
+//            System.out.println(morpheme+token);
             throw new CompileException("Parser Error is not ( or Number in PrimaryExp");
         }
 
