@@ -14,44 +14,43 @@ public class Parser {
 //        if (! MyBool.isFuncType(lexicalIterator.next())){
 //            throw new CompileException("Parser Error is not a FuncType");
 //        }
-        Utils.getLexical("Func def int");
-        String thisToken = Utils.getToken("FuncDef");
+        Utils.nextToken("FuncDef");
         output.add("define dso_local i32");
 
         parseIdent();
 
-        if(!MyBool.isLParen(Utils.getLexical("(")) || !MyBool.isRParen(Utils.getLexical(")"))){
+        if(!MyBool.isLParen(Utils.nextToken("(").getLexcial()) || !MyBool.isRParen(Utils.nextToken(")").getLexcial())){
             throw new CompileException("Parser Error is not ()");
-        }Utils.getToken("(");Utils.getToken(")"); //jump ()
-
+        }
         output.add("()");
 
         parseBlock();
         //TOOD
     }
     public static void parseIdent()throws CompileException {
-        if (! MyBool.isIdent(Utils.getLexical("Ident"))){
+
+        if (! MyBool.isIdent(Utils.nextToken("Ident").getLexcial())){
             throw new CompileException("Parser Error is not a Ident");
         }
-        output.add(Utils.getToken("Ident"));
+        output.add(Utils.getPreviousToken().getValue());
 
     }
     public static void parseBlock()throws CompileException {
-        if(!MyBool.isLBrace(Utils.getLexical("{"))){
+        if(!MyBool.isLBrace(Utils.nextTokenLexcial("{"))){
             throw new CompileException("Parser Error is not a { ");
-        }Utils.getToken("{"); output.add("{");
+        } output.add("{");
 
         parseStmt();
 
-        if(!MyBool.isRBrace(Utils.getLexical("}"))){
+        if(!MyBool.isRBrace(Utils.nextTokenLexcial("}"))){
             throw new CompileException("Parser Error is not a } ");
-        }Utils.getToken("}"); output.add("}");
+        } output.add("}");
     }
 
     public static void parseStmt()throws CompileException {
-        if (!MyBool.isReturn(Utils.getLexical("return"))){
+        if (!MyBool.isReturn(Utils.nextTokenLexcial("return"))){
             throw new CompileException("Parser Error is not a Return ");
-        }Utils.getToken("return");
+        }
         output.add("ret");
 
         int expNum = parseExp();
@@ -59,9 +58,9 @@ public class Parser {
 //            throw new CompileException("Parser Error is not a Number ");
 //        };
         output.add("i32 "+expNum);
-        if(!MyBool.isSemicolon(Utils.getLexical(";"))){
+        if(!MyBool.isSemicolon(Utils.nextTokenLexcial(";"))){
             throw new CompileException("Parser Error is not a ; ");
-        }Utils.getToken(";");
+        }
 
 
     }
@@ -72,8 +71,8 @@ public class Parser {
     public static int parseAddExp()throws CompileException {
         int mulExpNum = parseMulExp();
 
-        while(MyBool.isUnaryOp(Utils.getLexical("+ or -"))){
-            String op = Utils.getToken("+ or -");
+        while(MyBool.isUnaryOp(Utils.nextTokenLexcial("+ or -"))){
+            String op = Utils.getPreviousToken().getValue();
             System.out.println("this op:"+op);
             if(op.equals("Plus")) {
                 mulExpNum += parseMulExp();
@@ -82,14 +81,14 @@ public class Parser {
             }else{
                 throw new IllegalArgumentException("not - +");
             }
-        }Utils.backLexcial();
+        }Utils.previousToken();
         return mulExpNum;
     }
     public static int parseMulExp()throws CompileException {
 //        System.out.println("get UnaryExp");
         int unaryExpNum = parseUnaryExp();
-        while(MyBool.isLevel3Operator(Utils.getLexical("* / %"))){
-            String op = Utils.getToken("* / %");
+        while(MyBool.isLevel3Operator(Utils.nextTokenLexcial("* / %"))){
+            String op = Utils.getPreviousToken().getValue();
             if(op.equals("Mul")) {
                 unaryExpNum *= parseUnaryExp();
             }else if(op.equals("Div")) {
@@ -100,44 +99,37 @@ public class Parser {
                 throw new IllegalArgumentException("not * / %");
             }
         }
-        Utils.backLexcial();
+        Utils.previousToken();
         return unaryExpNum;
     }
     public static int parseUnaryExp()throws CompileException {
 
-        int thisLexcial = Utils.getLexical("( or Op");
-        Utils.getToken();
+        int thisLexcial = Utils.nextTokenLexcial("( or Op");
+
         if(MyBool.isUnaryOp(thisLexcial)){
             int coefficient = 1;
             while(MyBool.isUnaryOp(thisLexcial)){
                 coefficient *= parseUnaryOp(thisLexcial);
-                thisLexcial = Utils.getLexical("UnaryOp");
-                Utils.getToken();
-            }Utils.backLexcial(); Utils.backToken();
-
+                thisLexcial = Utils.nextTokenLexcial("UnaryOp");
+            }Utils.previousToken();
             return coefficient * parsePrimaryExp();
         }else{
-            Utils.backLexcial(); Utils.backToken();
+            Utils.previousToken();
             return parsePrimaryExp();
         }
     }
 
     public static int parsePrimaryExp() throws CompileException {
-        int morpheme = Utils.getLexical("( or Number in PrimaryExp");
-        String token = Utils.getToken();
-        
-
-        if( MyBool.isLParen(morpheme)){
+        Token token = Utils.nextToken("( or Number in PrimaryExp");
+        if( MyBool.isLParen(token.getLexcial())){
 
             int num = parseExp();
-
-            if(!MyBool.isRParen(Utils.getLexical(")"))){
+            if(!MyBool.isRParen(Utils.nextTokenLexcial(")"))){
                 throw new CompileException("Parser Error is not )");
-            }Utils.getToken();
+            }
             return num;
-
-        }else if(MyBool.isNumber(morpheme)){
-            return Integer.parseInt(token);
+        }else if(MyBool.isNumber(token.getLexcial())){
+            return Integer.parseInt(token.getValue());
         }
         else{
 //            System.out.println(morpheme+token);
@@ -155,26 +147,21 @@ public class Parser {
         return MyBool.isPlus(op)?1:-1;
     }
 
-    public static void deleteComment()throws CompileException {
-        ArrayList<Integer> lexicalList = Utils.getLexicalList();
-        ArrayList<String> tokenList = Utils.getTokenList();
-        int listSize = lexicalList.size();
-        int[] mark = new int[listSize];
+    public static void deleteComment(ArrayList<Token> tokens)throws CompileException {
+        int listSize = tokens.size();
         int i,j;
-        for (i=0;i<lexicalList.size();i++){
-            if(i<lexicalList.size() && MyBool.isLBlockComment(lexicalList.get(i))){
-                while(i<lexicalList.size()-1 && ! MyBool.isRBlockComment(lexicalList.get(i))){
-                    lexicalList.remove(i);
-                    tokenList.remove(i);
+        for (i=0;i<tokens.size();i++){
+            if(i<tokens.size() && MyBool.isLBlockComment(tokens.get(i).getLexcial())){
+                while(i<tokens.size()-1 && ! MyBool.isRBlockComment(tokens.get(i).getLexcial())){
+                    tokens.remove(i);
                 }
-                lexicalList.remove(i);
-                tokenList.remove(i);
+                tokens.remove(i);
                 i=i-1;
             }
         }
-        for (i=0; i<lexicalList.size(); i++) {
-            if (lexicalList.get(i)<0)
-                throw new CompileException("Lexical Error The String is "+tokenList.get(i));
+        for (i=0; i<tokens.size(); i++) {
+            if (tokens.get(i).getLexcial()<0)
+                throw new CompileException("Lexical Error The String is "+tokens.get(i).getValue());
         }
     }
     public static void outputFile(String file,ArrayList<String> array)  {
@@ -197,43 +184,21 @@ public class Parser {
             }
         }
     }
-    public static void lexicalAnalysis(String input) throws CompileException{
-        ArrayList<String> words = new ArrayList<String>();
-        ArrayList<Integer> lexicalList = Utils.getLexicalList();
-        ArrayList<String> tokenList = Utils.getTokenList();
-
-        try {
-            lexicalList = Lexical.getLexicalList(input,words);
-            Utils.setLexicalList(lexicalList);
-        }catch (CompileException e){
-            System.out.println(e);
-            System.exit(-1);
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        for (String word : words) {
-            tokenList.add(Lexical.typeRecognition(word,lexicalList,false));
-//            System.out.println(word);
-        }Utils.setTokenList(tokenList);
-        deleteComment(); // 删除注释
-        Utils.initIterator();//修改完成tokenList 与LexcialList后开始初始化迭代器
+    public static void lexicalAnalysis(String input) throws CompileException,FileNotFoundException{
+        Lexical.makeTokenList(input);
     }
-    public static void main(String[] args) throws  CompileException {
+    public static void main(String[] args) throws  CompileException,FileNotFoundException {
         lexicalAnalysis(args[0]);
         try {
             parseCompUnit();
         }catch (CompileException e){
 //            System.out.println(e);
             e.printStackTrace();
-            System.out.println(Utils.getLexicalList().size()+" "+Utils.getTokenList().size());
             System.exit(-1);
         }
         for(String str : output){
             System.out.println(str);
-        }
-        outputFile(args[1],output );
+        } outputFile(args[1],output );
         System.exit(0);
     }
 }

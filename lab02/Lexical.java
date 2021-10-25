@@ -189,27 +189,57 @@ public class Lexical {
         }
         return lexicalList;
     }
-    public static void main(String[] args) throws FileNotFoundException , CompileException {
+    public static ArrayList<Token> makeTokenList(String filePath)throws FileNotFoundException , CompileException {
+        ArrayList<Token> tokens = new ArrayList<Token>();
         ArrayList<String> words = new ArrayList<String>();
-        ArrayList<Integer> lexicalList = Utils.getLexicalList();
+        ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         try {
-            lexicalList = getLexicalList("./lab01/main.c",words);
+            lexicalList = getLexicalList(filePath,words);
         }catch (CompileException e){
             System.out.println(e);
             System.exit(-1);
         }
-        ArrayList<String> tokenList = Utils.getTokenList();
+        ArrayList<String> tokenList = new ArrayList<String>();
 
         for (String word : words) {
             tokenList.add(typeRecognition(word,lexicalList,false));
         }
-        Parser.deleteComment();
-//        System.out.println(tokenList.size()+""+lexicalList.size());
-        for(int i=0;i<lexicalList.size();i++){
-            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
+        int listSize = lexicalList.size();
+        for(int i = 0; i < listSize; ++i){
+            tokens.add(new Token(lexicalList.get(i),tokenList.get(i),0));
         }
-        System.exit(0);
+        Parser.deleteComment(tokens);
+        Utils.setTokenList(tokens);
+        return tokens;
     }
+
+    public static void main(String[] args) throws FileNotFoundException , CompileException {
+        ArrayList<Token> tokens = makeTokenList(args[0]);
+        for(Token token :tokens){
+            System.out.println(token.getValue()+"  "+token.getLexcial());
+        }
+    }
+//    public static void main(String[] args) throws FileNotFoundException , CompileException {
+//        ArrayList<String> words = new ArrayList<String>();
+//        ArrayList<Integer> lexicalList = Utils.getLexicalList();
+//        try {
+//            lexicalList = getLexicalList("./lab01/main.c",words);
+//        }catch (CompileException e){
+//            System.out.println(e);
+//            System.exit(-1);
+//        }
+//        ArrayList<String> tokenList = Utils.getTokenList();
+//
+//        for (String word : words) {
+//            tokenList.add(typeRecognition(word,lexicalList,false));
+//        }
+//        Parser.deleteComment();
+////        System.out.println(tokenList.size()+""+lexicalList.size());
+//        for(int i=0;i<lexicalList.size();i++){
+//            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
+//        }
+//        System.exit(0);
+//    }
 }
 
 
