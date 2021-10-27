@@ -3,8 +3,8 @@ FROM openjdk:16
 
 # 编译程序
 WORKDIR /app/
-COPY lab02 ./lab02
-RUN javac -encoding UTF-8   -d ./output ./lab02/*.java
+COPY lab03 ./lab03
+RUN javac -encoding UTF-8   -d ./output ./lab03/*.java
 
 # 将当前目录设为 /app/output
 WORKDIR /app/output
