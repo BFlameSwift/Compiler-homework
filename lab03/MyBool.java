@@ -28,9 +28,12 @@ public class MyBool {
     public static Boolean isDiv(int type){return type == Lexical.DIV;}
     public static Boolean isMod(int type){return type == Lexical.MOD;}
     public static Boolean isLevel3Operator(int type){return isMod(type)|| isMultiply(type) || isDiv(type);}
-
-
-
+    public static Boolean isConstDec(int type){return type == Lexical.CONST_DEC;}
+    public static Boolean isIntDec(int type){return type == Lexical.INT_DEC;}
+    public static Boolean isVoidDec(int type){return type == Lexical.VOID_DEC;}
+    public static Boolean isEqual(int type){return type == Lexical.EQUALS;}
+    public static Boolean isComma(int type){return type == Lexical.COMMA;}
+    public static Boolean isDecl(int type){return isIntDec(type) || isConstDec(type);}
 
 //    public static Boolean Statements(String str){
 //        if (MyConst.isNumber(str)){

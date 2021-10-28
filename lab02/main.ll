@@ -154,3 +154,17 @@ define dso_local i32
 ret
 i32 1
 }
+define dso_local i32
+@main
+()
+{
+ret
+i32 1
+}
+define dso_local i32
+@main
+()
+{
+ret
+i32 1
+}

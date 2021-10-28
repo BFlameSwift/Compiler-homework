@@ -9,6 +9,65 @@ public class Parser {
     public static void parseCompUnit()throws CompileException {
         parseFuncDef();
     }
+    public static void parseDecl() throws CompileException {
+        if(MyBool.isConstDec(Utils.nextTokenLexcial("const"))){
+            Utils.previousToken();
+            parseConstDecl();
+        }else{
+            Utils.previousToken();
+            //TODO vardecl
+        }
+    }
+    public static void parseConstDecl() throws CompileException {
+        if(!MyBool.isConstDec(Utils.nextTokenLexcial("const"))){
+            throw new CompileException("Parser constdecl Error is not const");
+        }
+        parseBType();
+        parseConstDef();
+        while(!MyBool.isComma(Utils.nextTokenLexcial(","))){
+            parseConstDef();
+        }Utils.previousToken();
+        while(!MyBool.isSemicolon(Utils.nextTokenLexcial(";"))){
+            throw new CompileException("Parser constdecl Error is not ;");
+        }
+    }
+    public static void parseBType() throws CompileException { // 检测Bype 只有int
+        if(!MyBool.isIntDec(Utils.nextTokenLexcial("int"))){
+            throw new CompileException("Parser Error is not int");
+        }
+    }
+    public static void parseConstDef() throws CompileException {
+        //TODO 添加进符号表
+        Token identToken = Utils.nextToken("ident");
+        if(!MyBool.isIdent(identToken.getLexcial())){
+            throw new CompileException("Parser const def Error is not Ident");
+        }if(!MyBool.isEqual(Utils.nextTokenLexcial("="))){
+            throw new CompileException("Parser const def Error is not =");
+        }
+        int valueConstInitval = parseConstExp();
+    }
+
+    public static int parseConstExp() throws CompileException {
+        return parseAddExp();
+    }
+    public static void parseVarDecl() throws CompileException {
+        parseBType();
+        parseVarDef();
+    }
+    public static void parseVarDef() throws CompileException {
+        Token identToken = Utils.nextToken("ident");
+//        output.add("allocte "+identToken.getValue());
+        if(MyBool.isEqual(Utils.nextTokenLexcial("="))){
+            parseInitVal();
+            // TODO 变量赋值
+        }Utils.previousToken();
+        return;
+    }
+    public static void parseInitVal() throws CompileException {
+        parseExp();
+        // TODO 修改EXP
+    }
+
 
     public static void parseFuncDef()throws CompileException {
 //        if (! MyBool.isFuncType(lexicalIterator.next())){
@@ -40,11 +99,22 @@ public class Parser {
             throw new CompileException("Parser Error is not a { ");
         } output.add("{");
 
-        parseStmt();
+        while (!MyBool.isRBrace(Utils.nextTokenLexcial("}"))) {
+            Utils.previousToken();
+            parseBlockItem();
+        }Utils.previousToken();
+//        parseStmt();
 
         if(!MyBool.isRBrace(Utils.nextTokenLexcial("}"))){
             throw new CompileException("Parser Error is not a } ");
         } output.add("}");
+    }
+    public static void parseBlockItem() throws CompileException {
+        if(MyBool.isDecl(Utils.nextTokenLexcial("decl"))){
+            Utils.previousToken();
+            parseDecl();
+        }Utils.previousToken();
+        parseStmt();
     }
 
     public static void parseStmt()throws CompileException {
