@@ -96,7 +96,7 @@ public class Utils {
             putallocalSymbolTable(item,funcName);
         }putAddressSymbol(constAddress,item);
 
-//        System.out.println(item.output());
+        System.out.println(item.output());
         return item.getAddress();
     }
 
@@ -141,7 +141,7 @@ public class Utils {
         SymbolItem theSymbolItem = getSymbolItem(token,funcName);
 //        System.out.println(token.getValue());
         if(theSymbolItem.getAddress() == 0){
-            System.out.println("this symbol addr == 0"+theSymbolItem);
+//            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
         putAddressSymbol(nowAddress+1,theSymbolItem);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();

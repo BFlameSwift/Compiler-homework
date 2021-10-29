@@ -166,7 +166,7 @@ public class Parser {
 //        output.add("ret i32 "+expNum);
             int expAddress = parseExp();
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
-            System.out.println("ret exp address = "+expAddress);
+//            System.out.println("ret exp address = "+expAddress);
             String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.valueInt    :    "%"+retSymbolItem.getAddress();
             output.add("ret i32 "+retStr);
 
@@ -207,10 +207,10 @@ public class Parser {
 //            System.out.println("this op:"+op);
             int mulExpAddress = parseMulExp();
             if(op.equals("Plus")) {
-                return Utils.midExpCalculate("add",addExpAddress,mulExpAddress);
+                addExpAddress = Utils.midExpCalculate("add",addExpAddress,mulExpAddress);
 
             }else if (op.equals("Minus")) {
-                Utils.midExpCalculate("sub",addExpAddress,mulExpAddress);
+                addExpAddress = Utils.midExpCalculate("sub",addExpAddress,mulExpAddress);
             }else{
                 throw new IllegalArgumentException("not - +");
             }
@@ -225,9 +225,9 @@ public class Parser {
             int unaryExpAddress = parseUnaryExp();
             if(op.equals("Mul")) {
 
-                return Utils.midExpCalculate("mul",mulExpAddress,unaryExpAddress);
+                mulExpAddress = Utils.midExpCalculate("mul",mulExpAddress,unaryExpAddress);
             }else if(op.equals("Div")) {
-                return Utils.midExpCalculate("sdiv",mulExpAddress,unaryExpAddress);
+                mulExpAddress = Utils.midExpCalculate("sdiv",mulExpAddress,unaryExpAddress);
             }else if(op.equals("Mod")){
                 return Utils.midExpCalculate("smod",mulExpAddress,unaryExpAddress);
 

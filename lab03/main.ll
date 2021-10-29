@@ -116,3 +116,59 @@ define dso_local i32
 {
 ret i32 5
 }
+define dso_local i32
+@main
+()
+{
+ret i32 2
+}
+define dso_local i32
+@main
+()
+{
+ret i32 1
+}
+define dso_local i32
+@main
+()
+{
+ret i32 1
+}
+define dso_local i32
+@main
+()
+{
+%-99993 = sub i32 %-99995, %-99994
+%-99992 = sdiv i32 %-99996, %-99995
+%-99991 = mul i32 %-99997, %-99992
+%-99990 = add i32 1, %-99991
+ret i32 1
+}
+define dso_local i32
+@main
+()
+{
+%-99993 = sub i32 %-99995, %-99994
+%-99992 = sdiv i32 %-99996, %-99995
+%-99991 = mul i32 %-99997, %-99992
+%-99990 = add i32 1, %-99991
+ret i32 1
+}
+define dso_local i32
+@main
+()
+{
+ret i32 1
+}
+define dso_local i32
+@main
+()
+{
+ret i32 7
+}
+define dso_local i32
+@main
+()
+{
+ret i32 7
+}

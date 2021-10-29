@@ -1,4 +1,3 @@
 int main() {
-    const int a = 1+2;
-    return a+2;
+    return 1 + (-2) * (3 / (4 - 5));
 }
