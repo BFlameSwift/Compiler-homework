@@ -229,7 +229,7 @@ public class Parser {
             }else if(op.equals("Div")) {
                 mulExpAddress = Utils.midExpCalculate("sdiv",mulExpAddress,unaryExpAddress);
             }else if(op.equals("Mod")){
-                return Utils.midExpCalculate("smod",mulExpAddress,unaryExpAddress);
+                return Utils.midExpCalculate("srem",mulExpAddress,unaryExpAddress);
 
             }else{
                 throw new IllegalArgumentException("not * / %");
