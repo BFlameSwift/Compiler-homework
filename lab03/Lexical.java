@@ -187,6 +187,7 @@ public class Lexical {
             typeRecognition(word,lexicalList,true);
 //            System.out.println(word+" "+"  "+ tokenTran(word,lexicalList));
         }
+        scanner.close();
         return lexicalList;
     }
     public static ArrayList<Token> makeTokenList(String filePath)throws FileNotFoundException , CompileException {

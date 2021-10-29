@@ -3,16 +3,19 @@ package lab03;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Utils {
 
-
+    public static Scanner scanner = new Scanner(System.in);
 
     public static Map<String, SymbolItem> globalSymbolTable = new HashMap<String, SymbolItem>();
 //    public static Map<String, SymbolItem> LocalSymbolTable = new HashMap<String, SymbolItem>();
     public static Map<Integer ,SymbolItem> addressSymbolTable = new HashMap<Integer, SymbolItem>(); // 用来存取当前地址是否是常量
     public static ArrayList<HashMap<String, SymbolItem> > blockSymbolTable = new ArrayList<HashMap<String, SymbolItem>>();
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
+    public static ArrayList<String > allFuncList = new ArrayList<String>();
+    public static Map<String,SymbolItem> funcSymbolTable = new HashMap<String,SymbolItem>();
     private static int blockIndex = -1;
 
     private static int constAddress = -100000;
@@ -157,6 +160,26 @@ public class Utils {
         }
         return theSymbolItem;
     }
+    public static int callFunction(String name,ArrayList<Integer> paramAddrList) throws CompileException {
+        if(!funcSymbolTable.containsKey(name)){
+            throw new CompileException("cant find  this function");
+        }
+        SymbolItem funcItem = funcSymbolTable.get(name);
+        String outputStr = "";
+        if(funcItem.type == 1){
+            outputStr += "%"+(++nowAddress)+" = ";
+        }
+        outputStr += "call "; outputStr += (funcItem.type == 1)?"i32":"void";
+        outputStr+=" "+name+"(";
+        for(int i=0;i<funcItem.length;i++){
+            outputStr+="i32 @"+paramAddrList.get(i);
+            outputStr += " ";
+        }outputStr+=")";
+        Parser.output.add(outputStr);
+        return funcItem.type == 1?nowAddress:0;
+    }
+
+
     public static int getIdentLVal(Token ident,String funcName) throws CompileException {
         // TODO 正确的找到真正数值
        int ret = -1;

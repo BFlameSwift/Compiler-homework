@@ -9,6 +9,7 @@ public class SymbolItem {
     public static final int ADDRESS_NOT_ASSIGN = 0;
     public String name;
     public int kind; // var 0,const 1,function 2,array 3
+    public int type; // void 0 int 1;
     public int valueInt;
     private int address;
 
@@ -31,12 +32,21 @@ public class SymbolItem {
         length = valueInt = NOT_ASSIGN;
         address = ADDRESS_NOT_ASSIGN;
         parametersList = new ArrayList<>();
+        type = 0;
     }
     public SymbolItem(String name,int kind,int valueInt){
         this.name = name;
         this.kind = kind;
         address = ADDRESS_NOT_ASSIGN;
+        type = 0;
         length = 0; parametersList = new ArrayList<Integer>();
+        this.valueInt = valueInt;
+    }public SymbolItem(String name,int kind,int valueInt,int type,int length){
+        this.name = name;
+        this.kind = kind;
+        address = ADDRESS_NOT_ASSIGN;
+        this.type = type;
+        this.length = length; parametersList = new ArrayList<Integer>();
         this.valueInt = valueInt;
     }
     // TODO 函数与数组时新增

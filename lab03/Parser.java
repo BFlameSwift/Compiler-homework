@@ -5,6 +5,19 @@ import java.util.ArrayList;
 
 public class Parser {
     public static ArrayList<String> output = new ArrayList<String>();
+    public static void initIOFunctions() {
+        output.add("declare i32 @getint()");
+        output.add("declare i32 @getch()");
+        output.add("declare void @putint(i32)");
+        output.add("declare void @putch(i32)");
+        SymbolItem getint = new SymbolItem("@getint",2,0,1,0);
+        SymbolItem getch = new SymbolItem("@getch",2,0,1,0);
+        SymbolItem putint = new SymbolItem("@putint",2,0,0,1);
+        SymbolItem putch = new SymbolItem("@putch",2,0,0,1);
+        Utils.allFuncList.add("@getint");Utils.allFuncList.add("@putint");Utils.allFuncList.add("@getch");Utils.allFuncList.add("@putch");
+        Utils.funcSymbolTable.put("@getint",getint); Utils.funcSymbolTable.put("@putint",putint); Utils.funcSymbolTable.put("@getch",getch);Utils.funcSymbolTable.put("@putch",putch);
+    }
+
     public static void parseCompUnit()throws CompileException {
         parseFuncDef();
     }
@@ -187,6 +200,12 @@ public class Parser {
                }
            }else {
                Token.previousToken();
+               if(!MyBool.isSemicolon(Token.getNextToken().getLexcial()))
+                    parseExp();
+               Token expToken = Token.nextToken(";");
+               if(MyBool.isSemicolon(expToken.getLexcial())){
+                   return;
+               }
                //TODO 处理表达式；
            }
         }else{
@@ -239,8 +258,8 @@ public class Parser {
         return mulExpAddress;
     }
     public static int parseUnaryExp()throws CompileException {
-
-        int thisLexcial = Token.nextTokenLexcial("( or Op");
+        Token thisToken = Token.nextToken("( or Op or func(param)");
+        int thisLexcial = thisToken.getLexcial();
 
         if(MyBool.isUnaryOp(thisLexcial)){
             int coefficient = 1;
@@ -252,11 +271,67 @@ public class Parser {
 
             return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).valueInt,"main");
 //            return coefficient * parsePrimaryExp();
-        }else{
+        }else if(MyBool.isIdent(thisLexcial)&&MyBool.isLParen(Token.getNextToken().getLexcial())){
+            if(!Utils.funcSymbolTable.containsKey(thisToken.getValue()))
+                throw new CompileException("Parse dont hava this func "+thisToken.getValue());
+            SymbolItem funcItem = Utils.funcSymbolTable.get(thisToken.getValue());
+            Token.nextToken("(");
+            ArrayList<Integer> paramAddrList = new ArrayList<>();
+            int i;
+            for(i=0;i< funcItem.length;i++){
+                paramAddrList.add(parseExp());
+                if(!MyBool.isComma(Token.nextTokenLexcial(","))){
+                    break;
+                }
+            }if(i< funcItem.length){
+                throw new CompileException("Parse Error ident param is lack");
+            }
+            if(!MyBool.isRParen(Token.nextTokenLexcial(")"))){
+                throw new CompileException("Parser Error is not )");
+            }
+            return processIOFunc(thisToken.getValue(),paramAddrList);
+        }
+
+        else{
             Token.previousToken();
             return parsePrimaryExp();
         }
     }
+
+    public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
+        int retAddr = 0;
+        if(funcName.equals("@getint")){
+            int intValue =Utils.scanner.nextInt();
+
+            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+//            System.out.println("saveaddress"+saveAddress);
+            SymbolItem saveItem = new SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
+            Utils.addressSymbolTable.put(saveAddress,saveItem);
+            return saveAddress;
+        }else if(funcName.equals("@getch")){
+            int intValue =Utils.scanner.nextInt();
+
+            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+//            System.out.println("saveaddress"+saveAddress);
+            SymbolItem saveItem = new SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
+            Utils.addressSymbolTable.put(saveAddress,saveItem);
+            return saveAddress;
+        }else if(funcName.equals("@putint")){
+            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+            int address = paramAddrList.get(0);
+            System.out.println("putint:"+Utils.getSymbolItemByAddress(address).valueInt);
+            return saveAddress;
+        }else if(funcName.equals("@putch")){
+            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+            int address = paramAddrList.get(0);
+            System.out.println("putch:"+((char)Utils.getSymbolItemByAddress(address).valueInt));
+            return saveAddress;
+        }else{
+            throw new CompileException("IOFunction error");
+        }
+
+    }
+
 
     public static int parsePrimaryExp() throws CompileException {
         Token token = Token.nextToken("( ,LVal or Number in PrimaryExp");
@@ -333,6 +408,7 @@ public class Parser {
         Lexical.makeTokenList(input);
     }
     public static void main(String[] args) throws CompileException,FileNotFoundException {
+        initIOFunctions();
         lexicalAnalysis(args[0]);
         try {
             parseCompUnit();
