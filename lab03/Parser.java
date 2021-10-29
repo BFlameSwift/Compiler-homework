@@ -284,12 +284,13 @@ public class Parser {
                 paramAddrList.add(parseExp());
                 i++;
                 if(!MyBool.isComma(Token.nextTokenLexcial(","))){
+                    Token.previousToken();
                     break;
                 }
             }if(i< funcItem.length){
                 throw new CompileException("Parse Error ident param is lack");
             }
-            Token.previousToken();
+
             if(!MyBool.isRParen(Token.nextTokenLexcial(")"))){
                 throw new CompileException("Parser Error is not )");
             }
