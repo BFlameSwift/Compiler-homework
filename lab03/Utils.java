@@ -108,14 +108,16 @@ public class Utils {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.valueInt,op, item2.valueInt);
-        int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);
+//        int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);
+        int objAddress = ++nowAddress;
         putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
 
-        if(objKind == 0){// 是变量就输出过程
+        if(objKind == 0||objKind == 1){// 是变量就输出过程
             String outStr = "%"+objAddress+" = "+op+" i32 ";
-            outStr += (item1.valueInt == 1)?item1.valueInt:"%"+item1.getAddress();
+            outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getAddress();
             outStr += ", ";
-            outStr += (item2.valueInt == 1)?item2.valueInt:"%"+item2.getAddress();
+            outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getAddress();
+
             Parser.output.add(outStr);
         }
 
@@ -143,7 +145,7 @@ public class Utils {
         if(theSymbolItem.getAddress() == 0){
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
-        putAddressSymbol(nowAddress+1,theSymbolItem);
+        putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.valueInt)); // TODO 这里应该是变量吗
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {

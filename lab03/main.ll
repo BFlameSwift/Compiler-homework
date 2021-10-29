@@ -32,3 +32,88 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 
 !0 = !{i32 1, !"wchar_size", i32 4}
 !1 = !{!"clang version 10.0.0-4ubuntu1 "}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+store i32 %1, i32* %1
+%2 = load i32, i32* %2
+ret i32 %2
+}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+store i32 %1, i32* %1
+%2 = load i32, i32* %2
+ret i32 %2
+}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+%-99997 = sub i32 %-99999, %-99998
+store i32 %1, i32* %1
+%2 = load i32, i32* %2
+ret i32 %2
+}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+%2 = sub i32 %-99999, %-99998
+store i32 %2, i32* %1
+%3 = load i32, i32* %3
+ret i32 %3
+}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+%2 = sub i32 123, 122
+store i32 %2, i32* %1
+%3 = load i32, i32* %3
+ret i32 %3
+}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+%2 = sub i32 123, 122
+store i32 %2, i32* %1
+%3 = load i32, i32* %1
+ret i32 %1
+}
+define dso_local i32
+@main
+()
+{
+%1 = alloca i32
+store i32 %1, i32* %1
+%2 = alloca i32
+store i32 %2, i32* %2
+%3 = alloca i32
+%4 = load i32, i32* %2
+%5 = load i32, i32* %1
+%6 = sub i32 %2, %1
+%7 = sdiv i32 %6, 1000
+%8 = sub i32 %7, 8
+store i32 %8, i32* %3
+%9 = alloca i32
+store i32 %9, i32* %9
+%10 = load i32, i32* %3
+%11 = load i32, i32* %9
+%12 = add i32 %3, %9
+store i32 %12, i32* %3
+%13 = load i32, i32* %3
+%14 = load i32, i32* %9
+%15 = sub i32 %3, %9
+%16 = add i32 %15, 0
+ret i32 %16
+}
