@@ -199,7 +199,8 @@ public class Parser {
                    throw new CompileException("Parser Error is not a ; ");
                }
            }else {
-               Token.previousToken();
+               Token.previousToken();Token.previousToken();
+//               System.out.println();
                if(!MyBool.isSemicolon(Token.getNextToken().getLexcial()))
                     parseExp();
                Token expToken = Token.nextToken(";");
@@ -272,20 +273,23 @@ public class Parser {
             return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).valueInt,"main");
 //            return coefficient * parsePrimaryExp();
         }else if(MyBool.isIdent(thisLexcial)&&MyBool.isLParen(Token.getNextToken().getLexcial())){
+            System.out.println("funcname"+thisToken.getValue());
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue()))
                 throw new CompileException("Parse dont hava this func "+thisToken.getValue());
             SymbolItem funcItem = Utils.funcSymbolTable.get(thisToken.getValue());
             Token.nextToken("(");
             ArrayList<Integer> paramAddrList = new ArrayList<>();
             int i;
-            for(i=0;i< funcItem.length;i++){
+            for(i=0;i< funcItem.length;){
                 paramAddrList.add(parseExp());
+                i++;
                 if(!MyBool.isComma(Token.nextTokenLexcial(","))){
                     break;
                 }
             }if(i< funcItem.length){
                 throw new CompileException("Parse Error ident param is lack");
             }
+            Token.previousToken();
             if(!MyBool.isRParen(Token.nextTokenLexcial(")"))){
                 throw new CompileException("Parser Error is not )");
             }
@@ -300,6 +304,7 @@ public class Parser {
 
     public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
         int retAddr = 0;
+        System.out.println("funcname"+funcName);
         if(funcName.equals("@getint")){
             int intValue = 1;
 //            intValue = Utils.scanner.nextInt();

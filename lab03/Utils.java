@@ -154,7 +154,7 @@ public class Utils {
         }
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.valueInt)); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress);
-        return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
+        return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getLoadAddress();
     }
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {
         SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
