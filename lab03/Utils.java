@@ -7,15 +7,15 @@ import java.util.Map;
 public class Utils {
 
 
+
     public static Map<String, SymbolItem> globalSymbolTable = new HashMap<String, SymbolItem>();
-    public static Map<String, SymbolItem> LocalSymbolTable = new HashMap<String, SymbolItem>();
-//    public static Map<Integer ,SymbolItem> addressSymbolTable = new HashMap<Integer, SymbolItem>(); // <
+//    public static Map<String, SymbolItem> LocalSymbolTable = new HashMap<String, SymbolItem>();
+    public static Map<Integer ,SymbolItem> addressSymbolTable = new HashMap<Integer, SymbolItem>(); // 用来存取当前地址是否是常量
     public static ArrayList<HashMap<String, SymbolItem> > blockSymbolTable = new ArrayList<HashMap<String, SymbolItem>>();
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
     private static int blockIndex = -1;
 
-
-
+    private static int constAddress = -100000;
     private static int nowAddress = 0;
 
     public static int getNowAddress() {
@@ -33,15 +33,20 @@ public class Utils {
         nowAddress ++;
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
-        symbolItem.address = nowAddress;
+        symbolItem.setAddress(nowAddress);
         if(isGolbal){
             globalSymbolTable.put(symbolName, symbolItem);
             return nowAddress;
         }
         //TODO 根据不同函数进入不同的Map块
+        putAddressSymbol(nowAddress,symbolItem);
         putallocalSymbolTable(symbolItem,"main");
         putblockSymbolTable(symbolItem,blockIndex);
         return nowAddress;
+    }
+    public static void putAddressSymbol(int addr, SymbolItem symbolItem){
+        symbolItem.setAddress(addr);
+        addressSymbolTable.put(addr,symbolItem);
     }
     public static void putallocalSymbolTable(SymbolItem symbolItem,String funcName){
         try {
@@ -50,6 +55,12 @@ public class Utils {
             allLocalSymbolTable.put(funcName,new HashMap<String, SymbolItem>()) ;
             allLocalSymbolTable.get(funcName).put(symbolItem.name,symbolItem);
         }
+    }
+    public static SymbolItem getSymbolItemByAddress(int address){
+        if(addressSymbolTable.containsKey(address)){
+            return addressSymbolTable.get(address);
+        }
+        throw new IllegalArgumentException("this address has not variable");
     }
     public static void putblockSymbolTable(SymbolItem symbolItem,int index) throws CompileException{
         Map<String, SymbolItem> map ;
@@ -74,25 +85,66 @@ public class Utils {
         }catch(Exception e){
             e.printStackTrace();
         }
-        symbolItem.constInt = value;
-        return symbolItem.address;
+        symbolItem.valueInt = value;
+        return symbolItem.getAddress();
     }
+    public static int storeConstVariable(String name,int value,String funcName) throws CompileException {
+        SymbolItem item = new SymbolItem(name,1,value);
+        item.setAddress(++ constAddress);
+        if(name != null){
+            putblockSymbolTable(item,blockIndex);
+            putallocalSymbolTable(item,funcName);
+        }putAddressSymbol(constAddress,item);
 
+//        System.out.println(item.output());
+        return item.getAddress();
+    }
 
     public static String storeVariableOutput(int varAddr){
         return "store i32 %"+nowAddress+", i32* %"+varAddr;
     }
 
-    public static String midExpOutput(String op,String num1,String num2){
-        return "%"+(++nowAddress) + " = "+op+" i32 "+num1+", "+num2;
+    public static int midExpCalculate(String op,int address1,int address2){
+        SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
+        int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
+        objValue = calculateValue(item1.valueInt,op, item2.valueInt);
+        int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);
+        putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
+
+        if(objKind == 0){// 是变量就输出过程
+            String outStr = "%"+objAddress+" = "+op+" i32 ";
+            outStr += (item1.valueInt == 1)?item1.valueInt:"%"+item1.getAddress();
+            outStr += ", ";
+            outStr += (item2.valueInt == 1)?item2.valueInt:"%"+item2.getAddress();
+            Parser.output.add(outStr);
+        }
+
+        return objAddress;
+    }
+
+    public static int calculateValue(int value1,String op,int value2){
+        if(op.equals("add")){
+            return value1 + value2;
+        }else if(op.equals("sub"))
+            return value1 - value2;
+        else if(op.equals("mul"))
+            return value1 * value2;
+        else if(op.equals("sdiv"))
+            return value1 / value2;
+        else if(op.equals("srem"))
+            return value1 % value2;
+        else{
+            throw new IllegalArgumentException("not + -  / %");
+        }
     }
     public static String loadLValOutput(Token token,String funcName) throws CompileException {
         SymbolItem theSymbolItem = getSymbolItem(token,funcName);
 //        System.out.println(token.getValue());
-        if(theSymbolItem.address == 0){
-            System.out.println(theSymbolItem);
+        if(theSymbolItem.getAddress() == 0){
+            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
-        return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.address;
+        putAddressSymbol(nowAddress+1,theSymbolItem);
+        return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {
         SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
@@ -107,7 +159,7 @@ public class Utils {
         // TODO 正确的找到真正数值
        int ret = -1;
        try {
-          ret =  allLocalSymbolTable.get(funcName).get(ident.getValue()).constInt;
+          ret =  allLocalSymbolTable.get(funcName).get(ident.getValue()).valueInt;
        }catch(Exception e){
            throw new CompileException("This ident"+ident.getValue()+"is not define");
        }SymbolItem thisSymbol = allLocalSymbolTable.get(funcName).get(ident.getValue());
@@ -116,11 +168,11 @@ public class Utils {
 //       }
        return ret;
     }
-    public static void storeConstVariable(Token token,int value,String funcName) throws CompileException{
-        SymbolItem constIdent = new SymbolItem(token.getValue(),1,value);
-
-        putallocalSymbolTable(constIdent,funcName);
-        putblockSymbolTable(constIdent,blockIndex);
-
-    }
+//    public static void storeConstVariable(Token token,int value,String funcName) throws CompileException{
+//        SymbolItem constIdent = new SymbolItem(token.getValue(),1,value);
+//
+//        putallocalSymbolTable(constIdent,funcName);
+//        putblockSymbolTable(constIdent,blockIndex);
+//
+//    }
 }

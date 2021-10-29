@@ -30,7 +30,11 @@ define dso_local i32 @main() #0 {
   %16 = load i32, i32* %6, align 4
   %17 = sub nsw i32 %15, %16
   %18 = add nsw i32 %17, 0
-  ret i32 %18
+  %19 = load i32, i32* %5, align 4
+  %20 = load i32, i32* %6, align 4
+  %21 = srem i32 %19, %20
+  %22 = add nsw i32 %18, %21
+  ret i32 %22
 }
 
 attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
@@ -44,23 +48,7 @@ define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %3, i32* %3
-%10 = alloca i32
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
+ret i32 %-99997
 }
 define dso_local i32
 @main
@@ -68,51 +56,8 @@ define dso_local i32
 {
 %1 = alloca i32
 store i32 %1, i32* %1
-%2 = alloca i32
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %3, i32* %3
-%10 = alloca i32
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-%2 = sub i32 123, 122
-store i32 %1, i32* %1
-%3 = load i32, i32* %1
-ret i32 %3
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-%2 = sub i32 123, 122
-store i32 %2, i32* %1
-%3 = load i32, i32* %1
-ret i32 %3
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-%2 = sub i32 123, 122
-store i32 %2, i32* %1
-%3 = load i32, i32* %1
-ret i32 %3
+%2 = load i32, i32* %2
+ret i32 %%2
 }
 define dso_local i32
 @main
@@ -120,326 +65,54 @@ define dso_local i32
 {
 %1 = alloca i32
 store i32 %1, i32* %1
-%2 = alloca i32
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-in stmt
-in stmt
-in stmt
-in stmt
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-in stmt
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 -1239032, 456
-%7 = sdiv i32 -1239488, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 -1239, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = sub i32 -1247, -1239032
-%14 = add i32 1237785, 0
-ret i32 %14
-}
-define dso_local i32
-@main
-()
-{
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = load i32, i32* %1
+%2 = load i32, i32* %2
 ret i32 %2
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 8, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-store i32 %10, i32* %10
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = add i32 0, 2
-store i32 %13, i32* %3
-%14 = load i32, i32* %3
-%15 = load i32, i32* %10
-%16 = sub i32 2, 2
-%17 = add i32 0, 0
-ret i32 %17
+ret i32 3
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 8, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-store i32 %10, i32* %10
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = add i32 0, 2
-store i32 %13, i32* %3
-%14 = load i32, i32* %3
-%15 = load i32, i32* %10
-%16 = sub i32 2, 2
-%17 = add i32 0, 0
-ret i32 %17
+ret i32 -99995
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 8, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-store i32 %10, i32* %10
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = add i32 0, 2
-store i32 %13, i32* %3
-%14 = load i32, i32* %3
-%15 = load i32, i32* %10
-%16 = sub i32 2, 2
-%17 = add i32 0, 0
-ret i32 %17
+ret i32 -99995
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 8, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-store i32 %10, i32* %10
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = add i32 0, 2
-store i32 %13, i32* %3
-%14 = load i32, i32* %3
-%15 = load i32, i32* %10
-%16 = sub i32 2, 2
-%17 = add i32 0, 0
-ret i32 %17
+ret i32 -99995
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 8, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-store i32 %10, i32* %10
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = add i32 0, 2
-store i32 %13, i32* %3
-%14 = load i32, i32* %3
-%15 = load i32, i32* %10
-%16 = sub i32 2, 2
-%17 = add i32 0, 0
-ret i32 %17
+ret i32 -99995
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = load i32, i32* %0
-%9 = sub i32 8, 8
-store i32 %9, i32* %3
-%10 = alloca i32
-store i32 %10, i32* %10
-%11 = load i32, i32* %3
-%12 = load i32, i32* %10
-%13 = add i32 0, 2
-store i32 %13, i32* %3
-%14 = load i32, i32* %3
-%15 = load i32, i32* %10
-%16 = sub i32 2, 2
-%17 = add i32 0, 0
-ret i32 %17
+ret i32 -99995
 }
 define dso_local i32
 @main
 ()
 {
-%1 = alloca i32
-store i32 %1, i32* %1
-%2 = alloca i32
-store i32 %2, i32* %2
-%3 = alloca i32
-%4 = load i32, i32* %2
-%5 = load i32, i32* %1
-%6 = sub i32 8456, 456
-%7 = sdiv i32 8000, 1000
-%8 = sub i32 8, 8
-store i32 %8, i32* %3
-%9 = alloca i32
-store i32 %9, i32* %9
-%10 = load i32, i32* %3
-%11 = load i32, i32* %9
-%12 = add i32 0, 2
-store i32 %12, i32* %3
-%13 = load i32, i32* %3
-%14 = load i32, i32* %9
-%15 = sub i32 2, 2
-%16 = add i32 0, 0
-ret i32 %16
+ret i32 5
+}
+define dso_local i32
+@main
+()
+{
+ret i32 5
 }
