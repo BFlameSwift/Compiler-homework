@@ -301,15 +301,16 @@ public class Parser {
     public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
         int retAddr = 0;
         if(funcName.equals("@getint")){
-            int intValue =Utils.scanner.nextInt();
-
+            int intValue = 1;
+//            intValue = Utils.scanner.nextInt();
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
 //            System.out.println("saveaddress"+saveAddress);
             SymbolItem saveItem = new SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
         }else if(funcName.equals("@getch")){
-            int intValue =Utils.scanner.nextInt();
+            int intValue = 1;
+//            intValue = Utils.scanner.nextInt();
 
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
 //            System.out.println("saveaddress"+saveAddress);
@@ -389,7 +390,7 @@ public class Parser {
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(file, true)));
+                    new FileOutputStream(file, false)));
 //            out.write(conent+"\r\n");
             for(int i=0;i<output.size();i++){
                 out.write(output.get(i)+"\r\n");
