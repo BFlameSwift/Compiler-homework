@@ -1,6 +1,4 @@
 int main() {
-    int five = 5;
-    const int six = five + 1;
-    putint(six - five);
-    return 0;
+    const int a = 1;
+    return a+1;
 }
