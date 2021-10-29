@@ -106,7 +106,7 @@ public class Utils {
     public static String storeVariableOutput(int valueAddr,int varAddr){
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
         String retStr = "store i32 ";
-        retStr += valueItem.kind == 1?valueItem.valueInt:"%"+valueItem.getAddress();
+        retStr += valueItem.kind == 1?valueItem.valueInt:"%"+nowAddress;
         retStr += ", i32* %"+varAddr;
         return retStr;
     }
