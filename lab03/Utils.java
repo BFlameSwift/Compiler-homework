@@ -153,7 +153,7 @@ public class Utils {
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.valueInt)); // TODO 这里应该是变量吗
-        theSymbolItem.setLoadAddress(nowAddress);
+        theSymbolItem.setLoadAddress(nowAddress+1);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {

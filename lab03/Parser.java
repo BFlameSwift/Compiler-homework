@@ -273,7 +273,7 @@ public class Parser {
             return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).valueInt,"main");
 //            return coefficient * parsePrimaryExp();
         }else if(MyBool.isIdent(thisLexcial)&&MyBool.isLParen(Token.getNextToken().getLexcial())){
-            System.out.println("funcname"+thisToken.getValue());
+//            System.out.println("funcname"+thisToken.getValue());
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue()))
                 throw new CompileException("Parse dont hava this func "+thisToken.getValue());
             SymbolItem funcItem = Utils.funcSymbolTable.get(thisToken.getValue());
@@ -305,7 +305,7 @@ public class Parser {
 
     public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
         int retAddr = 0;
-        System.out.println("funcname"+funcName);
+//        System.out.println("funcname"+funcName);
         if(funcName.equals("@getint")){
             int intValue = 1;
 //            intValue = Utils.scanner.nextInt();
@@ -356,6 +356,7 @@ public class Parser {
             SymbolItem lval = Utils.getSymbolItem(token,"main");
             if(!lval.isConstant())
                 output.add(Utils.loadLValOutput(token,"main"));
+//            output.add(Utils.loadLValOutput(token,"main"));
             return lval.getLoadAddress();
 //            return Utils.getIdentLVal(token,"main");
         }
