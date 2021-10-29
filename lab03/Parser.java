@@ -356,7 +356,7 @@ public class Parser {
             SymbolItem lval = Utils.getSymbolItem(token,"main");
             if(!lval.isConstant())
                 output.add(Utils.loadLValOutput(token,"main"));
-            return lval.getAddress();
+            return lval.getLoadAddress();
 //            return Utils.getIdentLVal(token,"main");
         }
         else{
