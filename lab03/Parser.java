@@ -58,13 +58,17 @@ public class Parser {
             throw new CompileException("Parser const def Error is not =");
         }
 
-        int valueConstInitval = parseConstInitVal();
+        int valueConstInitvalAddress = parseConstInitVal();
+        SymbolItem constItem = Utils.getSymbolItemByAddress(valueConstInitvalAddress);
+        if(constItem.kind == 0){
+            throw new CompileException("const cant assign by var");
+        }
 
-        Utils.storeConstVariable(identToken.getValue(),valueConstInitval,"main");
+        Utils.storeConstVariable(identToken.getValue(),constItem.valueInt,"main");
 
     }
     public static int parseConstInitVal() throws CompileException{
-        return Utils.getSymbolItemByAddress(parseConstExp()).valueInt;
+        return parseExp();
     }
 
     public static int parseConstExp() throws CompileException {

@@ -177,7 +177,10 @@ public class Utils {
         outputStr += "call "; outputStr += (funcItem.type == 1)?"i32":"void";
         outputStr+=" "+name+"(";
         for(int i=0;i<funcItem.length;i++){
-            outputStr+=" i32 %"+paramAddrList.get(i);
+            outputStr+=" i32";
+            SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
+            outputStr += item.kind == 1?item.valueInt:"%"+item.getLoadAddress();
+//        "%"+paramAddrList.get(i);
 //            outputStr += " ";
         }outputStr+=")";
         Parser.output.add(outputStr);
