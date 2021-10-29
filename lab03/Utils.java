@@ -96,7 +96,7 @@ public class Utils {
             putallocalSymbolTable(item,funcName);
         }putAddressSymbol(constAddress,item);
 
-        System.out.println(item.output());
+//        System.out.println(item.output());
         return item.getAddress();
     }
 

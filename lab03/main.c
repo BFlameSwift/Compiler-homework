@@ -1,3 +1,7 @@
+#include<stdio.h>
 int main() {
-    return 1 + (-2) * (3 / (4 - 5));
+    int f = 5;
+    const int s = f +1;
+    printf("%d",s-f);
+    return 0;
 }
