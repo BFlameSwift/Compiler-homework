@@ -106,7 +106,7 @@ public class Utils {
     public static String storeVariableOutput(int valueAddr,int varAddr){
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
         String retStr = "store i32 ";
-        retStr += valueItem.kind == 1?valueItem.valueInt:"%"+nowAddress;
+        retStr += valueItem.kind == 1?valueItem.valueInt:"%"+valueItem.getLoadAddress();
         retStr += ", i32* %"+varAddr;
         return retStr;
     }
@@ -121,9 +121,9 @@ public class Utils {
 
         if(objKind == 0||objKind == 1){// 是变量就输出过程
             String outStr = "%"+objAddress+" = "+op+" i32 ";
-            outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getAddress();
+            outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getLoadAddress();
             outStr += ", ";
-            outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getAddress();
+            outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
 
             Parser.output.add(outStr);
         }
@@ -153,6 +153,7 @@ public class Utils {
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.valueInt)); // TODO 这里应该是变量吗
+        theSymbolItem.setLoadAddress(nowAddress);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {

@@ -11,7 +11,19 @@ public class SymbolItem {
     public int kind; // var 0,const 1,function 2,array 3
     public int type; // void 0 int 1;
     public int valueInt;
-    private int address;
+    private int address = 0;
+    private int loadAddress = 0;
+
+    public int getLoadAddress() {
+        if(loadAddress == 0){
+            throw new IllegalArgumentException("load address = 0");
+        }
+        return loadAddress;
+    }
+
+    public void setLoadAddress(int loadAddress) {
+        this.loadAddress = loadAddress;
+    }
 
     public int getAddress() {
         if( address == 0)
@@ -20,6 +32,7 @@ public class SymbolItem {
     }
 
     public void setAddress(int address) {
+        this.loadAddress = address;
         this.address = address;
     }
 
