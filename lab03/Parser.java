@@ -91,16 +91,16 @@ public class Parser {
             Token.previousToken();
             return;
         }
-        int value = parseInitVal();
-        varAddr = Utils.storeVariable(identToken,value);
+        int valueAddr = parseInitVal();
+        varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).valueInt);
 //        System.out.println(value);
-        output.add(Utils.storeVariableOutput(varAddr));
+        output.add(Utils.storeVariableOutput(valueAddr,varAddr));
         // TODO 变量赋值
         return;
     }
     public static int parseInitVal() throws CompileException {
 
-        return Utils.getSymbolItemByAddress(parseExp()).valueInt;
+        return parseExp();
         // TODO 修改EXP
     }
 
@@ -194,7 +194,7 @@ public class Parser {
 //               SymbolItem theSymbolItem = Utils.getSymbolItem(token,"main");
                int expAddr = parseExp();
                int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).valueInt);
-               output.add(Utils.storeVariableOutput(varAddr));
+               output.add(Utils.storeVariableOutput(expAddr,varAddr));
                if(!MyBool.isSemicolon(Token.nextTokenLexcial(";"))){
                    throw new CompileException("Parser Error is not a ; ");
                }

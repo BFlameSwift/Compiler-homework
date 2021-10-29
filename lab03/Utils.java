@@ -103,8 +103,12 @@ public class Utils {
         return item.getAddress();
     }
 
-    public static String storeVariableOutput(int varAddr){
-        return "store i32 %"+nowAddress+", i32* %"+varAddr;
+    public static String storeVariableOutput(int valueAddr,int varAddr){
+        SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
+        String retStr = "store i32 ";
+        retStr += valueItem.kind == 1?valueItem.valueInt:"%"+valueItem.getAddress();
+        retStr += ", i32* %"+varAddr;
+        return retStr;
     }
 
     public static int midExpCalculate(String op,int address1,int address2){
