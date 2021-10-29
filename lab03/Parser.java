@@ -3,68 +3,89 @@ package lab03;
 import java.io.*;
 import java.util.ArrayList;
 
-//TODO 修改架构： gettoken get lexcial 中间内置抛出异常
 public class Parser {
     public static ArrayList<String> output = new ArrayList<String>();
     public static void parseCompUnit()throws CompileException {
         parseFuncDef();
     }
     public static void parseDecl() throws CompileException {
-        if(MyBool.isConstDec(Utils.nextTokenLexcial("const"))){
-            Utils.previousToken();
+        if(MyBool.isConstDec(Token.nextTokenLexcial("const"))){
+            Token.previousToken();
             parseConstDecl();
         }else{
-            Utils.previousToken();
-            //TODO vardecl
+            Token.previousToken();
+            parseVarDecl();
         }
     }
     public static void parseConstDecl() throws CompileException {
-        if(!MyBool.isConstDec(Utils.nextTokenLexcial("const"))){
+        if(!MyBool.isConstDec(Token.nextTokenLexcial("const"))){
             throw new CompileException("Parser constdecl Error is not const");
         }
         parseBType();
         parseConstDef();
-        while(!MyBool.isComma(Utils.nextTokenLexcial(","))){
+        while(MyBool.isComma(Token.nextTokenLexcial(","))){
             parseConstDef();
-        }Utils.previousToken();
-        while(!MyBool.isSemicolon(Utils.nextTokenLexcial(";"))){
+        }
+        Token.previousToken();
+        while(!MyBool.isSemicolon(Token.nextTokenLexcial(";"))){
             throw new CompileException("Parser constdecl Error is not ;");
         }
     }
     public static void parseBType() throws CompileException { // 检测Bype 只有int
-        if(!MyBool.isIntDec(Utils.nextTokenLexcial("int"))){
+        if(!MyBool.isIntDec(Token.nextTokenLexcial("int"))){
             throw new CompileException("Parser Error is not int");
         }
     }
     public static void parseConstDef() throws CompileException {
         //TODO 添加进符号表
-        Token identToken = Utils.nextToken("ident");
+        Token identToken = Token.nextToken("ident");
         if(!MyBool.isIdent(identToken.getLexcial())){
             throw new CompileException("Parser const def Error is not Ident");
-        }if(!MyBool.isEqual(Utils.nextTokenLexcial("="))){
+        }if(!MyBool.isAssign(Token.nextTokenLexcial("="))){
             throw new CompileException("Parser const def Error is not =");
         }
-        int valueConstInitval = parseConstExp();
+
+        int valueConstInitval = parseConstInitVal();
+        Utils.storeConstVariable(identToken,valueConstInitval,"main");
+
+    }
+    public static int parseConstInitVal() throws CompileException{
+        return parseConstExp();
     }
 
     public static int parseConstExp() throws CompileException {
         return parseAddExp();
     }
     public static void parseVarDecl() throws CompileException {
+//        System.out.println("in var decl");
         parseBType();
         parseVarDef();
+        while((MyBool.isComma(Token.nextTokenLexcial(",")))){
+            parseVarDef();
+        }
+        Token.previousToken();
+
+        if(!MyBool.isSemicolon(Token.nextTokenLexcial(";"))){
+            throw new CompileException("Parser error except ;");
+        }
     }
     public static void parseVarDef() throws CompileException {
-        Token identToken = Utils.nextToken("ident");
-//        output.add("allocte "+identToken.getValue());
-        if(MyBool.isEqual(Utils.nextTokenLexcial("="))){
-            parseInitVal();
-            // TODO 变量赋值
-        }Utils.previousToken();
+        Token identToken = Token.nextToken("ident");
+        int varAddr = Utils.allocateVariable(identToken,0,false);
+        output.add("%"+varAddr+" = alloca i32");
+        if(!MyBool.isAssign(Token.nextTokenLexcial("="))){
+            Token.previousToken();
+            return;
+        }
+        int value = parseInitVal();
+        varAddr = Utils.storeVariable(identToken,value);
+//        System.out.println(value);
+        output.add(Utils.storeVariableOutput(varAddr));
+        // TODO 变量赋值
         return;
     }
-    public static void parseInitVal() throws CompileException {
-        parseExp();
+    public static int parseInitVal() throws CompileException {
+        return parseExp();
         // TODO 修改EXP
     }
 
@@ -73,12 +94,12 @@ public class Parser {
 //        if (! MyBool.isFuncType(lexicalIterator.next())){
 //            throw new CompileException("Parser Error is not a FuncType");
 //        }
-        Utils.nextToken("FuncDef");
+        Token.nextToken("FuncDef");
         output.add("define dso_local i32");
 
         parseIdent();
 
-        if(!MyBool.isLParen(Utils.nextToken("(").getLexcial()) || !MyBool.isRParen(Utils.nextToken(")").getLexcial())){
+        if(!MyBool.isLParen(Token.nextToken("(").getLexcial()) || !MyBool.isRParen(Token.nextToken(")").getLexcial())){
             throw new CompileException("Parser Error is not ()");
         }
         output.add("()");
@@ -88,49 +109,87 @@ public class Parser {
     }
     public static void parseIdent()throws CompileException {
 
-        if (! MyBool.isIdent(Utils.nextToken("Ident").getLexcial())){
+        if (! MyBool.isIdent(Token.nextToken("Ident").getLexcial())){
             throw new CompileException("Parser Error is not a Ident");
         }
-        output.add(Utils.getPreviousToken().getValue());
+        output.add(Token.getPreviousToken().getValue());
 
     }
     public static void parseBlock()throws CompileException {
-        if(!MyBool.isLBrace(Utils.nextTokenLexcial("{"))){
+        Utils.enterBlock(); //blockindex ++;
+
+        if(!MyBool.isLBrace(Token.nextTokenLexcial("{"))){
             throw new CompileException("Parser Error is not a { ");
         } output.add("{");
 
-        while (!MyBool.isRBrace(Utils.nextTokenLexcial("}"))) {
-            Utils.previousToken();
+        while (!MyBool.isRBrace(Token.nextTokenLexcial("}"))) {
+            Token.previousToken();
             parseBlockItem();
-        }Utils.previousToken();
+        }
+        Token.previousToken();
 //        parseStmt();
 
-        if(!MyBool.isRBrace(Utils.nextTokenLexcial("}"))){
+        if(!MyBool.isRBrace(Token.nextTokenLexcial("}"))){
             throw new CompileException("Parser Error is not a } ");
         } output.add("}");
     }
     public static void parseBlockItem() throws CompileException {
-        if(MyBool.isDecl(Utils.nextTokenLexcial("decl"))){
-            Utils.previousToken();
+
+        if(MyBool.isDecl(Token.nextTokenLexcial("decl"))){
+            Token.previousToken();
             parseDecl();
-        }Utils.previousToken();
-        parseStmt();
+        }else{
+            Token.previousToken();
+            parseStmt();
+        }
     }
 
     public static void parseStmt()throws CompileException {
-        if (!MyBool.isReturn(Utils.nextTokenLexcial("return"))){
-            throw new CompileException("Parser Error is not a Return ");
-        }
-        output.add("ret");
+        Token token = Token.nextToken("exp or Lval = Exp or return ");
+        if(MyBool.isReturn(token.getLexcial())){
+            //        output.add("ret");
+            if(MyBool.isNumber(Token.nextTokenLexcial("number "))){
+                if(MyBool.isSemicolon(Token.nextTokenLexcial(";")) ){
+                    output.add("ret i32 "+ Token.previousToken().getValue());
+                    return;
+                }
+                Token.previousToken();
+            }
+            Token.previousToken();
 
-        int expNum = parseExp();
+            int expNum = parseExp();
 //        if(!MyBool.isNumber(Utils.getLexical("number"))){
 //            throw new CompileException("Parser Error is not a Number ");
 //        };
-        output.add("i32 "+expNum);
-        if(!MyBool.isSemicolon(Utils.nextTokenLexcial(";"))){
-            throw new CompileException("Parser Error is not a ; ");
+//        output.add("ret i32 "+expNum);
+            output.add("ret i32 "+"%"+Utils.getNowAddress());
+
+            if(!MyBool.isSemicolon(Token.nextTokenLexcial(";"))){
+                throw new CompileException("Parser Error is not a ; ");
+            }
         }
+
+        else if(MyBool.isIdent(token.getLexcial())){
+            //TODO 如果找不到这个变量
+           if(MyBool.isAssign(Token.nextTokenLexcial("="))){
+//               SymbolItem theSymbolItem = Utils.getSymbolItem(token,"main");
+               int value = parseExp();
+               int varAddr = Utils.storeVariable(token,value);
+               output.add(Utils.storeVariableOutput(varAddr));
+
+               if(!MyBool.isSemicolon(Token.nextTokenLexcial(";"))){
+                   throw new CompileException("Parser Error is not a ; ");
+               }
+
+           }else {
+               Token.previousToken();
+               //TODO 处理表达式；
+           }
+        }else{
+            Token.previousToken();
+        }
+
+
 
 
     }
@@ -139,69 +198,83 @@ public class Parser {
         return parseAddExp();
     }
     public static int parseAddExp()throws CompileException {
-        int mulExpNum = parseMulExp();
+        int addExpNum = parseMulExp();
 
-        while(MyBool.isUnaryOp(Utils.nextTokenLexcial("+ or -"))){
-            String op = Utils.getPreviousToken().getValue();
-            System.out.println("this op:"+op);
+        while(MyBool.isUnaryOp(Token.nextTokenLexcial("+ or -"))){
+            String op = Token.getPreviousToken().getValue();
+//            System.out.println("this op:"+op);
             if(op.equals("Plus")) {
-                mulExpNum += parseMulExp();
+                int mulExpNum = parseMulExp();
+                output.add(Utils.midExpOutput("add",String.valueOf(addExpNum),String.valueOf(mulExpNum)));
+                addExpNum += mulExpNum;
             }else if (op.equals("Minus")) {
-                mulExpNum -= parseMulExp();
+                int mulExpNum = parseMulExp();
+                output.add(Utils.midExpOutput("sub",String.valueOf(addExpNum),String.valueOf(mulExpNum)));
+                addExpNum -= mulExpNum;
+
             }else{
                 throw new IllegalArgumentException("not - +");
             }
         }
-        Utils.previousToken();
-        return mulExpNum;
+        Token.previousToken();
+        return addExpNum;
     }
     public static int parseMulExp()throws CompileException {
-//        System.out.println("get UnaryExp");
-        int unaryExpNum = parseUnaryExp();
-        while(MyBool.isLevel3Operator(Utils.nextTokenLexcial("* / %"))){
-            String op = Utils.getPreviousToken().getValue();
+        int mulExpNum = parseUnaryExp();
+        while(MyBool.isLevel3Operator(Token.nextTokenLexcial("* / %"))){
+            String op = Token.getPreviousToken().getValue();
+            int unaryExpNum = parseUnaryExp();
             if(op.equals("Mul")) {
-                unaryExpNum *= parseUnaryExp();
+                output.add(Utils.midExpOutput("mul",String.valueOf(mulExpNum),String.valueOf(unaryExpNum)));
+                mulExpNum *= unaryExpNum;
             }else if(op.equals("Div")) {
-                unaryExpNum /= parseUnaryExp();
+                output.add(Utils.midExpOutput("sdiv",String.valueOf(mulExpNum),String.valueOf(unaryExpNum)));
+                mulExpNum /= unaryExpNum;
             }else if(op.equals("Mod")){
-                unaryExpNum %= parseUnaryExp();
+                output.add(Utils.midExpOutput("smod",String.valueOf(mulExpNum),String.valueOf(unaryExpNum)));
+                mulExpNum %= unaryExpNum;
             }else{
                 throw new IllegalArgumentException("not * / %");
             }
         }
-        Utils.previousToken();
-        return unaryExpNum;
+        Token.previousToken();
+        return mulExpNum;
     }
     public static int parseUnaryExp()throws CompileException {
 
-        int thisLexcial = Utils.nextTokenLexcial("( or Op");
+        int thisLexcial = Token.nextTokenLexcial("( or Op");
 
         if(MyBool.isUnaryOp(thisLexcial)){
             int coefficient = 1;
             while(MyBool.isUnaryOp(thisLexcial)){
                 coefficient *= parseUnaryOp(thisLexcial);
-                thisLexcial = Utils.nextTokenLexcial("UnaryOp");
+                thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
-            Utils.previousToken();
+            Token.previousToken();
             return coefficient * parsePrimaryExp();
         }else{
-            Utils.previousToken();
+            Token.previousToken();
             return parsePrimaryExp();
         }
     }
 
     public static int parsePrimaryExp() throws CompileException {
-        Token token = Utils.nextToken("( or Number in PrimaryExp");
+        Token token = Token.nextToken("( ,LVal or Number in PrimaryExp");
         if( MyBool.isLParen(token.getLexcial())){
 
             int num = parseExp();
-            if(!MyBool.isRParen(Utils.nextTokenLexcial(")"))){
+            if(!MyBool.isRParen(Token.nextTokenLexcial(")"))){
                 throw new CompileException("Parser Error is not )");
             }
             return num;
         }else if(MyBool.isNumber(token.getLexcial())){
             return Integer.parseInt(token.getValue());
+        }else if(MyBool.isIdent(token.getLexcial())){
+            SymbolItem lval = Utils.getSymbolItem(token,"main");
+            if(!lval.isConstant())
+                output.add(Utils.loadLValOutput(token,"main"));
+
+            return Utils.getIdentLVal(token,"main");
         }
         else{
 //            System.out.println(morpheme+token);

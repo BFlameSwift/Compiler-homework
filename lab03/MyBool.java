@@ -32,6 +32,8 @@ public class MyBool {
     public static Boolean isIntDec(int type){return type == Lexical.INT_DEC;}
     public static Boolean isVoidDec(int type){return type == Lexical.VOID_DEC;}
     public static Boolean isEqual(int type){return type == Lexical.EQUALS;}
+    public static Boolean isAssign(int type){return type == Lexical.ASSIGN;}
+
     public static Boolean isComma(int type){return type == Lexical.COMMA;}
     public static Boolean isDecl(int type){return isIntDec(type) || isConstDec(type);}
 

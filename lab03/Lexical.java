@@ -209,7 +209,7 @@ public class Lexical {
             tokens.add(new Token(lexicalList.get(i),tokenList.get(i),0));
         }
         Parser.deleteComment(tokens);
-        Utils.setTokenList(tokens);
+        Token.setTokenList(tokens);
         return tokens;
     }
 

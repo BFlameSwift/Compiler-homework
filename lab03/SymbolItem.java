@@ -5,16 +5,18 @@ import java.util.ArrayList;
  * @author BFlame
  */
 public class SymbolItem {
+    public static final int NOT_ASSIGN = -1239032;
     public String name;
-    int kind; // var 0,const 1,function 2,array 3
-    int constInt;
-    int length; // 数组长度，函数变量参数数目
+    public int kind; // var 0,const 1,function 2,array 3
+    public int constInt;
+    public int address;
+    public int length; // 数组长度，函数变量参数数目
     ArrayList<Integer> parametersList; // 参数类型
 
     public SymbolItem(String name,int kind ){
         this.name = name;
         this.kind = kind;
-        length = constInt = 0;
+        length = constInt = NOT_ASSIGN;
         parametersList = new ArrayList<>();
     }
     public SymbolItem(String name,int kind,int constInt){
@@ -30,7 +32,16 @@ public class SymbolItem {
 
         // TODO 根据不同种类输出
         return out;
-
     }
+    public  Boolean isConstant(){
+        return kind == 1;
+    }
+
+
+    @Override
+    public String toString() {
+        return "name："+name+" kind"+kind+" value:"+constInt;
+    }
+
 
 }
