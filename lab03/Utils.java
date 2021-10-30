@@ -114,17 +114,18 @@ public class Utils {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.valueInt,op, item2.valueInt);
-//        int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);
-        int objAddress = ++nowAddress;
-        putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
+        int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
+//        int objAddress = nowAddress;
 
         if(objKind == 0){// 是变量就输出过程
+            //TODO 选择计算的目标变量，如果是变量就是输出，换言之：折叠常量计算
             String outStr = "%"+objAddress+" = "+op+" i32 ";
             outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getLoadAddress();
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
             Parser.output.add(outStr);
         }
+        putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
 
         return objAddress;
     }
