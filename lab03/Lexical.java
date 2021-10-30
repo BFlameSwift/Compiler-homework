@@ -34,9 +34,9 @@ public class Lexical {
             null,"Const","Int","Void" ,"If" ,"Else" ,"While" ,"Continue" ,"Break", "Return",
             "Assign","Semicolon","LParen","RParen","LBracket","RBracket","LBrace","RBrace","Lt","Gt","Le","Ge",
             "Ident","Decimal","Octal","Hexadecimal",
-            "Plus" ,"Minus" ,"Mul","Div","Mod", "Not","Equals","NEquals","Comma",
+            "add" ,"sub" ,"mul","sdiv","srem", "Not","Equals","NEquals","Comma",
             "SingleQuote" ,"DoubleQuote" ,"SingleComment" ,"LBlockComment","RBlockComment","And","Or"
-    };
+    }; // srem == Mod
     public static List<String> TOKEN_LIST = Arrays.asList(TOKEN_NAMES);
     public static List<String> SYMBOL_LIST = Arrays.asList(SYMBOL_NAMES);
     public static Boolean isLegalWord(String str){
@@ -221,27 +221,7 @@ public class Lexical {
             System.out.println(token.getValue()+"  "+token.getLexcial());
         }
     }
-//    public static void main(String[] args) throws FileNotFoundException , CompileException {
-//        ArrayList<String> words = new ArrayList<String>();
-//        ArrayList<Integer> lexicalList = Utils.getLexicalList();
-//        try {
-//            lexicalList = getLexicalList("./lab01/main.c",words);
-//        }catch (CompileException e){
-//            System.out.println(e);
-//            System.exit(-1);
-//        }
-//        ArrayList<String> tokenList = Utils.getTokenList();
-//
-//        for (String word : words) {
-//            tokenList.add(typeRecognition(word,lexicalList,false));
-//        }
-//        Parser.deleteComment();
-////        System.out.println(tokenList.size()+""+lexicalList.size());
-//        for(int i=0;i<lexicalList.size();i++){
-//            System.out.println(tokenList.get(i)+" "+lexicalList.get(i));
-//        }
-//        System.exit(0);
-//    }
+
 }
 
 
