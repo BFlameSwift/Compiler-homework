@@ -99,7 +99,6 @@ public class Utils {
             putallocalSymbolTable(item,funcName);
         }putAddressSymbol(constAddress,item);
 
-//        System.out.println(item.output());
         return item.getAddress();
     }
 
@@ -119,12 +118,11 @@ public class Utils {
         int objAddress = ++nowAddress;
         putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
 
-        if(objKind == 0||objKind == 1){// 是变量就输出过程
+        if(objKind == 0){// 是变量就输出过程
             String outStr = "%"+objAddress+" = "+op+" i32 ";
             outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getLoadAddress();
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
-
             Parser.output.add(outStr);
         }
 
@@ -201,11 +199,5 @@ public class Utils {
 //       }
        return ret;
     }
-//    public static void storeConstVariable(Token token,int value,String funcName) throws CompileException{
-//        SymbolItem constIdent = new SymbolItem(token.getValue(),1,value);
-//
-//        putallocalSymbolTable(constIdent,funcName);
-//        putblockSymbolTable(constIdent,blockIndex);
-//
-//    }
+
 }
