@@ -116,9 +116,8 @@ public class Utils {
         objValue = calculateValue(item1.valueInt,op, item2.valueInt);
         int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
 //        int objAddress = nowAddress;
-
         if(objKind == 0){// 是变量就输出过程
-            //TODO 选择计算的目标变量，如果是变量就是输出，换言之：折叠常量计算
+            // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
             String outStr = "%"+objAddress+" = "+op+" i32 ";
             outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getLoadAddress();
             outStr += ", ";
@@ -131,6 +130,7 @@ public class Utils {
     }
 
     public static int calculateValue(int value1,String op,int value2){
+        //根据符号计算，节约Parse部分的底阿妈
         if(op.equals("add")){
             return value1 + value2;
         }else if(op.equals("sub"))
@@ -142,7 +142,7 @@ public class Utils {
         else if(op.equals("srem"))
             return value1 % value2;
         else{
-            throw new IllegalArgumentException("not + -  / %");
+            throw new IllegalArgumentException("calculate not + - * / %");
         }
     }
     public static String loadLValOutput(Token token,String funcName) throws CompileException {
@@ -170,7 +170,7 @@ public class Utils {
         }
         SymbolItem funcItem = funcSymbolTable.get(name);
         String outputStr = "";
-        if(funcItem.type == 1){
+        if(funcItem.type == 1){// 是否有返回值
             outputStr += "%"+(++nowAddress)+" = ";
         }
         outputStr += "call "; outputStr += (funcItem.type == 1)?"i32":"void";

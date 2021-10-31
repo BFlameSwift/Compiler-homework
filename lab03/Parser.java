@@ -17,10 +17,11 @@ public class Parser {
         Utils.allFuncList.add("@getint");Utils.allFuncList.add("@putint");Utils.allFuncList.add("@getch");Utils.allFuncList.add("@putch");
         Utils.funcSymbolTable.put("@getint",getint); Utils.funcSymbolTable.put("@putint",putint); Utils.funcSymbolTable.put("@getch",getch);Utils.funcSymbolTable.put("@putch",putch);
     }
-
+    //    CompUnit     -> [CompUnit] (Decl | FuncDef)
     public static void parseCompUnit()throws CompileException {
         parseFuncDef();
     }
+    //    Decl         -> ConstDecl | VarDecl
     public static void parseDecl() throws CompileException {
         if(Token.isConstDec(Token.nextTokenLexcial("const"))){
             Token.previousToken();
@@ -30,6 +31,7 @@ public class Parser {
             parseVarDecl();
         }
     }
+    //    ConstDecl    -> 'const' BType ConstDef { ',' ConstDef } ';'
     public static void parseConstDecl() throws CompileException {
         Token.exceptNextToken(Lexical.CONST_DEC);
 
@@ -43,10 +45,11 @@ public class Parser {
         Token.exceptNextToken(Lexical.SEMICOLON);
 
     }
+    //    BType        -> 'int'
     public static void parseBType() throws CompileException { // 检测Bype 只有int
         Token.exceptNextToken(Lexical.INT_DEC);
-
     }
+    //ConstDef     -> Ident { '[' ConstExp ']' } '=' ConstInitVal
     public static void parseConstDef() throws CompileException {
         //TODO 添加进符号表
         Token identToken = Token.nextToken("ident");
@@ -64,13 +67,15 @@ public class Parser {
         Utils.storeConstVariable(identToken.getValue(),constItem.valueInt,"main");
 
     }
+    // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
     public static int parseConstInitVal() throws CompileException{
         return parseConstExp();
     }
-
+    // ConstExp     -> AddExp
     public static int parseConstExp() throws CompileException {
         return parseAddExp();
     }
+    // VarDecl      -> BType VarDef { ',' VarDef } ';'
     public static void parseVarDecl() throws CompileException {
 //        System.out.println("in var decl");
         parseBType();
@@ -84,6 +89,7 @@ public class Parser {
             throw new CompileException("Parser error except ;");
         }
     }
+    // VarDef       -> Ident { '[' ConstExp ']' }  | Ident { '[' ConstExp ']' } '=' InitVal
     public static void parseVarDef() throws CompileException {
         Token identToken = Token.nextToken("ident");
         int varAddr = Utils.allocateVariable(identToken,0,false);
@@ -101,8 +107,7 @@ public class Parser {
     public static int parseInitVal() throws CompileException {
         return parseExp();
     }
-
-
+    // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
     public static void parseFuncDef()throws CompileException {
 
         Token.nextToken("FuncDef");
@@ -112,11 +117,13 @@ public class Parser {
         output.add("()");
         parseBlock();
     }
+
     public static void parseIdent()throws CompileException {
 
         Token.exceptNextToken(Lexical.IDENT);
         output.add(Token.getPreviousToken().getValue());
     }
+    // Block        -> '{' { BlockItem } '}'
     public static void parseBlock()throws CompileException {
         Utils.enterBlock(); //blockindex ++;
         Token.exceptNextToken(Lexical.LBRACE);   output.add("{");
@@ -126,6 +133,7 @@ public class Parser {
         }
         output.add("}");
     }
+    // BlockItem    -> Decl | Stmt
     public static void parseBlockItem() throws CompileException {
         if(Token.isDecl(Token.nextTokenLexcial("decl"))){
             Token.previousToken();
@@ -135,7 +143,14 @@ public class Parser {
             parseStmt();
         }
     }
-
+    //Stmt         -> LVal '=' Exp ';'
+    //                | [Exp] ';'
+    //                | Block
+    //                | 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+    //                | 'while' '(' Cond ')' Stmt
+    //                | 'break' ';'
+    //                | 'continue' ';'
+    //                | 'return' [Exp] ';'
     public static void parseStmt()throws CompileException {
         Token token = Token.nextToken("exp or Lval = Exp or return ");
         if(token.judgeThis(Lexical.RETURN_DEC)){
@@ -164,9 +179,11 @@ public class Parser {
             Token.previousToken();
         }
     }
+    // Exp          -> AddExp
     public static int parseExp()throws CompileException {
         return parseAddExp();
     }
+    // AddExp       -> MulExp  | AddExp ('+' | '−') MulExp
     public static int parseAddExp()throws CompileException {
         int addExpAddress = parseMulExp();
         //todo 可以简化步骤
@@ -183,6 +200,7 @@ public class Parser {
         Token.previousToken();
         return addExpAddress;
     }
+    // MulExp       -> UnaryExp  | MulExp ('*' | '/' | '%') UnaryExp
     public static int parseMulExp()throws CompileException {
         int mulExpAddress = parseUnaryExp();
         while(Token.isLevel3Operator(Token.nextTokenLexcial("* / %"))){
@@ -197,6 +215,7 @@ public class Parser {
         Token.previousToken();
         return mulExpAddress;
     }
+    // UnaryExp     -> PrimaryExp  | Ident '(' [FuncRParams] | UnaryOp UnaryExp
     public static int parseUnaryExp()throws CompileException {
         Token thisToken = Token.nextToken("( or Op or func(param)");
         int thisLexcial = thisToken.getLexcial();
@@ -236,7 +255,40 @@ public class Parser {
             return parsePrimaryExp();
         }
     }
+    // PrimaryExp   -> '(' Exp ')' | LVal | Number
+    public static int parsePrimaryExp() throws CompileException {
+        Token token = Token.nextToken("( ,LVal or Number in PrimaryExp");
+        if( Token.isLParen(token.getLexcial())){
 
+            int address = parseExp();
+            Token.exceptNextToken(Lexical.RPAREN);
+
+            return address;
+        }else if(Token.isNumber(token.getLexcial())){
+            int value = Integer.parseInt(token.getValue());
+            return Utils.storeConstVariable(null,value,"main");
+        }else if(Token.isIdent(token.getLexcial())){
+            SymbolItem lval = Utils.getSymbolItem(token,"main");
+            if(!lval.isConstant())
+                output.add(Utils.loadLValOutput(token,"main"));
+//            output.add(Utils.loadLValOutput(token,"main"));
+            return lval.getLoadAddress();
+//            return Utils.getIdentLVal(token,"main");
+        }
+        else{
+            throw new CompileException("Parser Error is not ( or Number in PrimaryExp");
+        }
+
+    }
+    // Plus return + Minux return false
+    public static int parseUnaryOp(int morpheme)throws CompileException {
+        int op = morpheme;
+
+        if(!(Token.isPlus(op) || Token.isMinus(op))){
+            throw new CompileException("Unary op is not + or -");
+        }
+        return Token.isPlus(op)?1:-1;
+    }
     public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
         int retAddr = 0;
 //        System.out.println("funcname"+funcName);
@@ -271,41 +323,6 @@ public class Parser {
         }
 
     }
-
-    public static int parsePrimaryExp() throws CompileException {
-        Token token = Token.nextToken("( ,LVal or Number in PrimaryExp");
-        if( Token.isLParen(token.getLexcial())){
-
-            int address = parseExp();
-            Token.exceptNextToken(Lexical.RPAREN);
-
-            return address;
-        }else if(Token.isNumber(token.getLexcial())){
-            int value = Integer.parseInt(token.getValue());
-            return Utils.storeConstVariable(null,value,"main");
-        }else if(Token.isIdent(token.getLexcial())){
-            SymbolItem lval = Utils.getSymbolItem(token,"main");
-            if(!lval.isConstant())
-                output.add(Utils.loadLValOutput(token,"main"));
-//            output.add(Utils.loadLValOutput(token,"main"));
-            return lval.getLoadAddress();
-//            return Utils.getIdentLVal(token,"main");
-        }
-        else{
-            throw new CompileException("Parser Error is not ( or Number in PrimaryExp");
-        }
-
-    }
-    // Plus return + Minux return false
-    public static int parseUnaryOp(int morpheme)throws CompileException {
-        int op = morpheme;
-
-        if(!(Token.isPlus(op) || Token.isMinus(op))){
-            throw new CompileException("Unary op is not + or -");
-        }
-        return Token.isPlus(op)?1:-1;
-    }
-
     public static void deleteComment(ArrayList<Token> tokens)throws CompileException {
         int i;
         for (i=0;i<tokens.size();i++){
