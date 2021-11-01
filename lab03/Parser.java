@@ -64,7 +64,7 @@ public class Parser {
             throw new CompileException("const cant assign by var");
         }
 
-        Utils.storeConstVariable(identToken.getValue(),constItem.valueInt,"main");
+        Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(),"main");
 
     }
     // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
@@ -99,7 +99,7 @@ public class Parser {
             return;
         }
         int valueAddr = parseInitVal();
-        varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).valueInt);
+        varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt());
 //        System.out.println(value);
         output.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;
@@ -157,7 +157,7 @@ public class Parser {
             int expAddress = parseExp();
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
-            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.valueInt    :    "%"+retSymbolItem.getAddress();
+            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getAddress();
             output.add("ret i32 "+retStr);
             Token.exceptNextToken(Lexical.SEMICOLON);
         }
@@ -166,7 +166,7 @@ public class Parser {
            if(Token.isAssign(Token.nextTokenLexcial("="))){
 //               SymbolItem theSymbolItem = Utils.getSymbolItem(token,"main");
                int expAddr = parseExp();
-               int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).valueInt);
+               int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).getValueInt());
                output.add(Utils.storeVariableOutput(expAddr,varAddr));
                Token.exceptNextToken(Lexical.SEMICOLON);
            }else {
@@ -227,7 +227,7 @@ public class Parser {
                 thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
             Token.previousToken();
-            return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).valueInt,"main");
+            return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(),"main");
         }else if(Token.isIdent(thisLexcial)&& Token.isLParen(Token.getNextToken().getLexcial())){
 
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue()))
@@ -259,10 +259,8 @@ public class Parser {
     public static int parsePrimaryExp() throws CompileException {
         Token token = Token.nextToken("( ,LVal or Number in PrimaryExp");
         if( Token.isLParen(token.getLexcial())){
-
             int address = parseExp();
             Token.exceptNextToken(Lexical.RPAREN);
-
             return address;
         }else if(Token.isNumber(token.getLexcial())){
             int value = Integer.parseInt(token.getValue());
@@ -311,12 +309,12 @@ public class Parser {
         }else if(funcName.equals("@putint")){
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
             int address = paramAddrList.get(0);
-            System.out.println("putint:"+Utils.getSymbolItemByAddress(address).valueInt);
+            System.out.println("putint:"+Utils.getSymbolItemByAddress(address).getValueInt());
             return saveAddress;
         }else if(funcName.equals("@putch")){
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
             int address = paramAddrList.get(0);
-            System.out.println("putch:"+((char)Utils.getSymbolItemByAddress(address).valueInt));
+            System.out.println("putch:"+((char)Utils.getSymbolItemByAddress(address).getValueInt()));
             return saveAddress;
         }else{
             throw new CompileException("IOFunction error");

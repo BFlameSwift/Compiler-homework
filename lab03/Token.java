@@ -7,19 +7,22 @@ import java.util.NoSuchElementException;
 public class Token {
     private int lexcial;
     private String value;
+    private int lineNumber;
+    static ArrayList<Token> tokenList = new ArrayList<>();
+    static ListIterator<Token> tokenIterator = tokenList.listIterator();
+
+
+
 
     public static Boolean isFuncType(int type){
         return type == Lexical.INT_DEC || type == Lexical.VOID_DEC;
     }
-
     public static Boolean isIdent(int type){
         return type == Lexical.IDENT;
     }
-
     public static Boolean isLParen(int type){
         return type == Lexical.LPAREN;
     }
-
     public static Boolean isRParen(int type){return type == Lexical.RPAREN;}
     public static Boolean isLBrace(int type){return type == Lexical.LBRACE;}
     public static Boolean isRBrace(int type){return type == Lexical.RBRACE;}
@@ -43,12 +46,11 @@ public class Token {
     public static Boolean isComma(int type){return type == Lexical.COMMA;}
     public static Boolean isDecl(int type){return isIntDec(type) || isConstDec(type);}
     public String getValue() {
+
         return value;
     }
 
-    private int lineNumber;
-    static ArrayList<Token> tokenList = new ArrayList<>();
-    static ListIterator<Token> tokenIterator = tokenList.listIterator();
+
 
     public static ArrayList<Token> getTokenList() {
         return tokenList;
