@@ -38,8 +38,9 @@ public class SymbolItem {
     }
 
     public int getAddress() {
-        if( address == 0)
+        if( address == 0) {
             throw new IllegalArgumentException("Address is not assign");
+        }
         return address;
     }
 

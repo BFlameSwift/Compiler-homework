@@ -21,7 +21,8 @@ public class Main {
         Scanner scanner = null;
         scanner = new Scanner(new File(filePath));
         boolean hasError = false;
-        while (scanner.hasNextLine()&&!hasError)//逐行读取文件内容
+        //逐行读取文件内容
+        while (scanner.hasNextLine()&&!hasError)
         {
             String line = scanner.nextLine();
             hasError = processLine(line,words);
@@ -49,8 +50,9 @@ public class Main {
             }
             if(isIdentifier(thisStr)){
                 for(j = i+1;j<lineLen;j++){
-                    if( ! (line.charAt(j)>='a'&&line.charAt(j)<='z' || line.charAt(j)>='0' && line.charAt(j) <= '9' || line.charAt(j) >= 'A' && line.charAt(j) <= 'Z' || line.charAt(j) == '_'))
+                    if( ! (line.charAt(j)>='a'&&line.charAt(j)<='z' || line.charAt(j)>='0' && line.charAt(j) <= '9' || line.charAt(j) >= 'A' && line.charAt(j) <= 'Z' || line.charAt(j) == '_')) {
                         break;
+                    }
                 }
             }
             else if (isSymbol(thisStr)){
@@ -62,8 +64,9 @@ public class Main {
             }
             else if(isUnsignNumnber(thisStr)){
                 for(j = i+1;j<lineLen;j++){
-                    if( ! (line.charAt(j) >= 48 && line.charAt(j) <= 57))
+                    if( ! (line.charAt(j) >= 48 && line.charAt(j) <= 57)) {
                         break;
+                    }
                 }
             }
             if (j>i)  {

@@ -7,7 +7,13 @@ public class Parser {
     public static ArrayList<String> midCodeOut = new ArrayList<String>();
     //    CompUnit     -> [CompUnit] (Decl | FuncDef)
     public static void parseCompUnit()throws CompileException {
-        parseFuncDef();
+        int lexcial = Token.getNextToken().getLexcial();
+        while(Token.isCompUnit(lexcial)){
+
+            if(Token.isFuncType(lexcial))  if(!parseFuncDef()) parseDecl();
+            else parseDecl();
+            lexcial = Token.getNextToken().getLexcial();
+        }
     }
     //    Decl         -> ConstDecl | VarDecl
     public static void parseDecl() throws CompileException {
@@ -90,10 +96,10 @@ public class Parser {
         }
         int valueAddr = parseInitVal();
         if(Utils.isGlobal()) {
-            Utils.allocateGlobalVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).valueInt,1,false);
+            Utils.allocateGlobalVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt(),1,false);
             return;
         }
-        varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).valueInt);
+        varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt());
         midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;
     }
@@ -101,15 +107,22 @@ public class Parser {
         return parseExp();
     }
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
-    public static void parseFuncDef()throws CompileException {
-
-        Token.nextToken("FuncDef");
-        midCodeOut.add("define dso_local i32");
+    public static Boolean parseFuncDef()throws CompileException {
+        Token funcDef = Token.nextToken("FuncDef");
         String funcName = parseIdent();
+        // 如果下一个不是函数定义，则可能是变量定义，先回退
+        if(Token.getNextToken().getLexcial() != Lexical.LPAREN) {
+            Token.previousToken();Token.previousToken(); return false;
+        }
+
+        midCodeOut.add("define dso_local i32");
+        Token.exceptNextToken(Lexical.LPAREN);
+        // TODO 函数参数
+        Token.exceptNextToken(Lexical.RPAREN);
         Utils.enterFunction(funcName); // 进入函数
-        Token.exceptNextToken(Lexical.LPAREN);  Token.exceptNextToken(Lexical.RPAREN);
         midCodeOut.add("()");
         parseBlock();
+        return true;
     }
 
     public static String parseIdent()throws CompileException {
@@ -151,7 +164,7 @@ public class Parser {
             int expAddress = parseExp();
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
-            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.valueInt    :    "%"+retSymbolItem.getAddress();
+            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getAddress();
             midCodeOut.add("ret i32 "+retStr);
             Token.exceptNextToken(Lexical.SEMICOLON);
         }
@@ -160,7 +173,7 @@ public class Parser {
            if(Token.isAssign(Token.nextTokenLexcial("="))){
            //SymbolItem theSymbolItem = Utils.getSymbolItem(token,"main");
                int expAddr = parseExp();
-               int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).valueInt);
+               int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).getValueInt());
                midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
                Token.exceptNextToken(Lexical.SEMICOLON);
            }else {

@@ -17,16 +17,16 @@ public class Utils {
     public static ArrayList<String > allFuncList = new ArrayList<String>();
     public static Map<String,SymbolItem> funcSymbolTable = new HashMap<String,SymbolItem>();
     private static int blockIndex = -1;
-
+    private static int nowBlockLevel = 0;
     private static int constAddress = -100000;
     private static int nowAddress = 0;
-    private static final String defaultGloablFunctionName = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
-    private static String nowFunctionName = defaultGloablFunctionName;
+    private static final String DEFAULT_GLOABL_FUNCTION_NAME = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
+    private static String nowFunctionName = DEFAULT_GLOABL_FUNCTION_NAME ;
     public static String getNowFunction(){ // 获取当前函数名称，从而对变量找准位置
         return nowFunctionName;
     }
     public static Boolean isGlobal(){
-        return nowFunctionName.equals(defaultGloablFunctionName);
+        return nowFunctionName.equals(DEFAULT_GLOABL_FUNCTION_NAME);
     }
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
@@ -38,6 +38,10 @@ public class Utils {
 
     public static void enterBlock(){
         blockIndex ++;
+        nowBlockLevel ++;
+    }
+    public static void quitBlock(){
+        nowBlockLevel --;
     }
     public static int getBlockIndex() {
         return blockIndex;
@@ -47,6 +51,23 @@ public class Utils {
     }
     public static void allocateGlobalVariable(String symbolName,SymbolItem symbolItem){
         globalSymbolTable.put(symbolName, symbolItem);
+        try{
+            blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
+        }catch(IndexOutOfBoundsException ie){
+            HashMap<String,SymbolItem> map = new HashMap<String,SymbolItem>();
+            blockSymbolTable.add(map);
+            blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
+        }
+    }
+    public static void judgeVariableNameIsLegal(String variableName) throws CompileException{
+        if(!Lexical.isIdentifier(variableName)){
+            throw new CompileException("variable Name is not ident name"); // 按道理不应该出现。判断变量名字是不是ident形式
+
+        }else if(Lexical.TOKEN_LIST.indexOf(variableName)>=Lexical.CONST_DEC && Lexical.TOKEN_LIST.indexOf(variableName)<=Lexical.RETURN_DEC){
+            // 如果变量名字是保留字的话,  不过由于已经识别为了保留字，例如return 会被转化为Return 详见lexical文件 所以要在TOkenlist的名字中找
+            throw new CompileException("Variable name is Reserved words");
+        }// TODO 区域内已经存在同名变量
+
     }
     public static void allocateGlobalVariable(Token token,int value,int kind,Boolean isCommon) throws CompileException {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
@@ -67,7 +88,7 @@ public class Utils {
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.setAddress(nowAddress);
-        if(funcName.equals(defaultGloablFunctionName)){
+        if(isGlobal()){
             allocateGlobalVariable(symbolName,symbolItem);
             return 0;
         }
@@ -110,11 +131,34 @@ public class Utils {
         }
         blockSymbolTable.get(index).put(symbolItem.name,symbolItem);
     }
-// 自小块向大块赋值
-    public static int storeVariable(Token token,int value){
+    // 自小块向大块查找需要的
+    private static SymbolItem getSymbolItem(Token token) throws CompileException{
+        int now_block_level = nowBlockLevel;
+        while(now_block_level>0){
+            Map<String,SymbolItem> map = blockSymbolTable.get(now_block_level);
+            if(map.containsKey(token.getValue())){
+                return map.get(token.getValue());
+            }
+        }
+        if(globalSymbolTable.containsKey(token.getValue())){
+            return globalSymbolTable.get(token.getValue());
+        }
+        if(funcSymbolTable.containsKey(token.getValue())){
+            return funcSymbolTable.get(token.getValue());
+        }
+        throw new CompileException("this Token"+token.getValue()+"cant be find");
+    }
+    public static SymbolItem getSymbolVariable(Token token) throws CompileException {
+        SymbolItem item = getSymbolItem(token);
+        if(item.kind != 0 || item.kind != 1){
+            throw new CompileException("This ident "+token.getValue()+"is not a variable");
+        }return item;
+    }
+    public static int storeVariable(Token token,int value) throws CompileException {
         // TODO 自下向上查找变量 而后区分出不同类型的变量并赋值
         // TODO 暂时认为只有一个块
-        SymbolItem symbolItem = blockSymbolTable.get(blockIndex).get(token.getValue());
+        SymbolItem symbolItem = new SymbolItem(null,-1); // 随便初始化一个。。后面会覆盖掉
+        symbolItem = getSymbolVariable(token);
         if(symbolItem.isConstant()){
             throw new CompileException("Constant cant be store value");
         }
@@ -151,7 +195,7 @@ public class Utils {
             String outStr = "%"+objAddress+" = "+op+" i32 ";
             outStr += (item1.kind == 1)?item1.getValueInt():"%"+item1.getLoadAddress();
             outStr += ", ";
-            outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
+            outStr += (item2.kind == 1)?item2.getValueInt():"%"+item2.getLoadAddress();
             Parser.midCodeOut.add(outStr);
         }
         putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
@@ -161,17 +205,17 @@ public class Utils {
 
     public static int calculateValue(int value1,String op,int value2){
         //根据符号计算，节约Parse部分的底阿妈
-        if(op.equals("add")){
+        if("add".equals(op)){
             return value1 + value2;
-        }else if(op.equals("sub"))
+        }else if("sub".equals(op)) {
             return value1 - value2;
-        else if(op.equals("mul"))
+        } else if("mul".equals(op)) {
             return value1 * value2;
-        else if(op.equals("sdiv"))
+        } else if("sdiv".equals(op)) {
             return value1 / value2;
-        else if(op.equals("srem"))
+        } else if("srem".equals(op)) {
             return value1 % value2;
-        else{
+        } else{
             throw new IllegalArgumentException("calculate not + - * / %");
         }
     }
@@ -185,6 +229,7 @@ public class Utils {
         theSymbolItem.setLoadAddress(nowAddress+1);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
+    // find by funcname
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {
         SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
 
