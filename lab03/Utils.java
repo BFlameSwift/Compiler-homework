@@ -16,8 +16,11 @@ public class Utils {
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
     public static ArrayList<String > allFuncList = new ArrayList<String>();
     public static Map<String,SymbolItem> funcSymbolTable = new HashMap<String,SymbolItem>();
-    private static int blockIndex = -1;
-    private static int nowBlockLevel = 0;
+    static{
+        blockSymbolTable.add(new HashMap<String, SymbolItem>());
+    }
+    private static int blockIndex = 0;
+    private static int thisFunctionBlockIndex = -1;
     private static int constAddress = -100000;
     private static int nowAddress = 0;
     private static final String DEFAULT_GLOABL_FUNCTION_NAME = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
@@ -30,6 +33,7 @@ public class Utils {
     }
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
+        thisFunctionBlockIndex = blockIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
     }
 
     public static int getNowAddress() {
@@ -38,10 +42,7 @@ public class Utils {
 
     public static void enterBlock(){
         blockIndex ++;
-        nowBlockLevel ++;
-    }
-    public static void quitBlock(){
-        nowBlockLevel --;
+        blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
     public static int getBlockIndex() {
         return blockIndex;
@@ -49,8 +50,7 @@ public class Utils {
     public static String allocateVariableOutput(int varialeAddr){
         return "%"+varialeAddr+" = alloca i32";
     }
-    public static void allocateGlobalVariable(String symbolName,SymbolItem symbolItem){
-        globalSymbolTable.put(symbolName, symbolItem);
+    public static void putGlobalInBlock0(String symbolName,SymbolItem symbolItem){
         try{
             blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
         }catch(IndexOutOfBoundsException ie){
@@ -60,7 +60,7 @@ public class Utils {
         }
     }
     public static void judgeVariableNameIsLegal(String variableName) throws CompileException{
-        if(!Lexical.isIdentifier(variableName)){
+        if(!Lexical.isIdentifier(variableName.substring(1))){ // 名字是@+identName
             throw new CompileException("variable Name is not ident name"); // 按道理不应该出现。判断变量名字是不是ident形式
 
         }else if(Lexical.TOKEN_LIST.indexOf(variableName)>=Lexical.CONST_DEC && Lexical.TOKEN_LIST.indexOf(variableName)<=Lexical.RETURN_DEC){
@@ -69,6 +69,14 @@ public class Utils {
         }// TODO 区域内已经存在同名变量
 
     }
+    public static String allocateGlobalVariableOutput(Token token,int value,int kind,Boolean isCommon){
+        String retStr = "";
+        retStr += token.getValue(); retStr += " = ";
+        retStr += isCommon?"common ":""; retStr += "dso_local ";
+        retStr += kind == 0?"global i32 ":"constant i32 ";
+        retStr += value+", align 4";
+        return retStr;
+    }
     public static void allocateGlobalVariable(Token token,int value,int kind,Boolean isCommon) throws CompileException {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
         String symbolName = token.getValue();
@@ -76,27 +84,19 @@ public class Utils {
         if(globalSymbolTable.containsKey(symbolName)){
             throw new CompileException("this variable name"+symbolName+"has been allocate");
         }globalSymbolTable.put(symbolName,symbolItem);
-        String retStr = "";
-        retStr += symbolName; retStr += " = ";
-        retStr += isCommon?"common":""; retStr += "dso_local ";
-        retStr += kind == 0?"global i32 ":"constant i32 ";
-        retStr += value+", align 4";
-        Parser.midCodeOut.add(retStr);
+        putGlobalInBlock0(symbolName,symbolItem);
+        Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon));
     }
     public static int allocateVariable(Token token,int kind,String funcName) throws CompileException {
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.setAddress(nowAddress);
-        if(isGlobal()){
-            allocateGlobalVariable(symbolName,symbolItem);
-            return 0;
-        }
         nowAddress ++;
         Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
         //TODO 根据不同函数进入不同的Map块
         putAddressSymbol(nowAddress,symbolItem);
-        putallocalSymbolTable(symbolItem,"main");
+        putallocalSymbolTable(symbolItem,funcName);
         putblockSymbolTable(symbolItem,blockIndex);
         return nowAddress;
     }
@@ -120,25 +120,23 @@ public class Utils {
     }
     public static void putblockSymbolTable(SymbolItem symbolItem,int index) throws CompileException{
         Map<String, SymbolItem> map ;
-        try {
-             map = blockSymbolTable.get(index);
-        }catch(IndexOutOfBoundsException e){
-            blockSymbolTable.add(new HashMap<String, SymbolItem>());
-            map = blockSymbolTable.get(index);
-        }
+        map = blockSymbolTable.get(index);
         if(map.containsKey(symbolItem.name)){
             throw new CompileException("same block"+index+"redefine Var or const which name is "+ symbolItem.name);
         }
-        blockSymbolTable.get(index).put(symbolItem.name,symbolItem);
+//        System.out.println("put"+symbolItem.name+"in block "+blockIndex);
+        map.put(symbolItem.name,symbolItem);
     }
     // 自小块向大块查找需要的
     private static SymbolItem getSymbolItem(Token token) throws CompileException{
-        int now_block_level = nowBlockLevel;
-        while(now_block_level>0){
-            Map<String,SymbolItem> map = blockSymbolTable.get(now_block_level);
+        int block_index = Utils.blockIndex;
+        while(block_index>=thisFunctionBlockIndex){
+//            System.out.println("this block index"+block_index);
+            Map<String,SymbolItem> map = blockSymbolTable.get(block_index);
             if(map.containsKey(token.getValue())){
                 return map.get(token.getValue());
             }
+            block_index --;
         }
         if(globalSymbolTable.containsKey(token.getValue())){
             return globalSymbolTable.get(token.getValue());
@@ -150,7 +148,8 @@ public class Utils {
     }
     public static SymbolItem getSymbolVariable(Token token) throws CompileException {
         SymbolItem item = getSymbolItem(token);
-        if(item.kind != 0 || item.kind != 1){
+
+        if(item.kind != 0 && item.kind != 1){
             throw new CompileException("This ident "+token.getValue()+"is not a variable");
         }return item;
     }

@@ -3,6 +3,9 @@ source_filename = "llvm-link"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
+@a = dso_local global i32 1, align 4
+@cons = dso_local constant i32 2, align 4
+@comon = common dso_local global i32 0, align 4
 @.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @.str.1 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
 @.str.2 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
@@ -11,9 +14,10 @@ target triple = "x86_64-pc-linux-gnu"
 
 define dso_local i32 @main() {
   %1 = alloca i32
-  %2 = call i32 @getint()
-  store i32 %2, i32* %1
-  ret i32 0
+  store i32 2, i32* %1
+  %2 = load i32, i32* %1
+  call void @putint(i32 %2)
+  ret i32 3
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable

@@ -9,9 +9,13 @@ public class Parser {
     public static void parseCompUnit()throws CompileException {
         int lexcial = Token.getNextToken().getLexcial();
         while(Token.isCompUnit(lexcial)){
-
-            if(Token.isFuncType(lexcial))  if(!parseFuncDef()) parseDecl();
-            else parseDecl();
+            if(Token.isFuncType(lexcial))  {if(!parseFuncDef()) parseDecl();}
+            else if(Token.isDecl(lexcial)) parseDecl();
+            else if(lexcial == -1){
+                return;
+            }else{
+                throw new IllegalArgumentException("compunit error");
+            }
             lexcial = Token.getNextToken().getLexcial();
         }
     }
@@ -54,8 +58,12 @@ public class Parser {
         if(constItem.kind == 0){
             throw new CompileException("const cant assign by var");
         }
+        if(Utils.isGlobal()){
+            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),1,false);
+        }else{
+            Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(),Utils.getNowFunction());
+        }
 
-        Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(),"main");
 
     }
     // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
@@ -80,13 +88,13 @@ public class Parser {
             throw new CompileException("Parser error except ;");
         }
     }
-    // VarDef       -> Ident { '[' ConstExp ']' }  | Ident { '[' ConstExp ']' } '=' InitVal
+    // VarDef   -> Ident { '[' ConstExp ']' }  | Ident { '[' ConstExp ']' } '=' InitVal
     public static void parseVarDef() throws CompileException {
         Token identToken = Token.nextToken("ident");
         int varAddr = 0;
         if(!Token.isAssign(Token.nextTokenLexcial("="))){
             if(Utils.isGlobal()){
-                Utils.allocateGlobalVariable(identToken,0,1,true);
+                Utils.allocateGlobalVariable(identToken,0,0,true);
             }else{
                 varAddr = Utils.allocateVariable(identToken,0,Utils.getNowFunction());
                 midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
@@ -96,9 +104,10 @@ public class Parser {
         }
         int valueAddr = parseInitVal();
         if(Utils.isGlobal()) {
-            Utils.allocateGlobalVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt(),1,false);
+            Utils.allocateGlobalVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false);
             return;
         }
+        varAddr = Utils.allocateVariable(identToken,0,Utils.getNowFunction());
         varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt());
         midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;
@@ -115,7 +124,7 @@ public class Parser {
             Token.previousToken();Token.previousToken(); return false;
         }
 
-        midCodeOut.add("define dso_local i32");
+        midCodeOut.add("define dso_local i32"+funcName);
         Token.exceptNextToken(Lexical.LPAREN);
         // TODO 函数参数
         Token.exceptNextToken(Lexical.RPAREN);
@@ -127,7 +136,7 @@ public class Parser {
 
     public static String parseIdent()throws CompileException {
         Token.exceptNextToken(Lexical.IDENT);
-        midCodeOut.add(Token.getPreviousToken().getValue());
+//        midCodeOut.add(Token.getPreviousToken().getValue());
         return Token.getPreviousToken().getValue(); // 获取标识符的名字
     }
     // Block        -> '{' { BlockItem } '}'
@@ -171,7 +180,7 @@ public class Parser {
         else if(Token.isIdent(token.getLexcial())){
             //TODO 如果找不到这个变量
            if(Token.isAssign(Token.nextTokenLexcial("="))){
-           //SymbolItem theSymbolItem = Utils.getSymbolItem(token,"main");
+           //SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
                int expAddr = parseExp();
                int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).getValueInt());
                midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
@@ -235,7 +244,7 @@ public class Parser {
                 thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
             Token.previousToken();
-            return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(),"main");
+            return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(),Utils.getNowFunction());
         }else if(Token.isIdent(thisLexcial)&& Token.isLParen(Token.getNextToken().getLexcial())){
 
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue())) {
@@ -273,15 +282,15 @@ public class Parser {
             return address;
         }else if(Token.isNumber(token.getLexcial())){
             int value = Integer.parseInt(token.getValue());
-            return Utils.storeConstVariable(null,value,"main");
+            return Utils.storeConstVariable(null,value,Utils.getNowFunction());
         }else if(Token.isIdent(token.getLexcial())){
-            SymbolItem lval = Utils.getSymbolItem(token,"main");
+            SymbolItem lval = Utils.getSymbolItem(token,Utils.getNowFunction());
             if(!lval.isConstant()) {
-                midCodeOut.add(Utils.loadLValOutput(token,"main"));
+                midCodeOut.add(Utils.loadLValOutput(token,Utils.getNowFunction()));
             }
-//            output.add(Utils.loadLValOutput(token,"main"));
+//            output.add(Utils.loadLValOutput(token,Utils.getNowFunction()));
             return lval.getLoadAddress();
-//            return Utils.getIdentLVal(token,"main");
+//            return Utils.getIdentLVal(token,Utils.getNowFunction());
         }
         else{
             throw new CompileException("Parser Error is not ( or Number in PrimaryExp");
@@ -379,6 +388,9 @@ public class Parser {
         }catch (CompileException e){
 //            System.out.println(e);
             e.printStackTrace();
+            for(String str : midCodeOut){
+                System.out.println(str);
+            }
             System.exit(-1);
         }
         for(String str : midCodeOut){
