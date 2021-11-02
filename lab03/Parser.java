@@ -48,7 +48,9 @@ public class Parser {
         if(constItem.kind == 0){
             throw new CompileException("const cant assign by var");
         }
-        Utils.storeConstVariable(identToken.getValue(),constItem.valueInt,"main");
+
+        Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(),"main");
+
     }
     // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
     public static int parseConstInitVal() throws CompileException{
@@ -220,7 +222,7 @@ public class Parser {
                 thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
             Token.previousToken();
-            return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).valueInt,"main");
+            return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(),"main");
         }else if(Token.isIdent(thisLexcial)&& Token.isLParen(Token.getNextToken().getLexcial())){
 
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue())) {
@@ -253,10 +255,8 @@ public class Parser {
     public static int parsePrimaryExp() throws CompileException {
         Token token = Token.nextToken("( ,LVal or Number in PrimaryExp");
         if( Token.isLParen(token.getLexcial())){
-
             int address = parseExp();
             Token.exceptNextToken(Lexical.RPAREN);
-
             return address;
         }else if(Token.isNumber(token.getLexcial())){
             int value = Integer.parseInt(token.getValue());
@@ -306,12 +306,12 @@ public class Parser {
         }else if("@putint".equals(funcName)){
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
             int address = paramAddrList.get(0);
-            System.out.println("putint:"+Utils.getSymbolItemByAddress(address).valueInt);
+            System.out.println("putint:"+Utils.getSymbolItemByAddress(address).getValueInt());
             return saveAddress;
         }else if("@putch".equals(funcName)){
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
             int address = paramAddrList.get(0);
-            System.out.println("putch:"+((char)Utils.getSymbolItemByAddress(address).valueInt));
+            System.out.println("putch:"+((char)Utils.getSymbolItemByAddress(address).getValueInt()));
             return saveAddress;
         }else{
             throw new CompileException("IOFunction error");

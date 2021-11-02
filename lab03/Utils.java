@@ -64,6 +64,7 @@ public class Utils {
     }
     public static int allocateVariable(Token token,int kind,String funcName) throws CompileException {
         String symbolName = token.getValue();
+        judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.setAddress(nowAddress);
         if(funcName.equals(defaultGloablFunctionName)){
@@ -110,14 +111,14 @@ public class Utils {
         blockSymbolTable.get(index).put(symbolItem.name,symbolItem);
     }
 // 自小块向大块赋值
-    public static int storeVariable(Token token,int value) throws CompileException {
-        // 自下向上查找变量 而后区分出不同类型的变量并赋值
+    public static int storeVariable(Token token,int value){
+        // TODO 自下向上查找变量 而后区分出不同类型的变量并赋值
         // TODO 暂时认为只有一个块
         SymbolItem symbolItem = blockSymbolTable.get(blockIndex).get(token.getValue());
         if(symbolItem.isConstant()){
             throw new CompileException("Constant cant be store value");
         }
-        symbolItem.valueInt = value;
+        symbolItem.setValueInt(value);
         return symbolItem.getAddress();
     }
     public static int storeConstVariable(String name,int value,String funcName) throws CompileException {
@@ -131,24 +132,24 @@ public class Utils {
         return item.getAddress();
     }
 
-    public static String storeVariableOutput(int valueAddr,int varAddr){
+    public static String storeVariableOutput(int valueAddr,int varAddr) throws CompileException {
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
         String retStr = "store i32 ";
-        retStr += valueItem.kind == 1?valueItem.valueInt:"%"+valueItem.getLoadAddress();
+        retStr += valueItem.kind == 1?valueItem.getValueInt():"%"+valueItem.getLoadAddress();
         retStr += ", i32* %"+varAddr;
         return retStr;
     }
 
-    public static int midExpCalculate(String op,int address1,int address2){
+    public static int midExpCalculate(String op,int address1,int address2) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
-        objValue = calculateValue(item1.valueInt,op, item2.valueInt);
+        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
 //        int objAddress = nowAddress;
         if(objKind == 0){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
             String outStr = "%"+objAddress+" = "+op+" i32 ";
-            outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getLoadAddress();
+            outStr += (item1.kind == 1)?item1.getValueInt():"%"+item1.getLoadAddress();
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
             Parser.midCodeOut.add(outStr);
@@ -180,15 +181,22 @@ public class Utils {
         if(theSymbolItem.getAddress() == 0){
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
-        putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.valueInt)); // TODO 这里应该是变量吗
+        putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt())); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress+1);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
     public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {
         SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
+
         try {
             theSymbolItem = allLocalSymbolTable.get(funcName).get(ident.getValue());
-        }catch(Exception e){
+            if(! allLocalSymbolTable.get(funcName).containsKey(ident.getValue())){
+                throw new CompileException("this symbol"+ident.getValue()+"is not defined !!!");
+            }
+        }catch (CompileException e1){
+            throw new CompileException("this symbol "+ident.getValue()+" is not defined !!!");
+        }
+        catch(Exception e){
             throw new CompileException("This ident"+ident.getValue()+"is not define");
         }
         return theSymbolItem;
@@ -207,7 +215,7 @@ public class Utils {
         for(int i=0;i<funcItem.length;i++){
             outputStr+=" i32 ";
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
-            outputStr += item.kind == 1?item.valueInt:"%"+item.getLoadAddress();
+            outputStr += item.kind == 1?item.getValueInt():"%"+item.getLoadAddress();
 //        "%"+paramAddrList.get(i);
 //            outputStr += " ";
         }outputStr+=")";
@@ -220,7 +228,7 @@ public class Utils {
         // TODO 正确的找到真正数值
        int ret = -1;
        try {
-          ret =  allLocalSymbolTable.get(funcName).get(ident.getValue()).valueInt;
+          ret =  allLocalSymbolTable.get(funcName).get(ident.getValue()).getValueInt();
        }catch(Exception e){
            throw new CompileException("This ident"+ident.getValue()+"is not define");
        }SymbolItem thisSymbol = allLocalSymbolTable.get(funcName).get(ident.getValue());

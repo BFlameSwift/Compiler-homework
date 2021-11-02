@@ -1,6 +1,5 @@
 
 int main () {
-    const int d =0;
-    d=1;
+    int return = 0;
     return 0;
 }

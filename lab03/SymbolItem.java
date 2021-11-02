@@ -10,7 +10,19 @@ public class SymbolItem {
     public String name;
     public int kind; // var 0,const 1,function 2,array 3
     public int type; // void 0 int 1;
-    public int valueInt;
+    private int valueInt;
+
+    public int getValueInt() throws CompileException {
+        if (valueInt == NOT_ASSIGN){
+            throw new CompileException("this symbol"+name+ "is not assign value!!! cant read");
+        }
+        return valueInt;
+    }
+
+    public void setValueInt(int valueInt) {
+        this.valueInt = valueInt;
+    }
+
     private int address = 0;
     private int loadAddress = 0;
 
