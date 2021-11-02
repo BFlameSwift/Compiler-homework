@@ -20,6 +20,17 @@ public class Utils {
 
     private static int constAddress = -100000;
     private static int nowAddress = 0;
+    private static final String defaultGloablFunctionName = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
+    private static String nowFunctionName = defaultGloablFunctionName;
+    public static String getNowFunction(){ // 获取当前函数名称，从而对变量找准位置
+        return nowFunctionName;
+    }
+    public static Boolean isGlobal(){
+        return nowFunctionName.equals(defaultGloablFunctionName);
+    }
+    public static void enterFunction(String funcName){
+        nowFunctionName = funcName;
+    }
 
     public static int getNowAddress() {
         return nowAddress;
@@ -31,16 +42,36 @@ public class Utils {
     public static int getBlockIndex() {
         return blockIndex;
     }
-    public static int allocateVariable(Token token,int kind,Boolean isGolbal) throws CompileException {
-
-        nowAddress ++;
+    public static String allocateVariableOutput(int varialeAddr){
+        return "%"+varialeAddr+" = alloca i32";
+    }
+    public static void allocateGlobalVariable(String symbolName,SymbolItem symbolItem){
+        globalSymbolTable.put(symbolName, symbolItem);
+    }
+    public static void allocateGlobalVariable(Token token,int value,int kind,Boolean isCommon) throws CompileException {
+        // 声明全局变量，value 为数值，king种类， common是否初始化了数值
+        String symbolName = token.getValue();
+        SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value);
+        if(globalSymbolTable.containsKey(symbolName)){
+            throw new CompileException("this variable name"+symbolName+"has been allocate");
+        }globalSymbolTable.put(symbolName,symbolItem);
+        String retStr = "";
+        retStr += symbolName; retStr += " = ";
+        retStr += isCommon?"common":""; retStr += "dso_local ";
+        retStr += kind == 0?"global i32 ":"constant i32 ";
+        retStr += value+", align 4";
+        Parser.midCodeOut.add(retStr);
+    }
+    public static int allocateVariable(Token token,int kind,String funcName) throws CompileException {
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.setAddress(nowAddress);
-        if(isGolbal){
-            globalSymbolTable.put(symbolName, symbolItem);
-            return nowAddress;
+        if(funcName.equals(defaultGloablFunctionName)){
+            allocateGlobalVariable(symbolName,symbolItem);
+            return 0;
         }
+        nowAddress ++;
+        Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
         //TODO 根据不同函数进入不同的Map块
         putAddressSymbol(nowAddress,symbolItem);
         putallocalSymbolTable(symbolItem,"main");
@@ -79,14 +110,12 @@ public class Utils {
         blockSymbolTable.get(index).put(symbolItem.name,symbolItem);
     }
 // 自小块向大块赋值
-    public static int storeVariable(Token token,int value){
+    public static int storeVariable(Token token,int value) throws CompileException {
         // 自下向上查找变量 而后区分出不同类型的变量并赋值
         // TODO 暂时认为只有一个块
-        SymbolItem symbolItem = new SymbolItem(token.getValue(),10);
-        try{
-            symbolItem = blockSymbolTable.get(blockIndex).get(token.getValue());
-        }catch(Exception e){
-            e.printStackTrace();
+        SymbolItem symbolItem = blockSymbolTable.get(blockIndex).get(token.getValue());
+        if(symbolItem.isConstant()){
+            throw new CompileException("Constant cant be store value");
         }
         symbolItem.valueInt = value;
         return symbolItem.getAddress();
@@ -122,7 +151,7 @@ public class Utils {
             outStr += (item1.kind == 1)?item1.valueInt:"%"+item1.getLoadAddress();
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
-            Parser.output.add(outStr);
+            Parser.midCodeOut.add(outStr);
         }
         putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
 
@@ -182,7 +211,7 @@ public class Utils {
 //        "%"+paramAddrList.get(i);
 //            outputStr += " ";
         }outputStr+=")";
-        Parser.output.add(outputStr);
+        Parser.midCodeOut.add(outputStr);
         return funcItem.type == 1?nowAddress:0;
     }
 
@@ -201,4 +230,16 @@ public class Utils {
        return ret;
     }
 
+    public static void initIOFunctions() {
+        Parser.midCodeOut.add("declare i32 @getint()");
+        Parser.midCodeOut.add("declare i32 @getch()");
+        Parser.midCodeOut.add("declare void @putint(i32)");
+        Parser.midCodeOut.add("declare void @putch(i32)");
+        SymbolItem getint = new SymbolItem("@getint",2,0,1,0);
+        SymbolItem getch = new SymbolItem("@getch",2,0,1,0);
+        SymbolItem putint = new SymbolItem("@putint",2,0,0,1);
+        SymbolItem putch = new SymbolItem("@putch",2,0,0,1);
+        allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
+        funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
+    }
 }
