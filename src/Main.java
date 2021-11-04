@@ -1,6 +1,6 @@
 import Util.CompileException;
 import Util.Utils;
-import frontend.*;
+import frontend.Parser;
 import java.io.FileNotFoundException;
 
 public class Main {
