@@ -185,11 +185,22 @@ public class Utils {
         retStr += ", i32* %"+varAddr;
         return retStr;
     }
-
+    public static int condI1ToI32(int address) throws CompileException {
+        SymbolItem item1 = getSymbolItemByAddress(address);
+        if(item1.isCond){
+            Parser.midCodeOut.add("%"+(++nowAddress)+"= zext i1 %"+(address)+" to i32");
+            putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
+            item1.setLoadAddress(nowAddress);
+        }
+        return nowAddress;
+    }
     public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
+        if(op.equals("or") || op.equals("and")){
+            condI1ToI32(address1); condI1ToI32(address2);
+        }
         int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
         Boolean objIsCond = false;
 //        int objAddress = nowAddress;

@@ -54,7 +54,7 @@ public class Token {
     }
 
     public static Boolean isCond(String op){
-        return op.equals("or") ||op.equals("and")||op.equals("slt")||op.equals("sgt")||op.equals("sle")||op.equals("sge")||op.equals("ne")||op.equals("eq");
+        return op.equals("slt")||op.equals("sgt")||op.equals("sle")||op.equals("sge")||op.equals("ne")||op.equals("eq");
     }
 
     public static ArrayList<Token> getTokenList() {
