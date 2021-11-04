@@ -1,4 +1,4 @@
-package lab03;
+package src.Util;
 
 public class CompileException extends Exception {
     public CompileException(){

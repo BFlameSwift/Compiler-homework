@@ -1,4 +1,7 @@
-package lab04;
+package src.frontend;
+
+import src.Util.CompileException;
+import src.Util.MyConst;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,10 +35,10 @@ public class Lexical {
     };
     public static final String[] TOKEN_NAMES = {
             null,"Const","Int","Void" ,"If" ,"Else" ,"While" ,"Continue" ,"Break", "Return",
-            "Assign","Semicolon","LParen","RParen","LBracket","RBracket","LBrace","RBrace","Lt","Gt","Le","Ge",
+            "Assign","Semicolon","LParen","RParen","LBracket","RBracket","LBrace","RBrace","slt","sgt","sle","sge",
             "Ident","Decimal","Octal","Hexadecimal",
-            "add" ,"sub" ,"mul","sdiv","srem", "Not","Equals","NEquals","Comma",
-            "SingleQuote" ,"DoubleQuote" ,"SingleComment" ,"LBlockComment","RBlockComment","And","Or"
+            "add" ,"sub" ,"mul","sdiv","srem", "Not","eq","ne","Comma",
+            "SingleQuote" ,"DoubleQuote" ,"SingleComment" ,"LBlockComment","RBlockComment","and","or"
     }; // srem == Mod
     public static List<String> TOKEN_LIST = Arrays.asList(TOKEN_NAMES);
     public static List<String> SYMBOL_LIST = Arrays.asList(SYMBOL_NAMES);

@@ -1,4 +1,6 @@
-package lab04;
+package src.frontend;
+
+import src.Util.CompileException;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -45,12 +47,16 @@ public class Token {
     public static Boolean isAssign(int type){return type == Lexical.ASSIGN;}
     public static Boolean isComma(int type){return type == Lexical.COMMA;}
     public static Boolean isDecl(int type){return isIntDec(type) || isConstDec(type);}
-    public String getValue() {
+    public static Boolean isRelOp(int type){return type==Lexical.LE || type == Lexical.GE || type == Lexical.LT || type == Lexical.GT;}
 
+    public String getValue() {
         return value;
     }
 
-
+    public static Boolean isComd(String op){
+        //TODO 不全
+        return true;
+    }
 
     public static ArrayList<Token> getTokenList() {
         return tokenList;

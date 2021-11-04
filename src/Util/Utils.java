@@ -1,4 +1,6 @@
-package lab04;
+package src.Util;
+
+import src.frontend.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -214,8 +216,25 @@ public class Utils {
             return value1 / value2;
         } else if("srem".equals(op)) {
             return value1 % value2;
-        } else{
-            throw new IllegalArgumentException("calculate not + - * / %");
+        }else if("slt".equals(op)) {
+            return value1<value2?1:0;
+        }else if("sgt".equals(op)) {
+            return value1>value2?1:0;
+        }else if("sle".equals(op)) {
+            return value1<=value2?1:0;
+        }else if("sge".equals(op)) {
+            return value1>=value2?1:0;
+        }else if("eq".equals(op)) {
+            return value1==value2?1:0;
+        }else if("ne".equals(op)) {
+            return value1!=value2?1:0;
+        }else if("and".equals(op)) {
+            return value1+value2==2?1:0;
+        }else if("or".equals(op)) {
+            return value1+value2==0?0:1;
+        }
+        else{
+            throw new IllegalArgumentException("calculate not + - * / % && || == != < <= > >=");
         }
     }
     public static String loadLValOutput(Token token,String funcName) throws CompileException {
