@@ -250,6 +250,10 @@ public class Utils {
         theSymbolItem.setLoadAddress(nowAddress+1);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
+    public static int enterIfStmt(){
+        return ++nowAddress;
+    }
+
     // find by funcname
     public static SymbolItem getSymbolItem(Token ident, String funcName) throws Util.CompileException {
         SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);

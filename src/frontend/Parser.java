@@ -17,9 +17,13 @@ public class Parser {
     public static void parseCompUnit()throws CompileException {
         int lexcial = Token.getNextToken().getLexcial();
         while(Token.isCompUnit(lexcial)){
-            if(Token.isFuncType(lexcial))  {if(!parseFuncDef()) parseDecl();}
-            else if(Token.isDecl(lexcial)) parseDecl();
-            else if(lexcial == -1){
+            if(Token.isFuncType(lexcial))  {if(!parseFuncDef()) {
+                parseDecl();
+            }
+            }
+            else if(Token.isDecl(lexcial)) {
+                parseDecl();
+            } else if(lexcial == -1){
                 return;
             }else{
                 throw new IllegalArgumentException("compunit error");
@@ -133,13 +137,14 @@ public class Parser {
             Token.previousToken(); return false;
         }
 
-        midCodeOut.add("define dso_local i32"+funcName);
+
         Token.exceptNextToken(Lexical.LPAREN);
         // TODO 函数参数
         Token.exceptNextToken(Lexical.RPAREN);
+        midCodeOut.add("define dso_local i32"+funcName+"(){");
         Utils.enterFunction(funcName); // 进入函数
-        midCodeOut.add("()");
         parseBlock();
+        midCodeOut.add("}");
         return true;
     }
 
@@ -151,12 +156,12 @@ public class Parser {
     // Block        -> '{' { BlockItem } '}'
     public static void parseBlock()throws CompileException {
         Utils.enterBlock(); //blockindex ++;
-        Token.exceptNextToken(Lexical.LBRACE);   midCodeOut.add("{");
+        Token.exceptNextToken(Lexical.LBRACE);   //midCodeOut.add("{");
         while (!Token.judgeNextToken(Lexical.RBRACE)) {
             Token.previousToken();
             parseBlockItem();
         }
-        midCodeOut.add("}");
+//        midCodeOut.add("}");
     }
     // BlockItem    -> Decl | Stmt
     public static void parseBlockItem() throws CompileException {
@@ -203,12 +208,39 @@ public class Parser {
         }else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             int condAddr = parseCond();
+            midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+"Myplaceholder2");
+            int ifLocation = midCodeOut.size() - 1; // 获取iflocation的
+            Utils.enterIfStmt();
+            int nextAddr1 = Utils.getNowAddress();
+            midCodeOut.add(nextAddr1+":");
+
             Token.exceptNextToken(Lexical.RPAREN);
+
             parseStmt();
+            midCodeOut.add("br label jumpToEndAddr");
+            int jumpToloca1 = midCodeOut.size() - 1;
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
+                int elseAddr = Utils.enterIfStmt();
+                midCodeOut.add(elseAddr+":");
+
                 parseStmt();
+                midCodeOut.add("br label jumpToEndAddr");
+                int jumpToloca2 = midCodeOut.size() - 1;
+                Utils.enterIfStmt();
+                int outAddr = Utils.getNowAddress();
+                midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+outAddr)));
+                midCodeOut.set(jumpToloca2,midCodeOut.get(jumpToloca2).replaceAll("jumpToEndAddr","%"+outAddr));
+                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+elseAddr));
+            }else{
+                int endAddr = Utils.enterIfStmt();
+                midCodeOut.add(endAddr+":");
+                System.out.println(ifLocation+midCodeOut.get(ifLocation));
+                midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+endAddr)));
+                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+endAddr));
             }
+
+
 
         }else if(token.getLexcial() == Lexical.LBRACE){
             Token.previousToken();
