@@ -13,7 +13,7 @@ store i32 %1, i32* %2
 store i32 %3, i32* %4
 %5 = load i32, i32* %2
 %6 = load i32, i32* %4
-%7 = sle i32 %5, %6
+%7 = icmp sle i32 %5, %6
 {
 call void @putint( i32 1)
 }

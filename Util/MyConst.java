@@ -1,6 +1,7 @@
-package src.Util;
+package Util;
 
 import java.util.regex.Pattern;
+import frontend.Lexical;
 
 /**
  * @author BFlame

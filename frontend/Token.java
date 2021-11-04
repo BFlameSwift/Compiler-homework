@@ -1,6 +1,6 @@
-package src.frontend;
+package frontend;
 
-import src.Util.CompileException;
+import Util.CompileException;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -17,45 +17,44 @@ public class Token {
 
     public static Boolean isCompUnit(int type){return isFuncType(type) || isDecl(type);}
     public static Boolean isFuncType(int type){
-        return type == Lexical.INT_DEC || type == Lexical.VOID_DEC;
+        return type == frontend.Lexical.INT_DEC || type == frontend.Lexical.VOID_DEC;
     }
     public static Boolean isIdent(int type){
-        return type == Lexical.IDENT;
+        return type == frontend.Lexical.IDENT;
     }
     public static Boolean isLParen(int type){
-        return type == Lexical.LPAREN;
+        return type == frontend.Lexical.LPAREN;
     }
-    public static Boolean isRParen(int type){return type == Lexical.RPAREN;}
-    public static Boolean isLBrace(int type){return type == Lexical.LBRACE;}
-    public static Boolean isRBrace(int type){return type == Lexical.RBRACE;}
-    public static Boolean isReturn(int type){return type == Lexical.RETURN_DEC;}
-    public static Boolean isNumber(int type){return type == Lexical.DECIMAL_CONST;}
-    public static Boolean isSemicolon(int type){return type == Lexical.SEMICOLON;}
-    public static Boolean isLBlockComment(int type){return type == Lexical.LBLOCK_COMMENT;}
-    public static Boolean isRBlockComment(int type){return type == Lexical.RBLOCK_COMMENT;}
-    public static Boolean isPlus(int type){return type == Lexical.PLUS;}
-    public static Boolean isMinus(int type){return type == Lexical.MINUS;}
-    public static Boolean isUnaryOp(int type){return isPlus(type) || isMinus(type) || type == Lexical.NOT;}
-    public static Boolean isMultiply(int type){return type == Lexical.MUL;}
-    public static Boolean isDiv(int type){return type == Lexical.DIV;}
-    public static Boolean isMod(int type){return type == Lexical.MOD;}
+    public static Boolean isRParen(int type){return type == frontend.Lexical.RPAREN;}
+    public static Boolean isLBrace(int type){return type == frontend.Lexical.LBRACE;}
+    public static Boolean isRBrace(int type){return type == frontend.Lexical.RBRACE;}
+    public static Boolean isReturn(int type){return type == frontend.Lexical.RETURN_DEC;}
+    public static Boolean isNumber(int type){return type == frontend.Lexical.DECIMAL_CONST;}
+    public static Boolean isSemicolon(int type){return type == frontend.Lexical.SEMICOLON;}
+    public static Boolean isLBlockComment(int type){return type == frontend.Lexical.LBLOCK_COMMENT;}
+    public static Boolean isRBlockComment(int type){return type == frontend.Lexical.RBLOCK_COMMENT;}
+    public static Boolean isPlus(int type){return type == frontend.Lexical.PLUS;}
+    public static Boolean isMinus(int type){return type == frontend.Lexical.MINUS;}
+    public static Boolean isUnaryOp(int type){return isPlus(type) || isMinus(type) || type == frontend.Lexical.NOT;}
+    public static Boolean isMultiply(int type){return type == frontend.Lexical.MUL;}
+    public static Boolean isDiv(int type){return type == frontend.Lexical.DIV;}
+    public static Boolean isMod(int type){return type == frontend.Lexical.MOD;}
     public static Boolean isLevel3Operator(int type){return isMod(type)|| isMultiply(type) || isDiv(type);}
-    public static Boolean isConstDec(int type){return type == Lexical.CONST_DEC;}
-    public static Boolean isIntDec(int type){return type == Lexical.INT_DEC;}
-    public static Boolean isVoidDec(int type){return type == Lexical.VOID_DEC;}
-    public static Boolean isEqual(int type){return type == Lexical.EQUALS;}
-    public static Boolean isAssign(int type){return type == Lexical.ASSIGN;}
-    public static Boolean isComma(int type){return type == Lexical.COMMA;}
+    public static Boolean isConstDec(int type){return type == frontend.Lexical.CONST_DEC;}
+    public static Boolean isIntDec(int type){return type == frontend.Lexical.INT_DEC;}
+    public static Boolean isVoidDec(int type){return type == frontend.Lexical.VOID_DEC;}
+    public static Boolean isEqual(int type){return type == frontend.Lexical.EQUALS;}
+    public static Boolean isAssign(int type){return type == frontend.Lexical.ASSIGN;}
+    public static Boolean isComma(int type){return type == frontend.Lexical.COMMA;}
     public static Boolean isDecl(int type){return isIntDec(type) || isConstDec(type);}
-    public static Boolean isRelOp(int type){return type==Lexical.LE || type == Lexical.GE || type == Lexical.LT || type == Lexical.GT;}
+    public static Boolean isRelOp(int type){return type== frontend.Lexical.LE || type == frontend.Lexical.GE || type == frontend.Lexical.LT || type == frontend.Lexical.GT;}
 
     public String getValue() {
         return value;
     }
 
-    public static Boolean isComd(String op){
-        //TODO 不全
-        return true;
+    public static Boolean isCond(String op){
+        return op.equals("or") ||op.equals("and")||op.equals("slt")||op.equals("sgt")||op.equals("sle")||op.equals("sge")||op.equals("ne")||op.equals("eq");
     }
 
     public static ArrayList<Token> getTokenList() {
@@ -141,13 +140,13 @@ public class Token {
 
     public static void exceptNextToken(int lexcial) throws CompileException {
         //期待下一个的Token是什么， 一般用于只检测不处理的情况，例如 分号； 大小括号 逗号等
-        String expectString = Lexical.SYMBOL_LIST.get(lexcial);
+        String expectString = frontend.Lexical.SYMBOL_LIST.get(lexcial);
         if(nextToken(expectString).getLexcial() != lexcial){
             throw new CompileException("Parse Error next is not a "+ expectString);
         }
     }
     public static Boolean judgeNextToken(int lexcial) throws CompileException {
-        String expectString = Lexical.SYMBOL_LIST.get(lexcial);
+        String expectString = frontend.Lexical.SYMBOL_LIST.get(lexcial);
         return (nextToken(expectString).getLexcial()) == lexcial;
     }
 

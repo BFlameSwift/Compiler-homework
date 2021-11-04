@@ -1,11 +1,12 @@
-package src.Util;
+package Util;
 
-import src.frontend.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import frontend.*;
+
 
 public class Utils {
 
@@ -13,11 +14,11 @@ public class Utils {
 
     public static Map<String, SymbolItem> globalSymbolTable = new HashMap<String, SymbolItem>();
 //    public static Map<String, SymbolItem> LocalSymbolTable = new HashMap<String, SymbolItem>();
-    public static Map<Integer ,SymbolItem> addressSymbolTable = new HashMap<Integer, SymbolItem>(); // 用来存取当前地址是否是常量
+    public static Map<Integer , SymbolItem> addressSymbolTable = new HashMap<Integer, SymbolItem>(); // 用来存取当前地址是否是常量
     public static ArrayList<HashMap<String, SymbolItem> > blockSymbolTable = new ArrayList<HashMap<String, SymbolItem>>();
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
     public static ArrayList<String > allFuncList = new ArrayList<String>();
-    public static Map<String,SymbolItem> funcSymbolTable = new HashMap<String,SymbolItem>();
+    public static Map<String, SymbolItem> funcSymbolTable = new HashMap<String, SymbolItem>();
     static{
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
@@ -52,22 +53,22 @@ public class Utils {
     public static String allocateVariableOutput(int varialeAddr){
         return "%"+varialeAddr+" = alloca i32";
     }
-    public static void putGlobalInBlock0(String symbolName,SymbolItem symbolItem){
+    public static void putGlobalInBlock0(String symbolName, SymbolItem symbolItem){
         try{
             blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
         }catch(IndexOutOfBoundsException ie){
-            HashMap<String,SymbolItem> map = new HashMap<String,SymbolItem>();
+            HashMap<String, SymbolItem> map = new HashMap<String, SymbolItem>();
             blockSymbolTable.add(map);
             blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
         }
     }
-    public static void judgeVariableNameIsLegal(String variableName) throws CompileException {
+    public static void judgeVariableNameIsLegal(String variableName) throws Util.CompileException {
         if(!Lexical.isIdentifier(variableName.substring(1))){ // 名字是@+identName
-            throw new CompileException("variable Name is not ident name"); // 按道理不应该出现。判断变量名字是不是ident形式
+            throw new Util.CompileException("variable Name is not ident name"); // 按道理不应该出现。判断变量名字是不是ident形式
 
-        }else if(Lexical.TOKEN_LIST.indexOf(variableName)>=Lexical.CONST_DEC && Lexical.TOKEN_LIST.indexOf(variableName)<=Lexical.RETURN_DEC){
+        }else if(Lexical.TOKEN_LIST.indexOf(variableName)>= Lexical.CONST_DEC && Lexical.TOKEN_LIST.indexOf(variableName)<= Lexical.RETURN_DEC){
             // 如果变量名字是保留字的话,  不过由于已经识别为了保留字，例如return 会被转化为Return 详见lexical文件 所以要在TOkenlist的名字中找
-            throw new CompileException("Variable name is Reserved words");
+            throw new Util.CompileException("Variable name is Reserved words");
         }// TODO 区域内已经存在同名变量
 
     }
@@ -79,17 +80,17 @@ public class Utils {
         retStr += value+", align 4";
         return retStr;
     }
-    public static void allocateGlobalVariable(Token token,int value,int kind,Boolean isCommon) throws CompileException {
+    public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon) throws Util.CompileException {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value);
         if(globalSymbolTable.containsKey(symbolName)){
-            throw new CompileException("this variable name"+symbolName+"has been allocate");
+            throw new Util.CompileException("this variable name"+symbolName+"has been allocate");
         }globalSymbolTable.put(symbolName,symbolItem);
         putGlobalInBlock0(symbolName,symbolItem);
         Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon));
     }
-    public static int allocateVariable(Token token,int kind,String funcName) throws CompileException {
+    public static int allocateVariable(Token token, int kind, String funcName) throws Util.CompileException {
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
@@ -106,7 +107,7 @@ public class Utils {
         symbolItem.setAddress(addr);
         addressSymbolTable.put(addr,symbolItem);
     }
-    public static void putallocalSymbolTable(SymbolItem symbolItem,String funcName){
+    public static void putallocalSymbolTable(SymbolItem symbolItem, String funcName){
         try {
             allLocalSymbolTable.get(funcName).put(symbolItem.name,symbolItem);
         }catch(NullPointerException e){
@@ -120,21 +121,21 @@ public class Utils {
         }
         throw new IllegalArgumentException("this address has not variable");
     }
-    public static void putblockSymbolTable(SymbolItem symbolItem,int index) throws CompileException{
+    public static void putblockSymbolTable(SymbolItem symbolItem, int index) throws Util.CompileException {
         Map<String, SymbolItem> map ;
         map = blockSymbolTable.get(index);
         if(map.containsKey(symbolItem.name)){
-            throw new CompileException("same block"+index+"redefine Var or const which name is "+ symbolItem.name);
+            throw new Util.CompileException("same block"+index+"redefine Var or const which name is "+ symbolItem.name);
         }
 //        System.out.println("put"+symbolItem.name+"in block "+blockIndex);
         map.put(symbolItem.name,symbolItem);
     }
     // 自小块向大块查找需要的
-    private static SymbolItem getSymbolItem(Token token) throws CompileException{
+    private static SymbolItem getSymbolItem(Token token) throws Util.CompileException {
         int block_index = Utils.blockIndex;
         while(block_index>=thisFunctionBlockIndex){
 //            System.out.println("this block index"+block_index);
-            Map<String,SymbolItem> map = blockSymbolTable.get(block_index);
+            Map<String, SymbolItem> map = blockSymbolTable.get(block_index);
             if(map.containsKey(token.getValue())){
                 return map.get(token.getValue());
             }
@@ -146,27 +147,27 @@ public class Utils {
         if(funcSymbolTable.containsKey(token.getValue())){
             return funcSymbolTable.get(token.getValue());
         }
-        throw new CompileException("this Token"+token.getValue()+"cant be find");
+        throw new Util.CompileException("this Token"+token.getValue()+"cant be find");
     }
-    public static SymbolItem getSymbolVariable(Token token) throws CompileException {
+    public static SymbolItem getSymbolVariable(Token token) throws Util.CompileException {
         SymbolItem item = getSymbolItem(token);
 
         if(item.kind != 0 && item.kind != 1){
-            throw new CompileException("This ident "+token.getValue()+"is not a variable");
+            throw new Util.CompileException("This ident "+token.getValue()+"is not a variable");
         }return item;
     }
-    public static int storeVariable(Token token,int value) throws CompileException {
+    public static int storeVariable(Token token, int value) throws Util.CompileException {
         // TODO 自下向上查找变量 而后区分出不同类型的变量并赋值
         // TODO 暂时认为只有一个块
         SymbolItem symbolItem = new SymbolItem(null,-1); // 随便初始化一个。。后面会覆盖掉
         symbolItem = getSymbolVariable(token);
         if(symbolItem.isConstant()){
-            throw new CompileException("Constant cant be store value");
+            throw new Util.CompileException("Constant cant be store value");
         }
         symbolItem.setValueInt(value);
         return symbolItem.getAddress();
     }
-    public static int storeConstVariable(String name,int value,String funcName) throws CompileException {
+    public static int storeConstVariable(String name,int value,String funcName) throws Util.CompileException {
         SymbolItem item = new SymbolItem(name,1,value);
         item.setAddress(++ constAddress);
         if(name != null){
@@ -177,7 +178,7 @@ public class Utils {
         return item.getAddress();
     }
 
-    public static String storeVariableOutput(int valueAddr,int varAddr) throws CompileException {
+    public static String storeVariableOutput(int valueAddr,int varAddr) throws Util.CompileException {
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
         String retStr = "store i32 ";
         retStr += valueItem.kind == 1?valueItem.getValueInt():"%"+valueItem.getLoadAddress();
@@ -185,15 +186,17 @@ public class Utils {
         return retStr;
     }
 
-    public static int midExpCalculate(String op,int address1,int address2) throws CompileException {
+    public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
 //        int objAddress = nowAddress;
-        if(objKind == 0){// 是变量就输出过程
+        if(objKind == 0||objKind == 1){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
-            String outStr = "%"+objAddress+" = "+op+" i32 ";
+
+            String outStr = "%"+objAddress+" = ";
+            outStr += Token.isCond(op)?"icmp "+op+" i32 ":op+" i32 ";
             outStr += (item1.kind == 1)?item1.getValueInt():"%"+item1.getLoadAddress();
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.getValueInt():"%"+item2.getLoadAddress();
@@ -229,15 +232,15 @@ public class Utils {
         }else if("ne".equals(op)) {
             return value1!=value2?1:0;
         }else if("and".equals(op)) {
-            return value1+value2==2?1:0;
+            return (value2!=0 &&value1!=0)?1:0;
         }else if("or".equals(op)) {
-            return value1+value2==0?0:1;
+            return (value2==0 &&value1==0)?0:1;
         }
         else{
             throw new IllegalArgumentException("calculate not + - * / % && || == != < <= > >=");
         }
     }
-    public static String loadLValOutput(Token token,String funcName) throws CompileException {
+    public static String loadLValOutput(Token token, String funcName) throws Util.CompileException {
         SymbolItem theSymbolItem = getSymbolItem(token,funcName);
 //        System.out.println(token.getValue());
         if(theSymbolItem.getAddress() == 0){
@@ -248,25 +251,25 @@ public class Utils {
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
     // find by funcname
-    public static SymbolItem getSymbolItem(Token ident,String funcName) throws CompileException {
+    public static SymbolItem getSymbolItem(Token ident, String funcName) throws Util.CompileException {
         SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
 
         try {
             theSymbolItem = allLocalSymbolTable.get(funcName).get(ident.getValue());
             if(! allLocalSymbolTable.get(funcName).containsKey(ident.getValue())){
-                throw new CompileException("this symbol"+ident.getValue()+"is not defined !!!");
+                throw new Util.CompileException("this symbol"+ident.getValue()+"is not defined !!!");
             }
-        }catch (CompileException e1){
-            throw new CompileException("this symbol "+ident.getValue()+" is not defined !!!");
+        }catch (Util.CompileException e1){
+            throw new Util.CompileException("this symbol "+ident.getValue()+" is not defined !!!");
         }
         catch(Exception e){
-            throw new CompileException("This ident"+ident.getValue()+"is not define");
+            throw new Util.CompileException("This ident"+ident.getValue()+"is not define");
         }
         return theSymbolItem;
     }
-    public static int callFunction(String name,ArrayList<Integer> paramAddrList) throws CompileException {
+    public static int callFunction(String name,ArrayList<Integer> paramAddrList) throws Util.CompileException {
         if(!funcSymbolTable.containsKey(name)){
-            throw new CompileException("cant find  this function");
+            throw new Util.CompileException("cant find  this function");
         }
         SymbolItem funcItem = funcSymbolTable.get(name);
         String outputStr = "";
@@ -287,14 +290,15 @@ public class Utils {
     }
 
 
-    public static int getIdentLVal(Token ident,String funcName) throws CompileException {
+    public static int getIdentLVal(Token ident, String funcName) throws Util.CompileException {
         // TODO 正确的找到真正数值
        int ret = -1;
        try {
           ret =  allLocalSymbolTable.get(funcName).get(ident.getValue()).getValueInt();
        }catch(Exception e){
-           throw new CompileException("This ident"+ident.getValue()+"is not define");
-       }SymbolItem thisSymbol = allLocalSymbolTable.get(funcName).get(ident.getValue());
+           throw new Util.CompileException("This ident"+ident.getValue()+"is not define");
+       }
+        SymbolItem thisSymbol = allLocalSymbolTable.get(funcName).get(ident.getValue());
 //       if(thisSymbol.constInt == SymbolItem.NOT_ASSIGN){
 //           throw new CompileException("This ident"+ident.getValue()+"is not Assign");
 //       }

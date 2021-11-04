@@ -1,4 +1,4 @@
-package src.ir;
+package ir;
 
 import java.util.ArrayList;
 

@@ -1,7 +1,7 @@
-package src.frontend;
+package frontend;
 
-import src.Util.CompileException;
-import src.Util.MyConst;
+import Util.CompileException;
+import Util.MyConst;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -195,8 +195,8 @@ public class Lexical {
         scanner.close();
         return lexicalList;
     }
-    public static ArrayList<Token> makeTokenList(String filePath)throws FileNotFoundException , CompileException {
-        ArrayList<Token> tokens = new ArrayList<Token>();
+    public static ArrayList<frontend.Token> makeTokenList(String filePath)throws FileNotFoundException , CompileException {
+        ArrayList<frontend.Token> tokens = new ArrayList<frontend.Token>();
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<Integer> lexicalList = new ArrayList<Integer>();
         try {
@@ -212,16 +212,16 @@ public class Lexical {
         }
         int listSize = lexicalList.size();
         for(int i = 0; i < listSize; ++i){
-            tokens.add(new Token(lexicalList.get(i),tokenList.get(i),0));
+            tokens.add(new frontend.Token(lexicalList.get(i),tokenList.get(i),0));
         }
-        Parser.deleteComment(tokens);
-        Token.setTokenList(tokens);
+        frontend.Parser.deleteComment(tokens);
+        frontend.Token.setTokenList(tokens);
         return tokens;
     }
 
     public static void main(String[] args) throws FileNotFoundException , CompileException {
-        ArrayList<Token> tokens = makeTokenList(args[0]);
-        for(Token token :tokens){
+        ArrayList<frontend.Token> tokens = makeTokenList(args[0]);
+        for(frontend.Token token :tokens){
             System.out.println(token.getValue()+"  "+token.getLexcial());
         }
     }

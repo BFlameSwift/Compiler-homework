@@ -1,4 +1,4 @@
-package src.Util;
+package Util;
 
 public class CompileException extends Exception {
     public CompileException(){

@@ -4,7 +4,7 @@ FROM openjdk:16
 # 编译程序
 WORKDIR /app/
 COPY src ./src
-RUN javac -encoding UTF-8   -d ./output ./src.frontend/*.java
+RUN javac -encoding UTF-8   -d ./output ./src/frontend/Parser.java
 
 # 将当前目录设为 /app/output
-WORKDIR /app/output
+WORKDIR /app/output/src
