@@ -121,7 +121,7 @@ public class Parser {
         }
         varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
         varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
-        midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
+//        midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;
     }
     public static int parseInitVal() throws CompileException {
@@ -235,7 +235,6 @@ public class Parser {
             }else{
                 int endAddr = Utils.enterIfStmt();
                 midCodeOut.add(endAddr+":");
-                System.out.println(ifLocation+midCodeOut.get(ifLocation));
                 midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+endAddr)));
                 midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+endAddr));
             }

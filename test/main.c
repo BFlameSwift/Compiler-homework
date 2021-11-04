@@ -1,8 +1,4 @@
 int main() {
-    int a = getint();
-    int b = getint();
-    if (a <= b) {
-        putint(1);
-    }
+    int a ,b;
     return 0;
 }

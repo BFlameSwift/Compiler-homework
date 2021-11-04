@@ -96,7 +96,7 @@ public class Utils {
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.setAddress(nowAddress);
         nowAddress ++;
-        Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
+//        Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
         //TODO 根据不同函数进入不同的Map块
         putAddressSymbol(nowAddress,symbolItem);
         putallocalSymbolTable(symbolItem,funcName);
