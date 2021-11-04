@@ -191,18 +191,26 @@ public class Utils {
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
+        Boolean objIsCond = false;
 //        int objAddress = nowAddress;
-        if(objKind == 0||objKind == 1){// 是变量就输出过程
+        if(objKind == 0||objKind == 4){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
 
             String outStr = "%"+objAddress+" = ";
             outStr += Token.isCond(op)?"icmp "+op+" i32 ":op+" i32 ";
+
             outStr += (item1.kind == 1)?item1.getValueInt():"%"+item1.getLoadAddress();
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.getValueInt():"%"+item2.getLoadAddress();
             Parser.midCodeOut.add(outStr);
+            if(Token.isCond(op)){
+                objIsCond = true;                                                                                                                                                                     
+                Parser.midCodeOut.add("%"+Utils.enterIfStmt()+" = zext i1 %"+(Utils.getNowAddress()-1)+" to i32");
+            }
+
         }
-        putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
+        putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue,objIsCond));
+
 
         return objAddress;
     }

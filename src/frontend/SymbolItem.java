@@ -11,8 +11,9 @@ public class SymbolItem {
     public static final int NOT_ASSIGN = -1239032;
     public static final int ADDRESS_NOT_ASSIGN = 0;
     public String name;
-    public int kind; // var 0,const 1,function 2,array 3
+    public int kind; // var 0,const 1,function 2,array 3, i1(bool ?) 4
     public int type; // void 0 int 1;
+    public Boolean isCond = false;
     private int valueInt;
 
     public int getValueInt() throws CompileException {
@@ -70,7 +71,16 @@ public class SymbolItem {
         type = 0;
         length = 0; parametersList = new ArrayList<Integer>();
         this.valueInt = valueInt;
-    }public SymbolItem(String name,int kind,int valueInt,int type,int length){
+    } public SymbolItem(String name,int kind,int valueInt,Boolean isCond){
+        this.name = name;
+        this.kind = kind;
+        address = ADDRESS_NOT_ASSIGN;
+        type = 0;
+        this.isCond = isCond;
+        length = 0; parametersList = new ArrayList<Integer>();
+        this.valueInt = valueInt;
+    }
+    public SymbolItem(String name,int kind,int valueInt,int type,int length){
         this.name = name;
         this.kind = kind;
         address = ADDRESS_NOT_ASSIGN;

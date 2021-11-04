@@ -208,6 +208,11 @@ public class Parser {
         }else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             int condAddr = parseCond();
+            SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(Utils.getNowAddress());
+            if(thisAddrItem.isCond == false){
+                Utils.enterIfStmt();
+                midCodeOut.add("%"+Utils.getNowAddress()+" = icmp ne i32 %"+thisAddrItem.getAddress()+", 0");
+            }
             midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+"Myplaceholder2");
             int ifLocation = midCodeOut.size() - 1; // 获取iflocation的
             Utils.enterIfStmt();
@@ -292,18 +297,22 @@ public class Parser {
     // UnaryExp     -> PrimaryExp  | Ident '(' [FuncRParams] | UnaryOp UnaryExp
     public static int parseUnaryExp()throws CompileException {
         Token thisToken = Token.nextToken("( or Op or func(param)");
-        int thisLexcial = thisToken.getLexcial();
+        int thisLexcial = thisToken.getLexcial(),notCount = 0;
 
         if(Token.isUnaryOp(thisLexcial)){
             int coefficient = 1;
             while(Token.isUnaryOp(thisLexcial)){
-                coefficient *= parseUnaryOp(thisLexcial);
+                if(thisLexcial == Lexical.AND || thisLexcial== Lexical.MINUS)
+                    coefficient *= parseUnaryOp(thisLexcial);
+                else{
+                    notCount ++;
+                }
                 thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
             Token.previousToken();
             return Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(), Utils.getNowFunction());
         }else if(Token.isIdent(thisLexcial)&& Token.isLParen(Token.getNextToken().getLexcial())){
-
+            // TODO ! 还没兼容函数
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue())) {
                 throw new CompileException("Parse dont hava this func "+thisToken.getValue());
             }
@@ -367,7 +376,8 @@ public class Parser {
             case Lexical.MINUS ->{
                 return -1;
             } case Lexical.NOT ->{
-                return 0;
+
+                return 1;
             }default -> {
                 throw new CompileException("not + - !");
             }

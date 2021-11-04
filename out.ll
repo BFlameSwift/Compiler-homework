@@ -10,22 +10,29 @@ target triple = "x86_64-pc-linux-gnu"
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
 define dso_local i32 @main() {
-  %1 = call i32 @getint()
+  %1 = alloca i32
   %2 = alloca i32
-  store i32 %1, i32* %2
-  %3 = call i32 @getint()
-  %4 = alloca i32
-  store i32 %3, i32* %4
+  store i32 56, i32* %1
+  store i32 4, i32* %2
+  %3 = load i32, i32* %1
+  %4 = sub i32 %3, -4
   %5 = load i32, i32* %2
-  %6 = load i32, i32* %4
-  %7 = icmp sle i32 %5, %6
-  br i1 %7, label %8, label %9
+  %6 = add i32 %4, 4
+  store i32 %6, i32* %1
+  %7 = load i32, i32* %1
+  %8 = icmp ne i32 %7, 0
+  br i1 %8, label %9, label %10
 
-8:                                                ; preds = %0
-  call void @putint(i32 1)
-  br label %9
+9:                                                ; preds = %0
+  store i32 -1, i32* %1
+  br label %12
 
-9:                                                ; preds = %8, %0
+10:                                               ; preds = %0
+  %11 = load i32, i32* %2
+  store i32 4, i32* %1
+  br label %12
+
+12:                                               ; preds = %10, %9
   ret i32 0
 }
 
