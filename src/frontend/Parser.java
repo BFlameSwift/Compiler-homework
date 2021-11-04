@@ -208,10 +208,17 @@ public class Parser {
         }else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             int condAddr = parseCond();
-            SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(Utils.getNowAddress());
-            if(thisAddrItem.isCond == false){
+            SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
+            if(true){
+                if(thisAddrItem.isCond){
+                    Utils.condI1ToI32(thisAddrItem.getAddress());
+
+                }
                 Utils.enterIfStmt();
-                midCodeOut.add("%"+Utils.getNowAddress()+" = icmp ne i32 %"+thisAddrItem.getAddress()+", 0");
+                Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(null,0,1,true));
+
+                midCodeOut.add("%"+Utils.getNowAddress()+" = icmp ne i32 %"+thisAddrItem.getLoadAddress()+", 0");
+
             }
             midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+"Myplaceholder2");
             int ifLocation = midCodeOut.size() - 1; // 获取iflocation的
@@ -456,7 +463,6 @@ public class Parser {
         }else{
             throw new CompileException("IOFunction error");
         }
-
     }
     public static void deleteComment(ArrayList<Token> tokens)throws CompileException {
         int i;

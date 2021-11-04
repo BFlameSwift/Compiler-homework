@@ -119,7 +119,11 @@ public class Utils {
         if(addressSymbolTable.containsKey(address)){
             return addressSymbolTable.get(address);
         }
-        throw new IllegalArgumentException("this address has not variable");
+        for(int i=1;i<address;i++){
+
+            System.out.println(addressSymbolTable.get(i).output());
+        }
+        throw new IllegalArgumentException("this address"+address+" has not variable");
     }
     public static void putblockSymbolTable(SymbolItem symbolItem, int index) throws Util.CompileException {
         Map<String, SymbolItem> map ;
