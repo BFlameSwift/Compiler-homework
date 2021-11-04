@@ -109,7 +109,7 @@ public class Parser {
                 Utils.allocateGlobalVariable(identToken,0,0,true);
             }else{
                 varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
-                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
+//                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
             }
             Token.previousToken();
             return;
