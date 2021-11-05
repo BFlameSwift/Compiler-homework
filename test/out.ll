@@ -9,93 +9,43 @@ target triple = "x86_64-pc-linux-gnu"
 @.str.3 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
-; Function Attrs: noinline nounwind optnone uwtable
-define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  store i32 0, i32* %1, align 4
-  store i32 1, i32* %2, align 4
-  %4 = load i32, i32* %2, align 4
-  %5 = icmp eq i32 %4, 1
-  br i1 %5, label %6, label %48
+define dso_local i32 @main() {
+  %1 = call i32 @getint()
+  %2 = alloca i32
+  %3 = alloca i32
+  %4 = alloca i32
+  %5 = load i32, i32* %2
+  %6 = icmp eq i32 %5, 0
+  %7 = zext i1 %6 to i32
+  %8 = icmp ne i32 %7, 0
+  br i1 %8, label %9, label %10
 
-6:                                                ; preds = %0
-  store i32 0, i32* %3, align 4
-  %7 = load i32, i32* %2, align 4
-  %8 = add nsw i32 %7, 1
-  store i32 %8, i32* %2, align 4
-  %9 = load i32, i32* %3, align 4
-  %10 = load i32, i32* %2, align 4
-  %11 = add nsw i32 %9, %10
-  store i32 %11, i32* %3, align 4
-  %12 = load i32, i32* %2, align 4
-  %13 = icmp eq i32 %12, 2
-  br i1 %13, label %14, label %47
+9:                                                ; preds = %0
+  store i32 1, i32* %3
+  store i32 2, i32* %4
+  br label %17
 
-14:                                               ; preds = %6
-  %15 = load i32, i32* %2, align 4
-  %16 = add nsw i32 %15, 2
-  store i32 %16, i32* %2, align 4
-  %17 = load i32, i32* %3, align 4
-  %18 = load i32, i32* %2, align 4
-  %19 = sub nsw i32 %17, %18
-  store i32 %19, i32* %3, align 4
-  %20 = load i32, i32* %2, align 4
-  %21 = icmp eq i32 %20, 4
-  br i1 %21, label %22, label %46
+10:                                               ; preds = %0
+  %11 = load i32, i32* %2
+  %12 = icmp eq i32 %11, 1
+  %13 = zext i1 %12 to i32
+  %14 = icmp ne i32 %13, 0
+  br i1 %14, label %15, label %16
 
-22:                                               ; preds = %14
-  %23 = load i32, i32* %2, align 4
-  %24 = add nsw i32 %23, 4
-  store i32 %24, i32* %2, align 4
-  %25 = load i32, i32* %3, align 4
-  %26 = load i32, i32* %2, align 4
-  %27 = add nsw i32 %25, %26
-  store i32 %27, i32* %3, align 4
-  %28 = load i32, i32* %2, align 4
-  %29 = icmp ne i32 %28, 8
-  br i1 %29, label %30, label %45
+15:                                               ; preds = %10
+  store i32 1, i32* %4
+  store i32 2, i32* %3
+  br label %16
 
-30:                                               ; preds = %22
-  %31 = load i32, i32* %2, align 4
-  %32 = add nsw i32 %31, 8
-  store i32 %32, i32* %2, align 4
-  %33 = load i32, i32* %3, align 4
-  %34 = load i32, i32* %2, align 4
-  %35 = sub nsw i32 %33, %34
-  store i32 %35, i32* %3, align 4
-  %36 = load i32, i32* %2, align 4
-  %37 = icmp eq i32 %36, 16
-  br i1 %37, label %38, label %44
+16:                                               ; preds = %15, %10
+  br label %17
 
-38:                                               ; preds = %30
-  %39 = load i32, i32* %2, align 4
-  %40 = add nsw i32 %39, 16
-  store i32 %40, i32* %2, align 4
-  %41 = load i32, i32* %3, align 4
-  %42 = load i32, i32* %2, align 4
-  %43 = add nsw i32 %41, %42
-  store i32 %43, i32* %3, align 4
-  br label %44
-
-44:                                               ; preds = %38, %30
-  br label %45
-
-45:                                               ; preds = %44, %22
-  br label %46
-
-46:                                               ; preds = %45, %14
-  br label %47
-
-47:                                               ; preds = %46, %6
-  br label %48
-
-48:                                               ; preds = %47, %0
-  %49 = load i32, i32* %2, align 4
-  %50 = call i32 (i32, ...) bitcast (void (i32)* @putint to i32 (i32, ...)*)(i32 %49)
-  %51 = load i32, i32* %3, align 4
-  %52 = call i32 (i32, ...) bitcast (void (i32)* @putint to i32 (i32, ...)*)(i32 %51)
+17:                                               ; preds = %16, %9
+  %18 = load i32, i32* %3
+  %19 = mul i32 %18, 10
+  %20 = load i32, i32* %4
+  %21 = add i32 %19, %20
+  call void @putint(i32 %21)
   ret i32 0
 }
 
@@ -214,7 +164,7 @@ define dso_local void @putarray(i32 %0, i32* %1) #0 {
 attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 
-!llvm.ident = !{!0, !0}
+!llvm.ident = !{!0}
 !llvm.module.flags = !{!1}
 
 !0 = !{!"clang version 10.0.0-4ubuntu1 "}

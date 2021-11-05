@@ -1,27 +1,13 @@
 int main() {
-    int a = 1, sum;
-    if (a == 1) {
-        sum = 0;
-        a = a + 1;
-        sum = sum + a;
-        if (a == 2) {
-            a = a + 2;
-            sum = sum - a;
-            if (a == 4) {
-                a = a + 4;
-                sum = sum + a;
-                if (a != 8) {
-                    a = a + 8;
-                    sum = sum - a;
-                    if (a == 16) {
-                        a = a + 16;
-                        sum = sum + a;
-                    }
-                }
-            }
-        }
+    int flag = getint();
+    int a, b;
+    if (flag == 0) {
+        a = 1;
+        b = 2;
+    } else if (flag == 1) {
+        b = 1;
+        a = 2;
     }
-    putint(a);
-    putint(sum);
+    putint(a * 10 + b);
     return 0;
 }
