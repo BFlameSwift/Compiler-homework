@@ -321,7 +321,11 @@ public class Parser {
 //            else
 //                primaryAddr = Utils.putNewSymbol(new SymbolItem(null,0,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt()));
 //                    Utils.storeVariable(null,);
-
+            else if(coefficient == -1){
+                int newNegativeOne = Utils.storeConstVariable(null,-1,Utils.getNowFunction());
+                primaryAddr = Utils.midExpCalculate("mul",primaryAddr,newNegativeOne);
+                Utils.putAddressSymbol(primaryAddr,new SymbolItem(null,0,-Utils.getSymbolItemByAddress(primaryAddr).getValueInt()));
+            }
             if(notCount%2==1){
 //                primaryAddr = Utils.putNewVariable(null,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(), Utils.getNowFunction());
                 int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());

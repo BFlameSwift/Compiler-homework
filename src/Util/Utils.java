@@ -224,7 +224,7 @@ public class Utils {
         int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
         Boolean objIsCond = false;
 //        int objAddress = nowAddress;
-        if(objKind == 0||objKind == 4){// 是变量就输出过程
+        if(objKind == 0){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
 
             String outStr = "%"+objAddress+" = ";
