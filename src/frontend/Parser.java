@@ -256,7 +256,8 @@ public class Parser {
             parseBlock();
         }
         else{
-            Token.previousToken();
+            throw new CompileException("stmt error");
+//            Token.previousToken();
         }
     }
     // Exp          -> AddExp
