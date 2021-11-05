@@ -214,22 +214,9 @@ public class Parser {
             int condAddr = parseCond();
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
             Utils.beforejudgeCondition(condAddr);
-//            if(true){
-//                if(thisAddrItem.isCond){
-//                    Utils.condI1ToI32(thisAddrItem.getAddress());
-//                }
-//                int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());
-//                Utils.midExpCalculate("ne",thisAddrItem.getLoadAddress(),newZeroAddr);
-//                Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(null,0,1,true));
-//            }
             Utils.readyJump();
-//            midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+Analysis.BR_ADDRESS2);
-            int ifLocation = midCodeOut.size() - 1; // 获取iflocation的
-//            Utils.enterIfStmt();
-            int nextAddr1 = Utils.nextLabel();
-//            midCodeOut.add(nextAddr1+":");
-
             Token.exceptNextToken(Lexical.RPAREN);
+            Utils.nextLabel();
             int stmtRet = parseStmt();
             if(stmtRet !=1) Utils.endBlockJumpOutput(); // 如果stmt中没有ret块
 //            midCodeOut.add("br label jumpToEndAddr");
@@ -237,12 +224,9 @@ public class Parser {
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
-
                  stmtRet = parseStmt();
                 if(stmtRet != 1) Utils.endBlockJumpOutput();
-//                midCodeOut.add("br label jumpToEndAddr");
                 int jumpToloca2 = midCodeOut.size() - 1;
-//                Utils.enterIfStmt();
                 int outAddr = Utils.nextLabel();
                 Analysis.replaceStrInList(midCodeOut, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replaceStrInList(midCodeOut, Analysis.LEAVE_ADDRESS,"%"+outAddr);
@@ -330,7 +314,13 @@ public class Parser {
                 thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
             Token.previousToken();
-            int primaryAddr = Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(), Utils.getNowFunction());
+            int primaryAddr = parsePrimaryExp();
+            if(Utils.getSymbolItemByAddress(primaryAddr).kind == 1)
+                Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),Utils.getNowFunction());
+//            else
+//                primaryAddr = Utils.putNewSymbol(new SymbolItem(null,0,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt()));
+//                    Utils.storeVariable(null,);
+
             if(notCount%2==1){
 //                primaryAddr = Utils.putNewVariable(null,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(), Utils.getNowFunction());
                 int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());

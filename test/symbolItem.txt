@@ -1,4 +1,4 @@
-1 .This is a Variable:@a value = -40in address:1load addr40
+1 .This is a Variable:@a value = 40in address:1load addr40
 2 .This is a Variable:@b value = 10in address:2load addr24
 3 .This is a Variable:null value = 5in address:3load addr3
 4 .This is a Variable:null value = 0in address:4load addr7   cond

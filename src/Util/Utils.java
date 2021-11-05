@@ -105,6 +105,11 @@ public class Utils {
         putblockSymbolTable(symbolItem,blockIndex);
         return nowAddress;
     }
+    public static int putNewSymbol(SymbolItem symbolItem){
+        addressSymbolTable.put(++nowAddress,symbolItem);
+        symbolItem.setLoadAddress(nowAddress);
+        return nowAddress;
+    }
     public static void putAddressSymbol(int addr, SymbolItem symbolItem){
         symbolItem.setAddress(addr);
         addressSymbolTable.put(addr,symbolItem);

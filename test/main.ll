@@ -36,7 +36,7 @@ br label %38
 %24 = load i32, i32* %2
 %25 = icmp eq i32 %24, 10
 %26 = load i32, i32* %1
-%27 = icmp eq i32 %26, -5
+%27 = icmp eq i32 %26, 5
 %28= zext i1 %25 to i32
 %29= zext i1 %27 to i32
 %30 = and i32 %28, %29
@@ -49,7 +49,7 @@ store i32 %34, i32* %1
 br label %37
 35:
 %36 = load i32, i32* %1
-store i32 -40, i32* %1
+store i32 %36, i32* %1
 br label %37
 37:
 br label %38
