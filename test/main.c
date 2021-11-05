@@ -1,27 +1,18 @@
 int main() {
-     int a = 1, sum;
-     if (a == 1) {
-         sum = 0;
-         a = a + 1;
-         sum = sum + a;
-         if (a == 2) {
-             a = a + 2;
-             sum = sum - a;
-             if (a == 4) {
-                 a = a + 4;
-                 sum = sum + a;
-                 if (a != 8) {
-                     a = a + 8;
-                     sum = sum - a;
-                     if (a == 16) {
-                         a = a + 16;
-                         sum = sum + a;
-                     }
-                 }
-             }
-         }
-     }
-     putint(a);
-     putint(sum);
-     return 0;
- }
+    int a;
+    a = 5;
+    int b;
+    b = 10;
+    if (a == 6 || b == 0xb) {
+        return a;
+    } else {
+        if (b == 10 && a == 1)
+            a = 25;
+        else if (b == 10 && a == -5)
+            a = a + 15;
+        else
+            a = -+a;
+    }
+    putint(a);
+    return 0;
+}

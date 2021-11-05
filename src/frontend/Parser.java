@@ -154,23 +154,26 @@ public class Parser {
         return Token.getPreviousToken().getValue(); // 获取标识符的名字
     }
     // Block        -> '{' { BlockItem } '}'
-    public static void parseBlock()throws CompileException {
+    public static int parseBlock()throws CompileException {
         Utils.enterBlock(); //blockindex ++;
         Token.exceptNextToken(Lexical.LBRACE);   //midCodeOut.add("{");
+        int blockHasRet = 0;
         while (!Token.judgeNextToken(Lexical.RBRACE)) {
             Token.previousToken();
-            parseBlockItem();
+            blockHasRet += parseBlockItem();
         }
 //        midCodeOut.add("}");
+        return blockHasRet>0?1:0;
     }
     // BlockItem    -> Decl | Stmt
-    public static void parseBlockItem() throws CompileException {
+    public static int  parseBlockItem() throws CompileException {
         if(Token.isDecl(Token.nextTokenLexcial("decl"))){
             Token.previousToken();
             parseDecl();
+            return 0;
         }else{
             Token.previousToken();
-            parseStmt();
+            return parseStmt();
         }
     }
     //Stmt         -> LVal '=' Exp ';'
@@ -181,7 +184,7 @@ public class Parser {
     //                | 'break' ';'
     //                | 'continue' ';'
     //                | 'return' [Exp] ';'
-    public static void parseStmt()throws CompileException {
+    public static int parseStmt()throws CompileException {
         Token token = Token.nextToken("exp or Lval = Exp or return or block or if");
         if(token.judgeThis(Lexical.RETURN_DEC)){
             int expAddress = parseExp();
@@ -190,6 +193,7 @@ public class Parser {
             String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getAddress();
             midCodeOut.add("ret i32 "+retStr);
             Token.exceptNextToken(Lexical.SEMICOLON);
+            return 1;
         }
         else if(Token.isIdent(token.getLexcial())){//TODO 如果找不到这个变量
             if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
@@ -203,7 +207,7 @@ public class Parser {
                 if(!Token.isSemicolon(Token.getNextToken().getLexcial())) {
                     parseExp();
             }
-           Token.exceptNextToken(Lexical.SEMICOLON);
+            Token.exceptNextToken(Lexical.SEMICOLON);
        }
         }else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
@@ -226,16 +230,16 @@ public class Parser {
 //            midCodeOut.add(nextAddr1+":");
 
             Token.exceptNextToken(Lexical.RPAREN);
-            parseStmt();
-            Utils.endBlockJumpOutput();
+            int stmtRet = parseStmt();
+            if(stmtRet !=1) Utils.endBlockJumpOutput(); // 如果stmt中没有ret块
 //            midCodeOut.add("br label jumpToEndAddr");
             int jumpToloca1 = midCodeOut.size() - 1;
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
 
-                parseStmt();
-                Utils.endBlockJumpOutput();
+                 stmtRet = parseStmt();
+                if(stmtRet != 1) Utils.endBlockJumpOutput();
 //                midCodeOut.add("br label jumpToEndAddr");
                 int jumpToloca2 = midCodeOut.size() - 1;
 //                Utils.enterIfStmt();
@@ -246,6 +250,7 @@ public class Parser {
 //                midCodeOut.set(jumpToloca2,midCodeOut.get(jumpToloca2).replaceAll("jumpToEndAddr","%"+outAddr));
 //                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+elseAddr));
             }else{
+
                 int endAddr = Utils.nextLabel();
 //                midCodeOut.add(endAddr+":");
                 Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+endAddr);
@@ -255,15 +260,17 @@ public class Parser {
             }
 
 
-
+            return 0;
         }else if(token.getLexcial() == Lexical.LBRACE){
             Token.previousToken();
-            parseBlock();
+//            int blockHasRet = parseBlock();
+            return parseBlock();
         }
         else{
             throw new CompileException("stmt error");
 //            Token.previousToken();
         }
+        return 0;
     }
     // Exp          -> AddExp
     public static int parseExp()throws CompileException {

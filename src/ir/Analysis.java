@@ -19,6 +19,6 @@ public class Analysis {
                 return ;
             }
         }
-        throw new CompileException("nothing "+before+" to replace");
+//        throw new CompileException("nothing "+before+" to replace");
     }
 }
