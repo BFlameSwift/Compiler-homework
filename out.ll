@@ -11,69 +11,68 @@ target triple = "x86_64-pc-linux-gnu"
 
 define dso_local i32 @main() {
   %1 = alloca i32
-  store i32 5, i32* %1
   %2 = alloca i32
-  store i32 10, i32* %2
-  %3 = load i32, i32* %1
-  %4 = icmp eq i32 %3, 6
-  %5 = load i32, i32* %2
-  %6 = icmp eq i32 %5, 11
-  %7 = zext i1 %4 to i32
-  %8 = zext i1 %6 to i32
-  %9 = or i32 %7, %8
-  %10 = icmp ne i32 %9, 0
-  br i1 %10, label %11, label %13
-
-11:                                               ; preds = %0
-  %12 = load i32, i32* %1
-  ret i32 %12
-
-13:                                               ; preds = %0
-  %14 = load i32, i32* %2
-  %15 = icmp eq i32 %14, 10
-  %16 = load i32, i32* %1
-  %17 = icmp eq i32 %16, 1
-  %18 = zext i1 %15 to i32
+  %3 = alloca i32
+  %4 = alloca i32
+  %5 = alloca i32
+  store i32 5, i32* %1
+  store i32 5, i32* %2
+  store i32 1, i32* %3
+  store i32 -2, i32* %4
+  store i32 2, i32* %5
+  %6 = load i32, i32* %4
+  %7 = mul i32 %6, 1
+  %8 = sdiv i32 %7, 2
+  %9 = icmp slt i32 %8, 0
+  %10 = load i32, i32* %1
+  %11 = load i32, i32* %2
+  %12 = sub i32 %10, %11
+  %13 = icmp ne i32 %12, 0
+  %14 = load i32, i32* %3
+  %15 = add i32 %14, 3
+  %16 = srem i32 %15, 2
+  %17 = icmp ne i32 %16, 0
+  %18 = zext i1 %13 to i32
   %19 = zext i1 %17 to i32
   %20 = and i32 %18, %19
-  %21 = icmp ne i32 %20, 0
-  br i1 %21, label %22, label %23
+  %21 = zext i1 %9 to i32
+  %22 = or i32 %21, %20
+  %23 = icmp ne i32 %22, 0
+  br i1 %23, label %24, label %26
 
-22:                                               ; preds = %13
-  store i32 25, i32* %1
-  br label %38
+24:                                               ; preds = %0
+  %25 = load i32, i32* %5
+  call void @putint(i32 %25)
+  br label %26
 
-23:                                               ; preds = %13
-  %24 = load i32, i32* %2
-  %25 = icmp eq i32 %24, 10
-  %26 = load i32, i32* %1
-  %27 = icmp eq i32 %26, 5
-  %28 = zext i1 %25 to i32
-  %29 = zext i1 %27 to i32
-  %30 = and i32 %28, %29
-  %31 = icmp ne i32 %30, 0
-  br i1 %31, label %32, label %35
+26:                                               ; preds = %24, %0
+  %27 = load i32, i32* %4
+  %28 = srem i32 %27, 2
+  %29 = add i32 %28, 67
+  %30 = icmp slt i32 %29, 0
+  %31 = load i32, i32* %1
+  %32 = load i32, i32* %2
+  %33 = sub i32 %31, %32
+  %34 = icmp ne i32 %33, 0
+  %35 = load i32, i32* %3
+  %36 = add i32 %35, 2
+  %37 = srem i32 %36, 2
+  %38 = icmp ne i32 %37, 0
+  %39 = zext i1 %34 to i32
+  %40 = zext i1 %38 to i32
+  %41 = and i32 %39, %40
+  %42 = zext i1 %30 to i32
+  %43 = or i32 %42, %41
+  %44 = icmp ne i32 %43, 0
+  br i1 %44, label %45, label %47
 
-32:                                               ; preds = %23
-  %33 = load i32, i32* %1
-  %34 = add i32 %33, 15
-  store i32 %34, i32* %1
-  br label %37
+45:                                               ; preds = %26
+  store i32 4, i32* %5
+  %46 = load i32, i32* %5
+  call void @putint(i32 %46)
+  br label %47
 
-35:                                               ; preds = %23
-  %36 = load i32, i32* %1
-  store i32 %36, i32* %1
-  br label %37
-
-37:                                               ; preds = %35, %32
-  br label %38
-
-38:                                               ; preds = %37, %22
-  br label %39
-
-39:                                               ; preds = %38
-  %40 = load i32, i32* %1
-  call void @putint(i32 %40)
+47:                                               ; preds = %45, %26
   ret i32 0
 }
 

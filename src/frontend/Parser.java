@@ -315,8 +315,9 @@ public class Parser {
             }
             Token.previousToken();
             int primaryAddr = parsePrimaryExp();
-            if(Utils.getSymbolItemByAddress(primaryAddr).kind == 1)
-                Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),Utils.getNowFunction());
+            if(Utils.getSymbolItemByAddress(primaryAddr).isConstant())
+                primaryAddr = Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),Utils.getNowFunction());
+
 //            else
 //                primaryAddr = Utils.putNewSymbol(new SymbolItem(null,0,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt()));
 //                    Utils.storeVariable(null,);
