@@ -3,9 +3,6 @@ source_filename = "llvm-link"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-@a = dso_local global i32 1, align 4
-@cons = dso_local constant i32 2, align 4
-@comon = common dso_local global i32 0, align 4
 @.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @.str.1 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
 @.str.2 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
@@ -14,10 +11,25 @@ target triple = "x86_64-pc-linux-gnu"
 
 define dso_local i32 @main() {
   %1 = alloca i32
-  store i32 2, i32* %1
+  store i32 10, i32* %1
   %2 = load i32, i32* %1
-  call void @putint(i32 %2)
-  ret i32 3
+  %3 = icmp eq i32 %2, 0
+  %4 = zext i1 %3 to i32
+  %5 = icmp ne i32 %4, 0
+  br i1 %5, label %6, label %7
+
+6:                                                ; preds = %0
+  store i32 -1, i32* %1
+  br label %8
+
+7:                                                ; preds = %0
+  store i32 0, i32* %1
+  br label %8
+
+8:                                                ; preds = %7, %6
+  %9 = load i32, i32* %1
+  call void @putint(i32 %9)
+  ret i32 0
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable

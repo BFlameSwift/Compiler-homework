@@ -14,10 +14,12 @@ public class SymbolItem {
     public static final int NOT_ASSIGN = -1239032;
     public static final int ADDRESS_NOT_ASSIGN = 0;
     public String name;
-    public int kind; // var 0,const 1,function 2,array 3, i1(bool ?) 4
+    public int kind; // var 0,const 1,function 2,array 3
     public int type; // void 0 int 1;
     public Boolean isCond = false;
     private int valueInt;
+    public int length; // 数组长度，函数变量参数数目
+    ArrayList<Integer> parametersList; // 参数类型
 
     public int getValueInt() throws CompileException {
         if (valueInt == NOT_ASSIGN){
@@ -56,8 +58,6 @@ public class SymbolItem {
         this.address = address;
     }
 
-    public int length; // 数组长度，函数变量参数数目
-    ArrayList<Integer> parametersList; // 参数类型
 
     public SymbolItem(String name,int kind ){
         this.name = name;
@@ -95,12 +95,13 @@ public class SymbolItem {
     public String output(){
         String out = "";
         if(kind == 1){
-            out += "This is a const:"+name+" value = "+valueInt+ "in address:"+address;
+            out += "This is a const:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
         }else if(kind == 0){
-            out += "This is a Variable:"+name+" value = "+valueInt+ "in address:"+address;
+            out += "This is a Variable:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
         }else{
             out += "not a const or var";
         }
+        if(isCond) out += "   cond";
 
         // TODO 根据不同种类输出
         return out;
@@ -131,11 +132,11 @@ public class SymbolItem {
         ArrayList<String> itemList = new ArrayList<String>();
         for(int i=1;i<Utils.getNowAddress();i++){
             try {
-                itemList.add(Utils.getSymbolItemByAddress(i).output());
+                itemList.add(i+" ."+Utils.getSymbolItemByAddress(i).output());
             }catch (IllegalArgumentException e){
-                itemList.add("null");
+                itemList.add(i+"null");
             }catch (NullPointerException r){
-                itemList.add("null");
+                itemList.add(i+"null");
             }
         }Parser.outputFile("./test/symbolItem.txt",itemList);
 

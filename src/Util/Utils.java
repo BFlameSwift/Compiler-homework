@@ -181,6 +181,15 @@ public class Utils {
 
         return item.getAddress();
     }
+    public static int putNewVariable(String name,int value,String funcName) throws Util.CompileException {
+        SymbolItem item = new SymbolItem(name,1,value);
+        item.setAddress(++ nowAddress);
+        if(name != null){
+            putblockSymbolTable(item,blockIndex);
+            putallocalSymbolTable(item,funcName);
+        }putAddressSymbol(nowAddress,item);
+        return item.getAddress();
+    }
 
     public static String storeVariableOutput(int valueAddr,int varAddr) throws Util.CompileException {
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
@@ -219,8 +228,8 @@ public class Utils {
             outStr += (item2.kind == 1)?item2.getValueInt():"%"+item2.getLoadAddress();
             Parser.midCodeOut.add(outStr);
             if(Token.isCond(op)){
-                objIsCond = true;                                                                                                                                                                     
-                Parser.midCodeOut.add("%"+Utils.enterIfStmt()+" = zext i1 %"+(Utils.getNowAddress()-1)+" to i32");
+                objIsCond = true;
+//                Parser.midCodeOut.add("%"+Utils.enterIfStmt()+" = zext i1 %"+(Utils.getNowAddress()-1)+" to i32");
             }
 
         }

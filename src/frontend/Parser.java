@@ -212,12 +212,10 @@ public class Parser {
             if(true){
                 if(thisAddrItem.isCond){
                     Utils.condI1ToI32(thisAddrItem.getAddress());
-
                 }
-                Utils.enterIfStmt();
+                int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());
+                Utils.midExpCalculate("ne",thisAddrItem.getLoadAddress(),newZeroAddr);
                 Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(null,0,1,true));
-
-                midCodeOut.add("%"+Utils.getNowAddress()+" = icmp ne i32 %"+thisAddrItem.getLoadAddress()+", 0");
 
             }
             midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+"Myplaceholder2");
@@ -311,13 +309,21 @@ public class Parser {
             while(Token.isUnaryOp(thisLexcial)){
                 if(thisLexcial == Lexical.AND || thisLexcial== Lexical.MINUS)
                     coefficient *= parseUnaryOp(thisLexcial);
-                else{
+                else if(thisLexcial == Lexical.NOT){
                     notCount ++;
                 }
                 thisLexcial = Token.nextTokenLexcial("UnaryOp");
             }
             Token.previousToken();
-            return Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(), Utils.getNowFunction());
+            int primaryAddr = Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(), Utils.getNowFunction());
+            if(notCount%2==1){
+//                primaryAddr = Utils.putNewVariable(null,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(), Utils.getNowFunction());
+                int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());
+                primaryAddr = Utils.midExpCalculate("eq",(Utils.getNowAddress()-1),newZeroAddr);
+                Utils.putAddressSymbol(primaryAddr,new SymbolItem(null,0,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),true));
+//                midCodeOut.add("%"+Utils.getNowAddress()+" = icmp eq i32 %"++", 0");
+            }
+            return primaryAddr;
         }else if(Token.isIdent(thisLexcial)&& Token.isLParen(Token.getNextToken().getLexcial())){
             // TODO ! 还没兼容函数
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue())) {
@@ -401,12 +407,13 @@ public class Parser {
         return lorAddr;
     }
     public static int parseLAndExp () throws CompileException {
-        int eqAddr = parseEqExp();
+        int landAddr = parseEqExp();
         while(Token.getNextToken().getLexcial() == Lexical.AND){
-            Token andOp = Token.nextToken("&&");
-            eqAddr = parseEqExp();
+            String  andOp = Token.nextToken("&&").getValue();
+            int eqAddr = parseEqExp();
+            landAddr = Utils.midExpCalculate(andOp,landAddr,eqAddr);
         }
-        return eqAddr;
+        return landAddr;
     }
     public static int parseEqExp () throws CompileException {
         int eqAddr = parseRelRExp();
@@ -488,8 +495,8 @@ public class Parser {
             out = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(file, false)));
 //            out.write(conent+"\r\n");
-            for(int i=0;i<midCodeOut.size();i++){
-                out.write(midCodeOut.get(i)+"\r\n");
+            for(int i=0;i<array.size();i++){
+                out.write(array.get(i)+"\r\n");
             }
         } catch (Exception e) {
             e.printStackTrace();

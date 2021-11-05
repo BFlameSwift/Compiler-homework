@@ -109,9 +109,6 @@ public class Lexical {
                 }else if(line.charAt(j) == '!' &&j < lineLen-1 && line.charAt(j+1) == '='){
                     j++; // !=
                 }
-
-
-
                 j++;
             }
             else if(MyConst.isNumber(thisStr)){
@@ -164,6 +161,7 @@ public class Lexical {
         else if (isIdentifier(str)){
             lexicalList.add(Integer.valueOf(IDENT));
             token  = "@"+str;
+            // TODO 去掉@
         }
         else {
             lexicalList.add(Integer.valueOf(-1));
