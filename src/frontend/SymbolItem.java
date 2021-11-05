@@ -1,7 +1,10 @@
 package frontend;
 
 import Util.CompileException;
+import Util.Utils;
+import jdk.jshell.execution.Util;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -112,5 +115,37 @@ public class SymbolItem {
         return "name："+name+" kind"+kind+" value:"+valueInt;
     }
 
+    public static void main(String[] args) throws FileNotFoundException, CompileException {
+        Utils.initIOFunctions();
+        Parser.lexicalAnalysis(args[0]);
+        try {
+            Parser.parseCompUnit();
+        }catch (CompileException e){
+//            System.out.println(e);
+            e.printStackTrace();
+            for(String str : Parser.midCodeOut){
+                System.out.println(str);
+            }
+            System.exit(-1);
+        }
+        ArrayList<String> itemList = new ArrayList<String>();
+        for(int i=1;i<Utils.getNowAddress();i++){
+            try {
+                itemList.add(Utils.getSymbolItemByAddress(i).output());
+            }catch (IllegalArgumentException e){
+                itemList.add("null");
+            }catch (NullPointerException r){
+                itemList.add("null");
+            }
+        }Parser.outputFile("./test/symbolItem.txt",itemList);
+
+
+        for(String str : Parser.midCodeOut){
+            System.out.println(str);
+        } Parser.outputFile(args[1],Parser.midCodeOut );
+
+        System.exit(0);
+
+    }
 
 }
