@@ -114,14 +114,14 @@ public class Parser {
             Token.previousToken();
             return;
         }
+        varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
         int valueAddr = parseInitVal();
         if(Utils.isGlobal()) {
             Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false);
             return;
         }
-        varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
         varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
-//        midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
+        midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;
     }
     public static int parseInitVal() throws CompileException {
@@ -209,44 +209,49 @@ public class Parser {
             Token.exceptNextToken(Lexical.LPAREN);
             int condAddr = parseCond();
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
-            if(true){
-                if(thisAddrItem.isCond){
-                    Utils.condI1ToI32(thisAddrItem.getAddress());
-                }
-                int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());
-                Utils.midExpCalculate("ne",thisAddrItem.getLoadAddress(),newZeroAddr);
-                Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(null,0,1,true));
-
-            }
-            midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+"Myplaceholder2");
+            Utils.beforejudgeCondition(condAddr);
+//            if(true){
+//                if(thisAddrItem.isCond){
+//                    Utils.condI1ToI32(thisAddrItem.getAddress());
+//                }
+//                int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());
+//                Utils.midExpCalculate("ne",thisAddrItem.getLoadAddress(),newZeroAddr);
+//                Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(null,0,1,true));
+//            }
+            Utils.readyJump();
+//            midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(Utils.getNowAddress()+1)+", label "+Analysis.BR_ADDRESS2);
             int ifLocation = midCodeOut.size() - 1; // 获取iflocation的
-            Utils.enterIfStmt();
-            int nextAddr1 = Utils.getNowAddress();
-            midCodeOut.add(nextAddr1+":");
+//            Utils.enterIfStmt();
+            int nextAddr1 = Utils.nextLabel();
+//            midCodeOut.add(nextAddr1+":");
 
             Token.exceptNextToken(Lexical.RPAREN);
-
             parseStmt();
-            midCodeOut.add("br label jumpToEndAddr");
+            Utils.endBlockJumpOutput();
+//            midCodeOut.add("br label jumpToEndAddr");
             int jumpToloca1 = midCodeOut.size() - 1;
-            if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC){
+            if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
-                int elseAddr = Utils.enterIfStmt();
-                midCodeOut.add(elseAddr+":");
+                int elseAddr = Utils.nextLabel();
 
                 parseStmt();
-                midCodeOut.add("br label jumpToEndAddr");
+                Utils.endBlockJumpOutput();
+//                midCodeOut.add("br label jumpToEndAddr");
                 int jumpToloca2 = midCodeOut.size() - 1;
-                Utils.enterIfStmt();
-                int outAddr = Utils.getNowAddress();
-                midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+outAddr)));
-                midCodeOut.set(jumpToloca2,midCodeOut.get(jumpToloca2).replaceAll("jumpToEndAddr","%"+outAddr));
-                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+elseAddr));
+//                Utils.enterIfStmt();
+                int outAddr = Utils.nextLabel();
+                Analysis.replaceStrInList(midCodeOut, Analysis.LEAVE_ADDRESS,"%"+outAddr);
+                Analysis.replaceStrInList(midCodeOut, Analysis.LEAVE_ADDRESS,"%"+outAddr);
+                Analysis.replaceStrInList(midCodeOut, Analysis.BR_ADDRESS2,"%"+elseAddr);
+//                midCodeOut.set(jumpToloca2,midCodeOut.get(jumpToloca2).replaceAll("jumpToEndAddr","%"+outAddr));
+//                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+elseAddr));
             }else{
-                int endAddr = Utils.enterIfStmt();
-                midCodeOut.add(endAddr+":");
-                midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+endAddr)));
-                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+endAddr));
+                int endAddr = Utils.nextLabel();
+//                midCodeOut.add(endAddr+":");
+                Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+endAddr);
+                Analysis.replaceStrInList(midCodeOut, Analysis.BR_ADDRESS2,"%"+endAddr);
+//                midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+endAddr)));
+//                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+endAddr));
             }
 
 
@@ -266,7 +271,9 @@ public class Parser {
     }
     // Cond         -> LOrExp
     public static int parseCond() throws CompileException {
-        return parseLorExp();
+        int lorAddr = parseLorExp();
+//        Utils.getSymbolItemByAddress(lorAddr).isCond = true; // 设置cond返回的item一定是一个条件变量，  覆盖if(1+1) 类型
+        return lorAddr;
     }
     // AddExp       -> MulExp  | AddExp ('+' | '−') MulExp
     public static int parseAddExp()throws CompileException {

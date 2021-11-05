@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import frontend.*;
+import ir.Analysis;
 
 
 public class Utils {
@@ -94,8 +95,9 @@ public class Utils {
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
-        symbolItem.setAddress(nowAddress);
-        nowAddress ++;
+        symbolItem.setAddress((++nowAddress));
+
+//        nowAddress ++;
         Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
         //TODO 根据不同函数进入不同的Map块
         putAddressSymbol(nowAddress,symbolItem);
@@ -352,5 +354,28 @@ public class Utils {
         SymbolItem putch = new SymbolItem("@putch",2,0,0,1);
         allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
         funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
+    }
+    // 判断函数是否是i1类型。如果不是需要进行转换
+    public static int  beforejudgeCondition(int condAddr) throws CompileException {
+        SymbolItem item = getSymbolItemByAddress(condAddr);
+        if(! item.isCond){// 可能是 if(1+1) 类型，转换为i1类型进行判断
+            int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction()); //常量放一个0
+            int midAddr = midExpCalculate("ne",item.getLoadAddress(),newZeroAddr);
+            putAddressSymbol(midAddr,new SymbolItem(null,0,item.getValueInt()!=0?1:0,true));//在地址表中放入 item!=0 的item
+            return midAddr;// 返回数字是不是零
+        }
+        return nowAddress;
+    }
+    public static int readyJump(){
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
+
+        return nowAddress;
+    }
+    public static int nextLabel(){
+        Parser.midCodeOut.add((++nowAddress)+":");
+        return nowAddress;
+    }
+    public static void endBlockJumpOutput(){
+        Parser.midCodeOut.add("br label "+Analysis.LEAVE_ADDRESS);
     }
 }

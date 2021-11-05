@@ -1,20 +1,48 @@
-1 .This is a Variable:null value = 1in address:1load addr1
-2 .This is a Variable:@flag value = 1in address:2load addr11
-3 .This is a Variable:@a value = 2in address:3load addr18
-4 .This is a Variable:@b value = 1in address:4load addr20
-5 .This is a Variable:null value = 1in address:5load addr5
-6 .This is a Variable:null value = 0in address:6load addr7   cond
-7 .This is a Variable:null value = 0in address:7load addr7   cond
-8 .This is a Variable:null value = 1in address:8load addr8   cond
-9null
-10null
-11 .This is a Variable:null value = 1in address:11load addr11
-12 .This is a Variable:null value = 1in address:12load addr13   cond
-13 .This is a Variable:null value = 1in address:13load addr13   cond
-14 .This is a Variable:null value = 1in address:14load addr14   cond
-15null
-16null
-17null
-18 .This is a Variable:null value = 2in address:18load addr18
-19 .This is a Variable:null value = 20in address:19load addr19
-20 .This is a Variable:null value = 1in address:20load addr20
+1 .This is a Variable:@a value = 32in address:1load addr48
+2 .This is a Variable:@sum value = 22in address:2load addr49
+3 .This is a Variable:null value = 1in address:3load addr3
+4 .This is a Variable:null value = 1in address:4load addr4   cond
+5null
+6 .This is a Variable:null value = 1in address:6load addr6
+7 .This is a Variable:null value = 2in address:7load addr7
+8 .This is a Variable:null value = 0in address:8load addr8
+9 .This is a Variable:null value = 2in address:9load addr9
+10 .This is a Variable:null value = 2in address:10load addr10
+11 .This is a Variable:null value = 2in address:11load addr11
+12 .This is a Variable:null value = 1in address:12load addr12   cond
+13null
+14 .This is a Variable:null value = 2in address:14load addr14
+15 .This is a Variable:null value = 4in address:15load addr15
+16 .This is a Variable:null value = 2in address:16load addr16
+17 .This is a Variable:null value = 4in address:17load addr17
+18 .This is a Variable:null value = -2in address:18load addr18
+19 .This is a Variable:null value = 4in address:19load addr19
+20 .This is a Variable:null value = 1in address:20load addr20   cond
+21null
+22 .This is a Variable:null value = 4in address:22load addr22
+23 .This is a Variable:null value = 8in address:23load addr23
+24 .This is a Variable:null value = -2in address:24load addr24
+25 .This is a Variable:null value = 8in address:25load addr25
+26 .This is a Variable:null value = 6in address:26load addr26
+27 .This is a Variable:null value = 8in address:27load addr27
+28 .This is a Variable:null value = 0in address:28load addr28   cond
+29null
+30 .This is a Variable:null value = 8in address:30load addr30
+31 .This is a Variable:null value = 16in address:31load addr31
+32 .This is a Variable:null value = 6in address:32load addr32
+33 .This is a Variable:null value = 16in address:33load addr33
+34 .This is a Variable:null value = -10in address:34load addr34
+35 .This is a Variable:null value = 16in address:35load addr35
+36 .This is a Variable:null value = 1in address:36load addr36   cond
+37null
+38 .This is a Variable:null value = 16in address:38load addr38
+39 .This is a Variable:null value = 32in address:39load addr39
+40 .This is a Variable:null value = -10in address:40load addr40
+41 .This is a Variable:null value = 32in address:41load addr41
+42 .This is a Variable:null value = 22in address:42load addr42
+43null
+44null
+45null
+46null
+47null
+48 .This is a Variable:null value = 32in address:48load addr48

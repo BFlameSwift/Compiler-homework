@@ -15,7 +15,7 @@ public class SymbolItem {
     public static final int ADDRESS_NOT_ASSIGN = 0;
     public String name;
     public int kind; // var 0,const 1,function 2,array 3
-    public int type; // void 0 int 1;
+    public int type; // void 0 int 1,label 2;
     public Boolean isCond = false;
     private int valueInt;
     public int length; // 数组长度，函数变量参数数目
