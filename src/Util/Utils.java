@@ -24,7 +24,7 @@ public class Utils {
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
     private static int blockIndex = 0;
-    private static int blockLevel = 0;
+    private static int blockMaxIndex = 0;
     private static int thisFunctionBlockIndex = -1;
     private static int constAddress = -100000;
     private static int nowAddress = 0;
@@ -38,7 +38,8 @@ public class Utils {
     }
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
-        thisFunctionBlockIndex = blockIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
+        thisFunctionBlockIndex = blockMaxIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
+        blockIndex = blockMaxIndex;
     }
 
     public static int getNowAddress() {
@@ -47,12 +48,11 @@ public class Utils {
 
     public static void enterBlock(){
         blockIndex ++;
-        blockLevel++;
+        blockMaxIndex = Math.max(blockMaxIndex, blockIndex);
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
     public static void quitBlock(){
-        blockLevel --;
-//        blockSymbolTable.add(new HashMap<String, SymbolItem>());
+        blockIndex --;
     }
 
     public static int getBlockIndex() {
@@ -91,7 +91,7 @@ public class Utils {
     public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon) throws Util.CompileException {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
         String symbolName = token.getValue();
-        SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value);
+        SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value,getBlockIndex());
         symbolItem.blockIndex = 0;
         if(globalSymbolTable.containsKey(symbolName)){
             throw new Util.CompileException("this variable name"+symbolName+"has been allocate");
@@ -151,12 +151,14 @@ public class Utils {
         map.put(symbolItem.name,symbolItem);
     }
     // 自小块向大块查找需要的
-    private static SymbolItem getSymbolItem(Token token) throws Util.CompileException {
+    public static SymbolItem getSymbolItem(Token token) throws Util.CompileException {
         int block_index = Utils.blockIndex;
         while(block_index>=thisFunctionBlockIndex){
+//            System.out.println("finding symbol"+token.getValue()+'\t'+"index"+block_index);
 //            System.out.println("this block index"+block_index);
             Map<String, SymbolItem> map = blockSymbolTable.get(block_index);
             if(map.containsKey(token.getValue())){
+//                System.out.println("find!!! "+token.getValue()+"\t at \t"+block_index);
                 return map.get(token.getValue());
             }
             block_index --;
@@ -188,7 +190,7 @@ public class Utils {
         return symbolItem.getAddress();
     }
     public static int storeConstVariable(String name,int value,String funcName) throws Util.CompileException {
-        SymbolItem item = new SymbolItem(name,1,value);
+        SymbolItem item = new SymbolItem(name,1,value,getBlockIndex());
         item.setAddress(++ constAddress);
         if(name != null){
             putblockSymbolTable(item,blockIndex);
@@ -198,7 +200,7 @@ public class Utils {
         return item.getAddress();
     }
     public static int putNewVariable(String name,int value,String funcName) throws Util.CompileException {
-        SymbolItem item = new SymbolItem(name,1,value);
+        SymbolItem item = new SymbolItem(name,1,value,getBlockIndex());
         item.setAddress(++ nowAddress);
         if(name != null){
             putblockSymbolTable(item,blockIndex);
@@ -289,12 +291,12 @@ public class Utils {
         }
     }
     public static String loadLValOutput(Token token, String funcName) throws Util.CompileException {
-        SymbolItem theSymbolItem = getSymbolItem(token,funcName);
+        SymbolItem theSymbolItem = getSymbolItem(token);
 //        System.out.println(token.getValue());
         if(theSymbolItem.getAddress() == 0){
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
-        putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt())); // TODO 这里应该是变量吗
+        putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex())); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress+1);
         return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
     }
@@ -303,22 +305,22 @@ public class Utils {
     }
 
     // find by funcname
-    public static SymbolItem getSymbolItem(Token ident, String funcName) throws Util.CompileException {
-        SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
-
-        try {
-            theSymbolItem = allLocalSymbolTable.get(funcName).get(ident.getValue());
-            if(! allLocalSymbolTable.get(funcName).containsKey(ident.getValue())){
-                throw new Util.CompileException("this symbol"+ident.getValue()+"is not defined !!!");
-            }
-        }catch (Util.CompileException e1){
-            throw new Util.CompileException("this symbol "+ident.getValue()+" is not defined !!!");
-        }
-        catch(Exception e){
-            throw new Util.CompileException("This ident"+ident.getValue()+"is not define");
-        }
-        return theSymbolItem;
-    }
+//    public static SymbolItem getSymbolItem(Token ident, String funcName) throws Util.CompileException {
+//        SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
+//
+//        try {
+//            theSymbolItem = allLocalSymbolTable.get(funcName).get(ident.getValue());
+//            if(! allLocalSymbolTable.get(funcName).containsKey(ident.getValue())){
+//                throw new Util.CompileException("this symbol"+ident.getValue()+"is not defined !!!");
+//            }
+//        }catch (Util.CompileException e1){
+//            throw new Util.CompileException("this symbol "+ident.getValue()+" is not defined !!!");
+//        }
+//        catch(Exception e){
+//            throw new Util.CompileException("This ident"+ident.getValue()+"is not define");
+//        }
+//        return theSymbolItem;
+//    }
     public static int callFunction(String name,ArrayList<Integer> paramAddrList) throws Util.CompileException {
         if(!funcSymbolTable.containsKey(name)){
             throw new Util.CompileException("cant find  this function");
@@ -387,6 +389,7 @@ public class Utils {
     }
     public static int nextLabel(){
         Parser.midCodeOut.add((++nowAddress)+":");
+        getSymbolItemByAddress(nowAddress).isLabel = true;
         return nowAddress;
     }
     public static void endBlockJumpOutput(){

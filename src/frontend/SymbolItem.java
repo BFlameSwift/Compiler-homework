@@ -17,6 +17,7 @@ public class SymbolItem {
     public int kind; // var 0,const 1,function 2,array 3
     public int type; // void 0 int 1,label 2;
     public Boolean isCond = false;
+    public Boolean isLabel = false;
     private int valueInt;
     public int length; // 数组长度，函数变量参数数目
     public int blockIndex = 0;
@@ -68,12 +69,13 @@ public class SymbolItem {
         parametersList = new ArrayList<>();
         type = 0;
     }
-    public SymbolItem(String name,int kind,int valueInt){
+    public SymbolItem(String name,int kind,int valueInt,int blockIndex){
         this.name = name;
         this.kind = kind;
         address = ADDRESS_NOT_ASSIGN;
         type = 0;
         length = 0; parametersList = new ArrayList<Integer>();
+        this.blockIndex = blockIndex;
         this.valueInt = valueInt;
     } public SymbolItem(String name,int kind,int valueInt,Boolean isCond){
         this.name = name;
@@ -95,6 +97,9 @@ public class SymbolItem {
     // TODO 函数与数组时新增
     public String output(){
         String out = "";
+        if (isLabel){
+            return "label:";
+        }
         if(kind == 1){
             out += "This is a const:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
         }else if(kind == 0){

@@ -74,9 +74,9 @@ define dso_local i32 @main() {
   %38 = add i32 %36, %37
   store i32 %38, i32* %22
   call void @putch(i32 10)
-  %39 = load i32, i32* %22
+  %39 = load i32, i32* %2
   call void @putint(i32 %39)
-  %40 = load i32, i32* %19
+  %40 = load i32, i32* %3
   call void @putint(i32 %40)
   ret i32 0
 }

@@ -117,6 +117,9 @@ public class Parser {
         varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
         int valueAddr = parseInitVal();
         if(Utils.isGlobal()) {
+            if(Utils.getSymbolItemByAddress(valueAddr).isConstant() == false){
+                throw  new CompileException("global assign is not a constant");
+            }
             Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false);
             return;
         }
@@ -326,7 +329,7 @@ public class Parser {
             else if(coefficient == -1){
                 int newNegativeOne = Utils.storeConstVariable(null,-1,Utils.getNowFunction());
                 primaryAddr = Utils.midExpCalculate("mul",primaryAddr,newNegativeOne);
-                Utils.putAddressSymbol(primaryAddr,new SymbolItem(null,0,-Utils.getSymbolItemByAddress(primaryAddr).getValueInt()));
+                Utils.putAddressSymbol(primaryAddr,new SymbolItem(null,0,-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),Utils.getBlockIndex()));
             }
             if(notCount%2==1){
 //                primaryAddr = Utils.putNewVariable(null,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(), Utils.getNowFunction());
@@ -375,7 +378,7 @@ public class Parser {
             int value = Integer.parseInt(token.getValue());
             return Utils.storeConstVariable(null,value, Utils.getNowFunction());
         }else if(Token.isIdent(token.getLexcial())){
-            frontend.SymbolItem lval = Utils.getSymbolItem(token, Utils.getNowFunction());
+            frontend.SymbolItem lval = Utils.getSymbolItem(token);
             if(!lval.isConstant()) {
                 midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
             }
@@ -458,7 +461,7 @@ public class Parser {
 //            intValue = Utils.scanner.nextInt();
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
 //            System.out.println("saveaddress"+saveAddress);
-            frontend.SymbolItem saveItem = new frontend.SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
+            frontend.SymbolItem saveItem = new frontend.SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
         }else if("@getch".equals(funcName)){
@@ -466,7 +469,7 @@ public class Parser {
 
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
 //            System.out.println("saveaddress"+saveAddress);
-            frontend.SymbolItem saveItem = new frontend.SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
+            frontend.SymbolItem saveItem = new frontend.SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
         }else if("@putint".equals(funcName)){
