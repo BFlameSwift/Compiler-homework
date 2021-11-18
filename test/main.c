@@ -1,40 +1,24 @@
 int main() {
-    int a = 1, sum = 0;
-    {
-        int a = 2;
-        sum   = sum + a;
-        {
-            int a = 3;
-            sum   = sum + a;
-            putint(sum);
-            putint(a);
-            putch(10);
-            {
-                a        = 4;
-                int sum1 = sum;
-                int sum  = sum1 + a;
+    int k = 3389;
+    if (k < 10000) {
+        k     = k + 1;
+        int k = 112;
+        if (k > 10) {
+            k = k - 88;
+            if (k < 1000) {
+                int g = 9;
                 {
-                    int a    = 5;
-                    int sum1 = sum;
-                    int sum  = sum1 + a;
-                    a        = 6;
-                    putint(sum);
-                    putint(a);
-                    putch(10);
-                    sum = sum + a;
+                    int l = 11;
                     {
-                        a   = 7;
-                        sum = sum + a;
-                        putint(sum);
-                        putint(a);
-                        sum = sum + a;
-                        putch(10);
+                        g     = 10;
+                        k     = k - g;
+                        int g = 11;
+                        k     = k + g + l;
                     }
                 }
             }
         }
-        putint(sum);
-        putint(a);
+        putint(k);
     }
     return 0;
 }

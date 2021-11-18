@@ -24,8 +24,8 @@ public class Utils {
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
     private static int blockIndex = 0;
-    private static int blockMaxIndex = 0;
-    private static int thisFunctionBlockIndex = -1;
+//    private static int blockMaxIndex = 0;
+//    private static int thisFunctionBlockIndex = -1;
     private static int constAddress = -100000;
     private static int nowAddress = 0;
     private static final String DEFAULT_GLOABL_FUNCTION_NAME = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
@@ -38,8 +38,8 @@ public class Utils {
     }
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
-        thisFunctionBlockIndex = blockMaxIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
-        blockIndex = blockMaxIndex;
+//        thisFunctionBlockIndex = blockMaxIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
+//        blockIndex = blockMaxIndex;
     }
 
     public static int getNowAddress() {
@@ -48,10 +48,12 @@ public class Utils {
 
     public static void enterBlock(){
         blockIndex ++;
-        blockMaxIndex = Math.max(blockMaxIndex, blockIndex);
+//        blockMaxIndex = Math.max(blockMaxIndex, blockIndex);
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
     public static void quitBlock(){
+        Map<String, SymbolItem> map = blockSymbolTable.get(blockIndex);
+        map.clear();
         blockIndex --;
     }
 
@@ -153,7 +155,7 @@ public class Utils {
     // 自小块向大块查找需要的
     public static SymbolItem getSymbolItem(Token token) throws Util.CompileException {
         int block_index = Utils.blockIndex;
-        while(block_index>=thisFunctionBlockIndex){
+        while(block_index>=1){
 //            System.out.println("finding symbol"+token.getValue()+'\t'+"index"+block_index);
 //            System.out.println("this block index"+block_index);
             Map<String, SymbolItem> map = blockSymbolTable.get(block_index);
