@@ -399,7 +399,8 @@ public class Utils {
     }
     public static int nextLabel() throws CompileException{
         Parser.midCodeOut.add((++nowAddress)+":");
-//        getSymbolItemByAddress(nowAddress).isLabel = true;
+        putAddressSymbol(nowAddress,new SymbolItem(null,-1,-1,-1));
+        getSymbolItemByAddress(nowAddress).isLabel = true;
         return nowAddress;
     }
     public static void endBlockJumpOutput(){
