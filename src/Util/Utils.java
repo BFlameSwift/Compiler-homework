@@ -26,8 +26,11 @@ public class Utils {
     private static int blockIndex = 0;
 //    private static int blockMaxIndex = 0;
 //    private static int thisFunctionBlockIndex = -1;
-    private static int constAddress = -100000;
+    private static final int CONST_BEGIN_ADDRESS = -1000000;
+    private static int constAddress = CONST_BEGIN_ADDRESS;
     private static int nowAddress = 0;
+    public static final int GLOBAL_BEGIN_ADDRESS = -10000;
+    private static int globalAddress = GLOBAL_BEGIN_ADDRESS;
     private static final String DEFAULT_GLOABL_FUNCTION_NAME = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
     private static String nowFunctionName = DEFAULT_GLOABL_FUNCTION_NAME ;
     public static String getNowFunction(){ // 获取当前函数名称，从而对变量找准位置
@@ -95,6 +98,8 @@ public class Utils {
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value,getBlockIndex());
         symbolItem.blockIndex = 0;
+        symbolItem.setAddress((++globalAddress));
+        putAddressSymbol(globalAddress-1,symbolItem);
         if(globalSymbolTable.containsKey(symbolName)){
             throw new Util.CompileException("this variable name"+symbolName+"has been allocate");
         }globalSymbolTable.put(symbolName,symbolItem);
@@ -243,9 +248,9 @@ public class Utils {
             String outStr = "%"+objAddress+" = ";
             outStr += Token.isCond(op)?"icmp "+op+" i32 ":op+" i32 ";
 
-            outStr += (item1.kind == 1)?item1.getValueInt():"%"+item1.getLoadAddress();
+            outStr += (item1.kind == 1)?item1.getValueInt():(!item1.isGlobal())?"%"+item1.getLoadAddress():item1.name;
             outStr += ", ";
-            outStr += (item2.kind == 1)?item2.getValueInt():"%"+item2.getLoadAddress();
+            outStr += (item2.kind == 1)?item2.getValueInt():(!item2.isGlobal())?"%"+item2.getLoadAddress():item2.name;
             Parser.midCodeOut.add(outStr);
             if(Token.isCond(op)){
                 objIsCond = true;
@@ -300,7 +305,9 @@ public class Utils {
         }
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex())); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress+1);
-        return "%"+(++nowAddress)+" = load i32, i32* %"+theSymbolItem.getAddress();
+
+        String str = (theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress());
+        return "%"+(++nowAddress)+" = load i32, i32* "+str;
     }
     public static int enterIfStmt(){
         return ++nowAddress;

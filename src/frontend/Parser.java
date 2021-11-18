@@ -114,7 +114,7 @@ public class Parser {
             Token.previousToken();
             return;
         }
-        varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
+
         int valueAddr = parseInitVal();
         if(Utils.isGlobal()) {
             if(Utils.getSymbolItemByAddress(valueAddr).isConstant() == false){
@@ -123,6 +123,7 @@ public class Parser {
             Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false);
             return;
         }
+        varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
         varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
         midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;

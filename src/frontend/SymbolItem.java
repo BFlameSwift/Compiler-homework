@@ -36,10 +36,12 @@ public class SymbolItem {
 
     private int address = 0;
     private int loadAddress = 0;
-
-    public int getLoadAddress() {
+    public Boolean isGlobal(){
+        return address>=Utils.GLOBAL_BEGIN_ADDRESS && address <0;
+    }
+    public int getLoadAddress() throws CompileException {
         if(loadAddress == 0){
-            throw new IllegalArgumentException("load address = 0");
+            throw new CompileException("load address = 0");
         }
         return loadAddress;
     }
@@ -48,9 +50,9 @@ public class SymbolItem {
         this.loadAddress = loadAddress;
     }
 
-    public int getAddress() {
+    public int getAddress() throws CompileException {
         if( address == 0) {
-            throw new IllegalArgumentException("Address is not assign");
+            throw new CompileException("Address is not assign");
         }
         return address;
     }
