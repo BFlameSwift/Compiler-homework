@@ -538,6 +538,7 @@ public class Parser {
             for(String str : midCodeOut){
                 System.out.println(str);
             }
+
             System.exit(-1);
         }
         for(String str : midCodeOut){

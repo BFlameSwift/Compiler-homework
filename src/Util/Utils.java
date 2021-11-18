@@ -138,15 +138,15 @@ public class Utils {
             allLocalSymbolTable.get(funcName).put(symbolItem.name,symbolItem);
         }
     }
-    public static SymbolItem getSymbolItemByAddress(int address){
+    public static SymbolItem getSymbolItemByAddress(int address) throws CompileException {
         if(addressSymbolTable.containsKey(address)){
             return addressSymbolTable.get(address);
         }
         for(int i=1;i<address;i++){
-
             System.out.println(addressSymbolTable.get(i).output());
         }
-        throw new IllegalArgumentException("this address"+address+" has not variable");
+
+        throw new CompileException("this address"+address+" has not variable");
     }
     public static void putblockSymbolTable(SymbolItem symbolItem, int index) throws Util.CompileException {
         Map<String, SymbolItem> map ;
@@ -218,9 +218,10 @@ public class Utils {
 
     public static String storeVariableOutput(int valueAddr,int varAddr) throws Util.CompileException {
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
+        SymbolItem varItem = getSymbolItemByAddress(varAddr);
         String retStr = "store i32 ";
         retStr += valueItem.kind == 1?valueItem.getValueInt():"%"+valueItem.getLoadAddress();
-        retStr += ", i32* %"+varAddr;
+        retStr += ", i32* "+((varItem.isGlobal())?varItem.name:"%"+varAddr);
         return retStr;
     }
     public static int condI1ToI32(int address) throws CompileException {
@@ -306,8 +307,8 @@ public class Utils {
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex())); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress+1);
 
-        String str = (theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress());
-        return "%"+(++nowAddress)+" = load i32, i32* "+str;
+
+        return "%"+(++nowAddress)+" = load i32, i32* "+((theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress()));
     }
     public static int enterIfStmt(){
         return ++nowAddress;
@@ -396,9 +397,9 @@ public class Utils {
 
         return nowAddress;
     }
-    public static int nextLabel(){
+    public static int nextLabel() throws CompileException{
         Parser.midCodeOut.add((++nowAddress)+":");
-        getSymbolItemByAddress(nowAddress).isLabel = true;
+//        getSymbolItemByAddress(nowAddress).isLabel = true;
         return nowAddress;
     }
     public static void endBlockJumpOutput(){
