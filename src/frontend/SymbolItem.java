@@ -19,6 +19,7 @@ public class SymbolItem {
     public Boolean isCond = false;
     private int valueInt;
     public int length; // 数组长度，函数变量参数数目
+    public int blockIndex = 0;
     ArrayList<Integer> parametersList; // 参数类型
 
     public int getValueInt() throws CompileException {
@@ -104,6 +105,7 @@ public class SymbolItem {
         if(isCond) out += "   cond";
 
         // TODO 根据不同种类输出
+        out += '\t'+"block: "+blockIndex;
         return out;
     }
     public  Boolean isConstant(){

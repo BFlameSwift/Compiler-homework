@@ -24,6 +24,7 @@ public class Utils {
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
     private static int blockIndex = 0;
+    private static int blockLevel = 0;
     private static int thisFunctionBlockIndex = -1;
     private static int constAddress = -100000;
     private static int nowAddress = 0;
@@ -46,8 +47,14 @@ public class Utils {
 
     public static void enterBlock(){
         blockIndex ++;
+        blockLevel++;
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
+    public static void quitBlock(){
+        blockLevel --;
+//        blockSymbolTable.add(new HashMap<String, SymbolItem>());
+    }
+
     public static int getBlockIndex() {
         return blockIndex;
     }
@@ -85,6 +92,7 @@ public class Utils {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value);
+        symbolItem.blockIndex = 0;
         if(globalSymbolTable.containsKey(symbolName)){
             throw new Util.CompileException("this variable name"+symbolName+"has been allocate");
         }globalSymbolTable.put(symbolName,symbolItem);
@@ -95,6 +103,7 @@ public class Utils {
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
+        symbolItem.blockIndex = getBlockIndex();
         symbolItem.setAddress((++nowAddress));
 
 //        nowAddress ++;

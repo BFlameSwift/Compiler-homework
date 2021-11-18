@@ -144,6 +144,7 @@ public class Parser {
         midCodeOut.add("define dso_local i32"+funcName+"(){");
         Utils.enterFunction(funcName); // 进入函数
         parseBlock();
+
         midCodeOut.add("}");
         return true;
     }
@@ -162,6 +163,7 @@ public class Parser {
             Token.previousToken();
             blockHasRet += parseBlockItem();
         }
+        Utils.quitBlock();
 //        midCodeOut.add("}");
         return blockHasRet>0?1:0;
     }

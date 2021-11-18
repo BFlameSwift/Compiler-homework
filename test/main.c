@@ -1,18 +1,40 @@
 int main() {
-    int a;
-    a = 5;
-    int b;
-    b = 10;
-    if (a == 6 || b == 0xb) {
-        return a;
-    } else {
-        if (b == 10 && a == 1)
-            a = 25;
-        else if (b == 10 && a == -5)
-            a = a + 15;
-        else
-            a = -+a;
+    int a = 1, sum = 0;
+    {
+        int a = 2;
+        sum   = sum + a;
+        {
+            int a = 3;
+            sum   = sum + a;
+            putint(sum);
+            putint(a);
+            putch(10);
+            {
+                a        = 4;
+                int sum1 = sum;
+                int sum  = sum1 + a;
+                {
+                    int a    = 5;
+                    int sum1 = sum;
+                    int sum  = sum1 + a;
+                    a        = 6;
+                    putint(sum);
+                    putint(a);
+                    putch(10);
+                    sum = sum + a;
+                    {
+                        a   = 7;
+                        sum = sum + a;
+                        putint(sum);
+                        putint(a);
+                        sum = sum + a;
+                        putch(10);
+                    }
+                }
+            }
+        }
+        putint(sum);
+        putint(a);
     }
-    putint(a);
     return 0;
 }
