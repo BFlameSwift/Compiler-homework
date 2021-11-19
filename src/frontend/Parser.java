@@ -239,7 +239,10 @@ public class Parser {
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
                  stmtRet = parseStmt();
-                if(stmtRet != 1) Utils.endBlockJumpOutput();
+                if(stmtRet == 1){
+                    Utils.nextLabel();
+                }
+                    Utils.endBlockJumpOutput();
                 int jumpToloca2 = midCodeOut.size() - 1;
                 int outAddr = Utils.nextLabel();
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca1, Analysis.LEAVE_ADDRESS,"%"+outAddr);
@@ -262,7 +265,7 @@ public class Parser {
         }else if(token.getLexcial() == Lexical.WHILE_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
-            Utils.endBlockJumpOutput();int beginCondLoca = midCodeOut.size()-1;int beginCondLabel = Utils.nextLabel();
+            Utils.endBlockJumpOutput();int beginCondLoca = midCodeOut.size()-1; int beginCondLabel = Utils.nextLabel();
             Analysis.replacePreciseStr(midCodeOut,beginCondLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
             int condAddr = parseCond();
             Token.exceptNextToken(Lexical.RPAREN);
@@ -273,13 +276,13 @@ public class Parser {
                 int label = Utils.nextLabel();
             }
             Utils.endBlockJumpOutput(); int endCycleLoca = midCodeOut.size() - 1;
-
-            Analysis.replacePreciseStr(midCodeOut,endCycleLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
             int endCycleLabel = Utils.nextLabel();
+            Analysis.replacePreciseStr(midCodeOut,endCycleLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
 
             Analysis.replacePreciseStr(midCodeOut,jumpToloca2,Analysis.BR_ADDRESS2,"%"+endCycleLabel);
+
             List<HashMap<Integer, Integer>> list = Utils.cycleStack.pop();
-            for (int i=list.size()-1;i>=0;i--){
+            for (int i=0;i<list.size();i++){
                 HashMap<Integer, Integer> map = list.get(i);
                 if(map.containsKey(0)){
                     Analysis.replacePreciseStr(midCodeOut,map.get(0),Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
@@ -289,7 +292,6 @@ public class Parser {
                     throw new CompileException("not continue break!!!");
                 }
             }
-
         }else if(token.getLexcial() == Lexical.CONTINUE_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);
             Utils.endBlockJumpOutput();
