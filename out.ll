@@ -10,35 +10,38 @@ target triple = "x86_64-pc-linux-gnu"
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
 define dso_local i32 @main() {
-  %1 = call i32 @getint()
+  %1 = alloca i32
+  store i32 0, i32* %1
   %2 = alloca i32
-  store i32 %1, i32* %2
-  %3 = alloca i32
-  store i32 0, i32* %3
-  %4 = alloca i32
-  store i32 0, i32* %4
-  br label %5
+  store i32 0, i32* %2
+  br label %3
 
-5:                                                ; preds = %9, %0
-  %6 = load i32, i32* %3
-  %7 = load i32, i32* %2
-  %8 = icmp slt i32 %6, %7
-  br i1 %8, label %9, label %16
+3:                                                ; preds = %10, %0
+  %4 = load i32, i32* %1
+  %5 = icmp slt i32 %4, 100
+  br i1 %5, label %6, label %16
 
-9:                                                ; preds = %5
-  %10 = load i32, i32* %3
-  %11 = add i32 %10, 1
-  store i32 %11, i32* %3
-  %12 = load i32, i32* %4
-  %13 = load i32, i32* %3
-  %14 = add i32 %12, %13
-  store i32 %14, i32* %4
-  %15 = load i32, i32* %4
-  call void @putint(i32 %15)
-  call void @putch(i32 10)
-  br label %5
+6:                                                ; preds = %3
+  %7 = load i32, i32* %1
+  %8 = icmp eq i32 %7, 50
+  br i1 %8, label %9, label %10
 
-16:                                               ; preds = %5
+9:                                                ; preds = %6
+  br label %16
+
+10:                                               ; preds = %6
+  %11 = load i32, i32* %2
+  %12 = load i32, i32* %1
+  %13 = add i32 %11, %12
+  store i32 %13, i32* %2
+  %14 = load i32, i32* %1
+  %15 = add i32 %14, 1
+  store i32 %15, i32* %1
+  br label %3
+
+16:                                               ; preds = %9, %3
+  %17 = load i32, i32* %2
+  call void @putint(i32 %17)
   ret i32 0
 }
 

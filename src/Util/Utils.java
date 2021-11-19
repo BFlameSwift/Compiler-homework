@@ -1,10 +1,8 @@
 package Util;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+
 import frontend.*;
 import ir.Analysis;
 
@@ -20,6 +18,7 @@ public class Utils {
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
     public static ArrayList<String > allFuncList = new ArrayList<String>();
     public static Map<String, SymbolItem> funcSymbolTable = new HashMap<String, SymbolItem>();
+    public static Stack<ArrayList<HashMap<Integer,Integer>>>cycleStack = new Stack<ArrayList<HashMap<Integer,Integer>>>(); // 循环栈，0 为continue 1：break
     static{
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }

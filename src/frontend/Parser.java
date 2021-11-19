@@ -9,6 +9,9 @@ import Util.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 public class Parser {
     public static ArrayList<String> midCodeOut = new ArrayList<String>();
@@ -221,12 +224,17 @@ public class Parser {
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
             Utils.beforejudgeCondition(condAddr);
             Utils.readyJump();
+            int endLoca =midCodeOut.size() - 1;
             Token.exceptNextToken(Lexical.RPAREN);
             Utils.nextLabel();
             int stmtRet = parseStmt();
-            if(stmtRet !=1) Utils.endBlockJumpOutput(); // 如果stmt中没有ret块
+            int jumpToloca1 =0;
+            if(stmtRet !=1){
+                Utils.endBlockJumpOutput(); // 如果stmt中没有ret continue break等结束块语句
+                jumpToloca1 = midCodeOut.size() - 1;
+            }
 //            midCodeOut.add("br label jumpToEndAddr");
-            int jumpToloca1 = midCodeOut.size() - 1;
+
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
@@ -234,23 +242,20 @@ public class Parser {
                 if(stmtRet != 1) Utils.endBlockJumpOutput();
                 int jumpToloca2 = midCodeOut.size() - 1;
                 int outAddr = Utils.nextLabel();
-                Analysis.replaceStrInList(midCodeOut, Analysis.LEAVE_ADDRESS,"%"+outAddr);
-                Analysis.replaceStrInList(midCodeOut, Analysis.LEAVE_ADDRESS,"%"+outAddr);
-                Analysis.replaceStrInList(midCodeOut, Analysis.BR_ADDRESS2,"%"+elseAddr);
-//                midCodeOut.set(jumpToloca2,midCodeOut.get(jumpToloca2).replaceAll("jumpToEndAddr","%"+outAddr));
-//                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+elseAddr));
+                Analysis.replacePreciseStr(midCodeOut,jumpToloca1, Analysis.LEAVE_ADDRESS,"%"+outAddr);
+                Analysis.replacePreciseStr(midCodeOut,jumpToloca2, Analysis.LEAVE_ADDRESS,"%"+outAddr);
+                Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+elseAddr);
+
             }
             
             else{
 
                 int endAddr = Utils.nextLabel();
 //                midCodeOut.add(endAddr+":");
-                Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+endAddr);
-                Analysis.replaceStrInList(midCodeOut, Analysis.BR_ADDRESS2,"%"+endAddr);
-//                midCodeOut.set(jumpToloca1,(midCodeOut.get(jumpToloca1).replaceFirst("jumpToEndAddr","%"+endAddr)));
-//                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+endAddr));
-            }
+                Analysis.replacePreciseStr(midCodeOut,jumpToloca1,Analysis.LEAVE_ADDRESS,"%"+endAddr);
+                Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+endAddr);
 
+            }
 
             return 0;
         }else if(token.getLexcial() == Lexical.LBRACE){
@@ -259,21 +264,44 @@ public class Parser {
             return parseBlock();
         }else if(token.getLexcial() == Lexical.WHILE_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
-            Utils.endBlockJumpOutput();int beginCondLabel = Utils.nextLabel();
-            Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
+            Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
+            Utils.endBlockJumpOutput();int beginCondLoca = midCodeOut.size()-1;int beginCondLabel = Utils.nextLabel();
+            Analysis.replacePreciseStr(midCodeOut,beginCondLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
             int condAddr = parseCond();
             Token.exceptNextToken(Lexical.RPAREN);
-            Utils.beforejudgeCondition(condAddr);Utils.readyJump(); int condLabel = Utils.nextLabel();
+
+            Utils.beforejudgeCondition(condAddr);Utils.readyJump(); int jumpToloca2 = midCodeOut.size()-1; int condLabel = Utils.nextLabel();
             parseStmt();
-            Utils.endBlockJumpOutput();
-            Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
+            Utils.endBlockJumpOutput(); int endCycleLoca = midCodeOut.size() - 1;
+
+            Analysis.replacePreciseStr(midCodeOut,endCycleLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
             int endCycleLabel = Utils.nextLabel();
-            Analysis.replaceStrInList(midCodeOut,Analysis.BR_ADDRESS2,"%"+endCycleLabel);
+
+            Analysis.replacePreciseStr(midCodeOut,jumpToloca2,Analysis.BR_ADDRESS2,"%"+endCycleLabel);
+            List<HashMap<Integer, Integer>> list = Utils.cycleStack.pop();
+            for (int i=list.size()-1;i>=0;i--){
+                HashMap<Integer, Integer> map = list.get(i);
+                if(map.containsKey(0)){
+                    Analysis.replacePreciseStr(midCodeOut,map.get(0),Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
+                }else if(map.containsKey(1)){
+                    Analysis.replacePreciseStr(midCodeOut,map.get(1),Analysis.LEAVE_ADDRESS,"%"+endCycleLabel);
+                }else{
+                    throw new CompileException("not continue break!!!");
+                }
+            }
 
         }else if(token.getLexcial() == Lexical.CONTINUE_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);
+            Utils.endBlockJumpOutput();
+            int size = midCodeOut.size() - 1;
+            Utils.cycleStack.peek().add(new HashMap<>(){{put(0,size);}});
+            return 1;
         }else if(token.getLexcial() == Lexical.BREAK_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);
+            Utils.endBlockJumpOutput();
+            int size = midCodeOut.size() - 1;
+            Utils.cycleStack.peek().add((new HashMap<Integer, Integer>(){{put(1,size);}}));
+            return 1;
         }
         else{
             throw new CompileException("stmt error");
