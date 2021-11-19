@@ -239,10 +239,10 @@ public class Utils {
         if(op.equals("or") || op.equals("and")){
             condI1ToI32(address1); condI1ToI32(address2);
         }
-        int objAddress = (objKind == 1)?(++constAddress):(++nowAddress);// 将常量与变量计算分区
+        int objAddress = (objKind == 0||(objKind==1&&item1.isCond))?(++nowAddress):(++constAddress);// 将常量与变量计算分区
         Boolean objIsCond = false;
 //        int objAddress = nowAddress;
-        if(objKind == 0){// 是变量就输出过程
+        if(objKind == 0||item1.isCond){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
 
             String outStr = "%"+objAddress+" = ";
@@ -383,8 +383,10 @@ public class Utils {
     // 判断函数是否是i1类型。如果不是需要进行转换
     public static int  beforejudgeCondition(int condAddr) throws CompileException {
         SymbolItem item = getSymbolItemByAddress(condAddr);
-        if(! item.isCond){// 可能是 if(1+1) 类型，转换为i1类型进行判断
+//        Parser.midCodeOut.add("is const !!!"+item.isConstant());
+        if((! item.isCond) || item.isConstant()){// 可能是 if(1+1) 类型，转换为i1类型进行判断
             int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction()); //常量放一个0
+            item.isCond = true;
             int midAddr = midExpCalculate("ne",item.getLoadAddress(),newZeroAddr);
             putAddressSymbol(midAddr,new SymbolItem(null,0,item.getValueInt()!=0?1:0,true));//在地址表中放入 item!=0 的item
             return midAddr;// 返回数字是不是零

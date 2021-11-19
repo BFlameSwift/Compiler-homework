@@ -1,36 +1,51 @@
-int main() {
-    int instruction, low, high, mid, count;
-    count = getint();
-    while (count > 0) {
-        low   = getint();
-        high  = getint();
-        count = count - 1;
-        while (1) {
-            mid         = (low + high + 1) / 2;
-            instruction = getint();
-            if (instruction == 0) {
-                break;
-            } else if (instruction == 1) {
-                high = mid;
-            } else if (instruction == 2) {
-                low = mid;
-            } else {
-                putch(69);
-                putch(10);
-                continue;
-            }
+const int ascii_0 = 48;
 
-            if (low == high) {
-                putch(67);
-                putch(10);
-                break;
-            }
-            putint(mid);
-            putch(10);
+int main() {
+    int sum = 0, c;
+
+    while (1) {
+        c = getch() - ascii_0;
+        if (c < 0 || c > 9) {
+            continue;
+        } else {
+            break;
         }
-        putint(mid);
-        putch(10);
-        putch(10);
     }
+    sum = c;
+
+    while (1) {
+        c = getch() - ascii_0;
+        if (c >= 0 && c <= 9) {
+            sum = sum * 10 + c;
+        } else {
+            break;
+        }
+    }
+
+    putint(sum);
+    putch(10);
+
+    sum = 0;
+
+    while (1) {
+        c = getch() - ascii_0;
+        if (c < 0 || c > 9) {
+            continue;
+        } else {
+            break;
+        }
+    }
+    sum = c;
+
+    while (1) {
+        c = getch() - ascii_0;
+        if (c >= 0 && c <= 9) {
+            sum = sum * 10 + c;
+        } else {
+            break;
+        }
+    }
+
+    putint(sum);
     return 0;
 }
