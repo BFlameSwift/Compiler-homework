@@ -23,9 +23,9 @@ public class Analysis {
 //    }
 
     public static void replacePreciseStr(ArrayList<String> list,int locate,String before,String after) throws CompileException {
-//        if(list.get(locate).indexOf(before)<0){
-//            throw new CompileException("not find in"+list.get(locate));
-//        }
+        if(list.get(locate).indexOf(before)<0){
+            throw new CompileException("not find in"+list.get(locate));
+        }
         list.set(locate,list.get(locate).replaceAll(before,after));
 //        throw new CompileException("nothing "+before+" to replace");
     }

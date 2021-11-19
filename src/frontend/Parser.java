@@ -229,10 +229,10 @@ public class Parser {
             Utils.nextLabel();
             int stmtRet = parseStmt();
             int jumpToloca1 =0;
-            if(stmtRet !=1){
-                Utils.endBlockJumpOutput(); // 如果stmt中没有ret continue break等结束块语句
-                jumpToloca1 = midCodeOut.size() - 1;
-            }
+            if(stmtRet == 1){
+                int label = Utils.nextLabel();
+            }Utils.endBlockJumpOutput(); // 如果stmt中没有ret continue break等结束块语句
+            jumpToloca1 = midCodeOut.size() - 1;
 //            midCodeOut.add("br label jumpToEndAddr");
 
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
@@ -245,16 +245,13 @@ public class Parser {
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca1, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca2, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+elseAddr);
-
             }
             
             else{
-
                 int endAddr = Utils.nextLabel();
 //                midCodeOut.add(endAddr+":");
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca1,Analysis.LEAVE_ADDRESS,"%"+endAddr);
                 Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+endAddr);
-
             }
 
             return 0;
@@ -271,7 +268,10 @@ public class Parser {
             Token.exceptNextToken(Lexical.RPAREN);
 
             Utils.beforejudgeCondition(condAddr);Utils.readyJump(); int jumpToloca2 = midCodeOut.size()-1; int condLabel = Utils.nextLabel();
-            parseStmt();
+            int stmtRet = parseStmt();
+            if(stmtRet == 1){
+                int label = Utils.nextLabel();
+            }
             Utils.endBlockJumpOutput(); int endCycleLoca = midCodeOut.size() - 1;
 
             Analysis.replacePreciseStr(midCodeOut,endCycleLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
@@ -302,6 +302,8 @@ public class Parser {
             int size = midCodeOut.size() - 1;
             Utils.cycleStack.peek().add((new HashMap<Integer, Integer>(){{put(1,size);}}));
             return 1;
+        }else if(token.getLexcial() == Lexical.SEMICOLON){
+            return 0;
         }
         else{
             throw new CompileException("stmt error");

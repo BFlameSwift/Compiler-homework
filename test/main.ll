@@ -10,7 +10,7 @@ store i32 0, i32* %1
 br label %3
 3:
 %4 = icmp ne i32 1, 0
-br i1 %4, label %5, label %19
+br i1 %4, label %5, label %20
 5:
 %6 = call i32 @getch()
 %7 = sub i32 %6, 48
@@ -23,105 +23,109 @@ store i32 %7, i32* %2
 %13= zext i1 %11 to i32
 %14 = or i32 %12, %13
 %15 = icmp ne i32 %14, 0
-br i1 %15, label %16, label %17
+br i1 %15, label %16, label %18
 16:
 br label %3
 17:
-br label %18
+br label %19
 18:
-br label %3
+br label %19
 19:
-%20 = load i32, i32* %2
-store i32 %20, i32* %1
-br label %21
-21:
-%22 = icmp ne i32 1, 0
-br i1 %22, label %23, label %41
-23:
-%24 = call i32 @getch()
-%25 = sub i32 %24, 48
-store i32 %25, i32* %2
-%26 = load i32, i32* %2
-%27 = icmp sge i32 %26, 0
-%28 = load i32, i32* %2
-%29 = icmp sle i32 %28, 9
-%30= zext i1 %27 to i32
-%31= zext i1 %29 to i32
-%32 = and i32 %30, %31
-%33 = icmp ne i32 %32, 0
-br i1 %33, label %34, label %39
-34:
-%35 = load i32, i32* %1
-%36 = mul i32 %35, 10
-%37 = load i32, i32* %2
-%38 = add i32 %36, %37
-store i32 %38, i32* %1
-br label %40
-39:
-br label %40
+br label %3
+20:
+%21 = load i32, i32* %2
+store i32 %21, i32* %1
+br label %22
+22:
+%23 = icmp ne i32 1, 0
+br i1 %23, label %24, label %42
+24:
+%25 = call i32 @getch()
+%26 = sub i32 %25, 48
+store i32 %26, i32* %2
+%27 = load i32, i32* %2
+%28 = icmp sge i32 %27, 0
+%29 = load i32, i32* %2
+%30 = icmp sle i32 %29, 9
+%31= zext i1 %28 to i32
+%32= zext i1 %30 to i32
+%33 = and i32 %31, %32
+%34 = icmp ne i32 %33, 0
+br i1 %34, label %35, label %40
+35:
+%36 = load i32, i32* %1
+%37 = mul i32 %36, 10
+%38 = load i32, i32* %2
+%39 = add i32 %37, %38
+store i32 %39, i32* %1
+br label %41
 40:
-br label %21
+br label %41
 41:
-%42 = load i32, i32* %1
-call void @putint( i32 %42)
+br label %22
+42:
+%43 = load i32, i32* %1
+call void @putint( i32 %43)
 call void @putch( i32 10)
 store i32 0, i32* %1
-br label %43
-43:
-%44 = icmp ne i32 1, 0
-br i1 %44, label %45, label %59
-45:
-%46 = call i32 @getch()
-%47 = sub i32 %46, 48
-store i32 %47, i32* %2
-%48 = load i32, i32* %2
-%49 = icmp slt i32 %48, 0
-%50 = load i32, i32* %2
-%51 = icmp sgt i32 %50, 9
-%52= zext i1 %49 to i32
-%53= zext i1 %51 to i32
-%54 = or i32 %52, %53
-%55 = icmp ne i32 %54, 0
-br i1 %55, label %56, label %57
-56:
-br label %43
+br label %44
+44:
+%45 = icmp ne i32 1, 0
+br i1 %45, label %46, label %61
+46:
+%47 = call i32 @getch()
+%48 = sub i32 %47, 48
+store i32 %48, i32* %2
+%49 = load i32, i32* %2
+%50 = icmp slt i32 %49, 0
+%51 = load i32, i32* %2
+%52 = icmp sgt i32 %51, 9
+%53= zext i1 %50 to i32
+%54= zext i1 %52 to i32
+%55 = or i32 %53, %54
+%56 = icmp ne i32 %55, 0
+br i1 %56, label %57, label %59
 57:
-br label %58
+br label %44
 58:
-br label %43
+br label %60
 59:
-%60 = load i32, i32* %2
-store i32 %60, i32* %1
-br label %61
+br label %60
+60:
+br label %44
 61:
-%62 = icmp ne i32 1, 0
-br i1 %62, label %63, label %81
+%62 = load i32, i32* %2
+store i32 %62, i32* %1
+br label %63
 63:
-%64 = call i32 @getch()
-%65 = sub i32 %64, 48
-store i32 %65, i32* %2
-%66 = load i32, i32* %2
-%67 = icmp sge i32 %66, 0
+%64 = icmp ne i32 1, 0
+br i1 %64, label %65, label %83
+65:
+%66 = call i32 @getch()
+%67 = sub i32 %66, 48
+store i32 %67, i32* %2
 %68 = load i32, i32* %2
-%69 = icmp sle i32 %68, 9
-%70= zext i1 %67 to i32
-%71= zext i1 %69 to i32
-%72 = and i32 %70, %71
-%73 = icmp ne i32 %72, 0
-br i1 %73, label %74, label %79
-74:
-%75 = load i32, i32* %1
-%76 = mul i32 %75, 10
-%77 = load i32, i32* %2
-%78 = add i32 %76, %77
-store i32 %78, i32* %1
-br label %80
-79:
-br label %80
-80:
-br label %61
+%69 = icmp sge i32 %68, 0
+%70 = load i32, i32* %2
+%71 = icmp sle i32 %70, 9
+%72= zext i1 %69 to i32
+%73= zext i1 %71 to i32
+%74 = and i32 %72, %73
+%75 = icmp ne i32 %74, 0
+br i1 %75, label %76, label %81
+76:
+%77 = load i32, i32* %1
+%78 = mul i32 %77, 10
+%79 = load i32, i32* %2
+%80 = add i32 %78, %79
+store i32 %80, i32* %1
+br label %82
 81:
-%82 = load i32, i32* %1
-call void @putint( i32 %82)
+br label %82
+82:
+br label %63
+83:
+%84 = load i32, i32* %1
+call void @putint( i32 %84)
 ret i32 0
 }
