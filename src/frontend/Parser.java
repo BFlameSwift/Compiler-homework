@@ -300,7 +300,7 @@ public class Parser {
             Token.exceptNextToken(Lexical.SEMICOLON);
             Utils.endBlockJumpOutput();
             int size = midCodeOut.size() - 1;
-            Utils.cycleStack.peek().add((new HashMap<Integer, Integer>(){{put(1,size);}}));
+            Utils.cycleStack.peek().add((new HashMap<>(){{put(1,size);}}));
             return 1;
         }else if(token.getLexcial() == Lexical.SEMICOLON){
             return 0;
