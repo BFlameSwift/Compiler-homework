@@ -201,7 +201,7 @@ public class Parser {
             Token.exceptNextToken(Lexical.SEMICOLON);
             return 1;
         }
-        else if(Token.isIdent(token.getLexcial())){//TODO 如果找不到这个变量
+        else if(Token.isIdent(token.getLexcial())){
             if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
                 int expAddr = parseExp();
                 int varAddr = Utils.storeVariable(token, Utils.getSymbolItemByAddress(expAddr).getValueInt());
@@ -239,7 +239,9 @@ public class Parser {
                 Analysis.replaceStrInList(midCodeOut, Analysis.BR_ADDRESS2,"%"+elseAddr);
 //                midCodeOut.set(jumpToloca2,midCodeOut.get(jumpToloca2).replaceAll("jumpToEndAddr","%"+outAddr));
 //                midCodeOut.set(ifLocation,midCodeOut.get(ifLocation).replaceAll("Myplaceholder2","%"+elseAddr));
-            }else{
+            }
+            
+            else{
 
                 int endAddr = Utils.nextLabel();
 //                midCodeOut.add(endAddr+":");
@@ -255,6 +257,23 @@ public class Parser {
             Token.previousToken();
 //            int blockHasRet = parseBlock();
             return parseBlock();
+        }else if(token.getLexcial() == Lexical.WHILE_DEC){
+            Token.exceptNextToken(Lexical.LPAREN);
+            Utils.endBlockJumpOutput();int beginCondLabel = Utils.nextLabel();
+            Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
+            int condAddr = parseCond();
+            Token.exceptNextToken(Lexical.RPAREN);
+            Utils.beforejudgeCondition(condAddr);Utils.readyJump(); int condLabel = Utils.nextLabel();
+            parseStmt();
+            Utils.endBlockJumpOutput();
+            Analysis.replaceStrInList(midCodeOut,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
+            int endCycleLabel = Utils.nextLabel();
+            Analysis.replaceStrInList(midCodeOut,Analysis.BR_ADDRESS2,"%"+endCycleLabel);
+
+        }else if(token.getLexcial() == Lexical.CONTINUE_DEC){
+            Token.exceptNextToken(Lexical.SEMICOLON);
+        }else if(token.getLexcial() == Lexical.BREAK_DEC){
+            Token.exceptNextToken(Lexical.SEMICOLON);
         }
         else{
             throw new CompileException("stmt error");

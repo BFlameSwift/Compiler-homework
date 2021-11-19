@@ -1,29 +1,14 @@
-1 .This is a Variable:@k value = 3390in address:1load addr5	block: 1
-2 .This is a Variable:null value = 3389in address:2load addr2	block: 1
-3 .This is a Variable:null value = 1in address:3load addr3   cond	block: 0
-4 .label:
-5 .This is a Variable:null value = 3389in address:5load addr5	block: 2
-6 .This is a Variable:null value = 3390in address:6load addr6	block: 0
-7 .This is a Variable:@k value = 36in address:7load addr29	block: 2
-8 .This is a Variable:null value = 112in address:8load addr8	block: 2
-9 .This is a Variable:null value = 1in address:9load addr9   cond	block: 0
-10 .label:
-11 .This is a Variable:null value = 112in address:11load addr11	block: 3
-12 .This is a Variable:null value = 24in address:12load addr12	block: 0
-13 .This is a Variable:null value = 24in address:13load addr13	block: 3
-14 .This is a Variable:null value = 1in address:14load addr14   cond	block: 0
-15 .label:
-16 .This is a Variable:@g value = 10in address:16load addr19	block: 4
-17 .This is a Variable:@l value = 11in address:17load addr25	block: 5
-18 .This is a Variable:null value = 24in address:18load addr18	block: 6
-19 .This is a Variable:null value = 10in address:19load addr19	block: 6
-20 .This is a Variable:null value = 14in address:20load addr20	block: 0
-21 .This is a Variable:@g value = 11in address:21load addr23	block: 6
-22 .This is a Variable:null value = 14in address:22load addr22	block: 6
-23 .This is a Variable:null value = 11in address:23load addr23	block: 6
-24 .This is a Variable:null value = 25in address:24load addr24	block: 0
-25 .This is a Variable:null value = 11in address:25load addr25	block: 6
-26 .This is a Variable:null value = 36in address:26load addr26	block: 0
-27 .label:
-28 .label:
-29 .This is a Variable:null value = 36in address:29load addr29	block: 2
+1 .This is a Variable:null value = 1in address:1load addr1	block: 1
+2 .This is a Variable:@n value = 1in address:2load addr7	block: 1
+3 .This is a Variable:@i value = 1in address:3load addr13	block: 1
+4 .This is a Variable:@sum value = 1in address:4load addr15	block: 1
+5 .label:
+6 .This is a Variable:null value = 0in address:6load addr6	block: 1
+7 .This is a Variable:null value = 1in address:7load addr7	block: 1
+8 .This is a Variable:null value = 1in address:8load addr8   cond	block: 0
+9 .label:
+10 .This is a Variable:null value = 0in address:10load addr10	block: 2
+11 .This is a Variable:null value = 1in address:11load addr11	block: 0
+12 .This is a Variable:null value = 0in address:12load addr12	block: 2
+13 .This is a Variable:null value = 1in address:13load addr13	block: 2
+14 .This is a Variable:null value = 1in address:14load addr14	block: 0

@@ -10,71 +10,35 @@ target triple = "x86_64-pc-linux-gnu"
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
 define dso_local i32 @main() {
-  %1 = alloca i32
-  store i32 5, i32* %1
+  %1 = call i32 @getint()
   %2 = alloca i32
-  store i32 10, i32* %2
-  %3 = load i32, i32* %1
-  %4 = icmp eq i32 %3, 6
-  %5 = load i32, i32* %2
-  %6 = icmp eq i32 %5, 11
-  %7 = zext i1 %4 to i32
-  %8 = zext i1 %6 to i32
-  %9 = or i32 %7, %8
-  %10 = icmp ne i32 %9, 0
-  br i1 %10, label %11, label %13
+  store i32 %1, i32* %2
+  %3 = alloca i32
+  store i32 0, i32* %3
+  %4 = alloca i32
+  store i32 0, i32* %4
+  br label %5
 
-11:                                               ; preds = %0
-  %12 = load i32, i32* %1
-  ret i32 %12
+5:                                                ; preds = %9, %0
+  %6 = load i32, i32* %3
+  %7 = load i32, i32* %2
+  %8 = icmp slt i32 %6, %7
+  br i1 %8, label %9, label %16
 
-13:                                               ; preds = %0
-  %14 = load i32, i32* %2
-  %15 = icmp eq i32 %14, 10
-  %16 = load i32, i32* %1
-  %17 = icmp eq i32 %16, 1
-  %18 = zext i1 %15 to i32
-  %19 = zext i1 %17 to i32
-  %20 = and i32 %18, %19
-  %21 = icmp ne i32 %20, 0
-  br i1 %21, label %22, label %23
+9:                                                ; preds = %5
+  %10 = load i32, i32* %3
+  %11 = add i32 %10, 1
+  store i32 %11, i32* %3
+  %12 = load i32, i32* %4
+  %13 = load i32, i32* %3
+  %14 = add i32 %12, %13
+  store i32 %14, i32* %4
+  %15 = load i32, i32* %4
+  call void @putint(i32 %15)
+  call void @putch(i32 10)
+  br label %5
 
-22:                                               ; preds = %13
-  store i32 25, i32* %1
-  br label %39
-
-23:                                               ; preds = %13
-  %24 = load i32, i32* %2
-  %25 = icmp eq i32 %24, 10
-  %26 = load i32, i32* %1
-  %27 = icmp eq i32 %26, -5
-  %28 = zext i1 %25 to i32
-  %29 = zext i1 %27 to i32
-  %30 = and i32 %28, %29
-  %31 = icmp ne i32 %30, 0
-  br i1 %31, label %32, label %35
-
-32:                                               ; preds = %23
-  %33 = load i32, i32* %1
-  %34 = add i32 %33, 15
-  store i32 %34, i32* %1
-  br label %38
-
-35:                                               ; preds = %23
-  %36 = load i32, i32* %1
-  %37 = mul i32 %36, -1
-  store i32 %37, i32* %1
-  br label %38
-
-38:                                               ; preds = %35, %32
-  br label %39
-
-39:                                               ; preds = %38, %22
-  br label %40
-
-40:                                               ; preds = %39
-  %41 = load i32, i32* %1
-  call void @putint(i32 %41)
+16:                                               ; preds = %5
   ret i32 0
 }
 
