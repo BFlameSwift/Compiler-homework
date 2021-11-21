@@ -92,7 +92,7 @@ public class Utils {
         retStr += value+", align 4";
         return retStr;
     }
-    public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon) throws Util.CompileException {
+    public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon,ArrayList<Integer> array) throws Util.CompileException {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value,getBlockIndex());

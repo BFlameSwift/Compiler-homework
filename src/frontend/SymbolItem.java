@@ -14,12 +14,12 @@ public class SymbolItem {
     public static final int NOT_ASSIGN = -1239032;
     public static final int ADDRESS_NOT_ASSIGN = 0;
     public String name;
-    public int kind; // var 0,const 1,function 2,array 3
+    public int kind; // var 0,const 1,function 2,const array 3,var array 4
     public int type; // void 0 int 1,label 2;
     public Boolean isCond = false;
     public Boolean isLabel = false;
     private int valueInt;
-    public int length; // 数组长度，函数变量参数数目
+    public int length; // 数组总长度，函数变量参数数目
     public int blockIndex = 0;
     ArrayList<Integer> parametersList; // 参数类型  可以用作数据的对应维度的大小以及参数的类型
     public int getValueInt() throws CompileException {

@@ -62,11 +62,19 @@ public class Parser {
     }
     //ConstDef     -> Ident { '[' ConstExp ']' } '=' ConstInitVal
     public static void parseConstDef() throws CompileException {
-        //TODO 添加进符号表
+
         Token identToken = Token.nextToken("ident");
         if(!Token.isIdent(identToken.getLexcial())){
             throw new CompileException("Parser const def Error is not Ident");
         }
+        ArrayList<Integer> arrayDismension = new ArrayList<>();
+        Boolean isArray = false;
+        while(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
+            isArray = true;
+            int constAddr = parseConstExp();
+            arrayDismension.add(Utils.getSymbolItemByAddress(constAddr).getValueInt());
+            Token.exceptNextToken(Lexical.RBRACKET);
+        }Token.previousToken();
         Token.exceptNextToken(Lexical.ASSIGN);
         int valueConstInitvalAddress = parseConstInitVal();
         frontend.SymbolItem constItem = Utils.getSymbolItemByAddress(valueConstInitvalAddress);
@@ -74,7 +82,7 @@ public class Parser {
             throw new CompileException("const cant assign by var");
         }
         if(Utils.isGlobal()){
-            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),1,false);
+            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),isArray?3:1,false,arrayDismension);
         }else{
             Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(), Utils.getNowFunction());
         }
@@ -87,7 +95,11 @@ public class Parser {
     }
     // ConstExp     -> AddExp
     public static int parseConstExp() throws CompileException {
-        return parseAddExp();
+        int addExpAddr = parseAddExp();
+        if(Utils.getSymbolItemByAddress(addExpAddr).isConstant() == false) {
+            throw new CompileException("this const exp is not a const! ");
+        }
+        return addExpAddr;
     }
     // VarDecl      -> BType VarDef { ',' VarDef } ';'
     public static void parseVarDecl() throws CompileException {
@@ -107,11 +119,19 @@ public class Parser {
     public static void parseVarDef() throws CompileException {
         Token identToken = Token.nextToken("ident");
         int varAddr = 0;
+        ArrayList<Integer> arrayDismension = new ArrayList<>();
+        Boolean isArray = false;
+        while(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
+            isArray = true;
+            int constAddr = parseConstExp();
+            arrayDismension.add(Utils.getSymbolItemByAddress(constAddr).getValueInt());
+            Token.exceptNextToken(Lexical.RBRACKET); // ]
+        }Token.previousToken();
         if(!Token.isAssign(Token.nextTokenLexcial("="))){
             if(Utils.isGlobal()){
-                Utils.allocateGlobalVariable(identToken,0,0,true);
+                Utils.allocateGlobalVariable(identToken,0,isArray?4:0,true,arrayDismension);
             }else{
-                varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
+                varAddr = Utils.allocateVariable(identToken,isArray?4:0, Utils.getNowFunction());
 //                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
             }
             Token.previousToken();
@@ -123,7 +143,7 @@ public class Parser {
             if(Utils.getSymbolItemByAddress(valueAddr).isConstant() == false){
                 throw  new CompileException("global assign is not a constant");
             }
-            Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false);
+            Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false,arrayDismension);
             return;
         }
         varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
