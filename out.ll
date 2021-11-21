@@ -14,29 +14,29 @@ define dso_local i32 @main() {
   store i32 1, i32* %1
   br label %2
 
-2:                                                ; preds = %11, %0
+2:                                                ; preds = %10, %0
   %3 = icmp ne i32 1, 0
-  br i1 %3, label %4, label %12
+  br i1 %3, label %4, label %11
 
 4:                                                ; preds = %2
   %5 = load i32, i32* %1
   %6 = icmp eq i32 %5, 0
-  br i1 %6, label %7, label %10
+  br i1 %6, label %7, label %8
 
 7:                                                ; preds = %4
-  %8 = load i32, i32* %1
-  ret i32 %8
+  store i32 0, i32* %1
+  br label %10
+
+8:                                                ; preds = %4
+  br label %11
 
 9:                                                ; No predecessors!
-  br label %11
+  br label %10
 
-10:                                               ; preds = %4
-  br label %11
-
-11:                                               ; preds = %10, %9
+10:                                               ; preds = %9, %7
   br label %2
 
-12:                                               ; preds = %2
+11:                                               ; preds = %8, %2
   ret i32 1
 }
 
