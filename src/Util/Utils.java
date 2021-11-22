@@ -183,9 +183,9 @@ public class Utils {
         if(addressSymbolTable.containsKey(address)){
             return addressSymbolTable.get(address);
         }
-        for(int i=1;i<address;i++){
-            System.out.println(addressSymbolTable.get(i).output());
-        }
+//        for(int i=1;i<address;i++){
+//            System.out.println(addressSymbolTable.get(i).output());
+//        }
 
         throw new CompileException("this address"+address+" has not variable");
     }

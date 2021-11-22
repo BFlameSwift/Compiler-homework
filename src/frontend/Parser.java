@@ -2,16 +2,12 @@ package frontend;
 
 import Util.CompileException;
 import Util.Utils;
-import frontend.Lexical;
-import frontend.Token;
 import ir.Analysis;
-import Util.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class Parser {
     public static ArrayList<String> midCodeOut = new ArrayList<String>();
@@ -139,7 +135,7 @@ public class Parser {
             }
         }
             for(int i=0;i<list.size();i++){
-                System.out.printf("%d ",Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
+                System.out.printf("%d ",(Utils.getSymbolItemByAddress(list.get(i))).getValueInt());
             }System.out.println();
 
         return Utils.makeConstArray(null,3,dismension,list);
@@ -298,9 +294,21 @@ public class Parser {
                 midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
                 Token.exceptNextToken(Lexical.SEMICOLON);
             }else if(Token.getNextToken().getLexcial() == Lexical.LBRACKET){
+                SymbolItem array = Utils.getSymbolItem(token);
+                ArrayList<Integer> getAddrList = new ArrayList<Integer>();
+                while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
+                    getAddrList.add(parseConstExp());
+                    Token.exceptNextToken(Lexical.RBRACKET);
+                }Token.previousToken();
+                int location = array.addrListTransLocation(getAddrList);
 
+                if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
+                    int expAddr = parseExp();
 
-
+                    int varAddr = array.arrayAddrList.get(location);
+                    midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
+                    Token.exceptNextToken(Lexical.SEMICOLON);
+                }
             }
             else {
                 Token.previousToken();
@@ -310,7 +318,8 @@ public class Parser {
             }
             Token.exceptNextToken(Lexical.SEMICOLON);
        }
-        }else if(token.getLexcial() == Lexical.IF_DEC){
+        }
+        else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             int condAddr = parseCond();
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
@@ -350,11 +359,13 @@ public class Parser {
             }
 
             return 0;
-        }else if(token.getLexcial() == Lexical.LBRACE){
+        }
+        else if(token.getLexcial() == Lexical.LBRACE){
             Token.previousToken();
 //            int blockHasRet = parseBlock();
             return parseBlock();
-        }else if(token.getLexcial() == Lexical.WHILE_DEC){
+        }
+        else if(token.getLexcial() == Lexical.WHILE_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
             Utils.endBlockJumpOutput();int beginCondLoca = midCodeOut.size()-1; int beginCondLabel = Utils.nextLabel();
@@ -384,19 +395,22 @@ public class Parser {
                     throw new CompileException("not continue break!!!");
                 }
             }
-        }else if(token.getLexcial() == Lexical.CONTINUE_DEC){
+        }
+        else if(token.getLexcial() == Lexical.CONTINUE_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);
             Utils.endBlockJumpOutput();
             int size = midCodeOut.size() - 1;
             Utils.cycleStack.peek().add(new HashMap<>(){{put(0,size);}});
             return 1;
-        }else if(token.getLexcial() == Lexical.BREAK_DEC){
+        }
+        else if(token.getLexcial() == Lexical.BREAK_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);
             Utils.endBlockJumpOutput();
             int size = midCodeOut.size() - 1;
             Utils.cycleStack.peek().add((new HashMap<>(){{put(1,size);}}));
             return 1;
-        }else if(token.getLexcial() == Lexical.SEMICOLON){
+        }
+        else if(token.getLexcial() == Lexical.SEMICOLON){
             return 0;
         }
         else{
@@ -535,7 +549,7 @@ public class Parser {
                     getAddrList.add(parseConstExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }Token.previousToken();
-                return array.arrayTransAddr(getAddrList);
+                return array.arrayAddrList.get(array.addrListTransLocation(getAddrList));
             }
 
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());

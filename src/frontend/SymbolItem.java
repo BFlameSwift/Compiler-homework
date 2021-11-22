@@ -33,7 +33,7 @@ public class SymbolItem {
     public void setValueInt(int valueInt) {
         this.valueInt = valueInt;
     }
-    public int arrayTransAddr(ArrayList<Integer> list) throws CompileException {
+    public int addrListTransLocation(ArrayList<Integer> list) throws CompileException {
         if(list.size() != parametersList.size()){
             throw new CompileException("array size not match");
         }
