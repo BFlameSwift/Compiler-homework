@@ -2,12 +2,16 @@ package frontend;
 
 import Util.CompileException;
 import Util.Utils;
+import frontend.Lexical;
+import frontend.Token;
 import ir.Analysis;
+import Util.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class Parser {
     public static ArrayList<String> midCodeOut = new ArrayList<String>();
@@ -288,7 +292,12 @@ public class Parser {
                 int varAddr = Utils.storeVariable(token, Utils.getSymbolItemByAddress(expAddr).getValueInt());
                 midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
                 Token.exceptNextToken(Lexical.SEMICOLON);
-            }else {
+            }else if(Token.getNextToken().getLexcial() == Lexical.LBRACKET){
+
+
+
+            }
+            else {
                 Token.previousToken();
                 Token.previousToken();
                 if(!Token.isSemicolon(Token.getNextToken().getLexcial())) {

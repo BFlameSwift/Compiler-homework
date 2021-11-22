@@ -40,7 +40,7 @@ public class SymbolItem {
         for(int addr:list){
             valueList.add(Utils.getSymbolItemByAddress(addr).getValueInt());
         }
-        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(valueListx);
+        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(valueList);
         int ret = 0;
         for(int i=0;i<list.size()-1;i++){
             ret += list.get(i)*satisfiedList.get(i+1);
