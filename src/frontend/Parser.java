@@ -2,16 +2,12 @@ package frontend;
 
 import Util.CompileException;
 import Util.Utils;
-import frontend.Lexical;
-import frontend.Token;
 import ir.Analysis;
-import Util.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public class Parser {
     public static ArrayList<String> midCodeOut = new ArrayList<String>();
@@ -80,7 +76,7 @@ public class Parser {
 
         Token.exceptNextToken(Lexical.ASSIGN);
         int valueConstInitvalAddress = parseConstInitVal(arrayDismension);
-        frontend.SymbolItem constItem = Utils.getSymbolItemByAddress(valueConstInitvalAddress);
+        SymbolItem constItem = Utils.getSymbolItemByAddress(valueConstInitvalAddress);
         if(constItem.kind == 0){
             throw new CompileException("const cant assign by var");
         }
@@ -279,7 +275,7 @@ public class Parser {
         Token token = Token.nextToken("exp or Lval = Exp or return or block or if");
         if(token.judgeThis(Lexical.RETURN_DEC)){
             int expAddress = parseExp();
-            frontend.SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
+            SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
             String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getAddress();
             midCodeOut.add("ret i32 "+retStr);
@@ -478,7 +474,7 @@ public class Parser {
             if(!Utils.funcSymbolTable.containsKey(thisToken.getValue())) {
                 throw new CompileException("Parse dont hava this func "+thisToken.getValue());
             }
-            frontend.SymbolItem funcItem = Utils.funcSymbolTable.get(thisToken.getValue());
+            SymbolItem funcItem = Utils.funcSymbolTable.get(thisToken.getValue());
             Token.nextToken("(");
             ArrayList<Integer> paramAddrList = new ArrayList<>();
             int i;
@@ -512,12 +508,22 @@ public class Parser {
             int value = Integer.parseInt(token.getValue());
             return Utils.storeConstVariable(null,value, Utils.getNowFunction());
         }else if(Token.isIdent(token.getLexcial())){
-            frontend.SymbolItem lval = Utils.getSymbolItem(token);
-            if(!lval.isConstant()) {
-                midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
+            if(Token.getNextToken().getLexcial() != Lexical.LBRACKET){
+                SymbolItem lval = Utils.getSymbolItem(token);
+                if(lval.kind != 1) {
+                    midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
+                }
+                return lval.getLoadAddress();
+            }else{
+                SymbolItem array = Utils.getSymbolItem(token);
+                ArrayList<Integer> getAddrList = new ArrayList<Integer>();
+                while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
+                    getAddrList.add(parseConstExp());
+                    Token.exceptNextToken(Lexical.RBRACKET);
+                }Token.previousToken();
+                return array.arrayTransAddr(getAddrList);
             }
-//            output.add(Utils.loadLValOutput(token,Utils.getNowFunction()));
-            return lval.getLoadAddress();
+
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());
         }
         else{
@@ -595,7 +601,7 @@ public class Parser {
 //            intValue = Utils.scanner.nextInt();
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
 //            System.out.println("saveaddress"+saveAddress);
-            frontend.SymbolItem saveItem = new frontend.SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
+            SymbolItem saveItem = new SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
         }else if("@getch".equals(funcName)){
@@ -603,7 +609,7 @@ public class Parser {
 
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
 //            System.out.println("saveaddress"+saveAddress);
-            frontend.SymbolItem saveItem = new frontend.SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
+            SymbolItem saveItem = new SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
         }else if("@putint".equals(funcName)){

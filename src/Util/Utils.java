@@ -259,7 +259,7 @@ public class Utils {
             System.out.println("arr addr:"+valueAddrList.get(i));
             System.out.println("    load addr"+getSymbolItemByAddress(valueAddrList.get(i)).getLoadAddress());
             String str= "%"+(++nowAddress)+" = "+"getelementptr"+"i32.i32* "+"%";
-            putAddressSymbol(nowAddress,new SymbolItem(null,0));
+            putAddressSymbol(nowAddress,new SymbolItem(null,-2));
             str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getAddress();
             str += ", i32 0, i32 "+i;
             Parser.midCodeOut.add(str);

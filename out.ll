@@ -3,41 +3,34 @@ source_filename = "llvm-link"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
+@c = dso_local constant [2 x [1 x i32]] [[1 x i32] [i32 1], [1 x i32] [i32 3]], align 4
+@b = dso_local global [2 x [3 x i32]] [[3 x i32] [i32 1, i32 0, i32 0], [3 x i32] zeroinitializer], align 16
+@a = dso_local global [3 x i32] [i32 1, i32 2, i32 0], align 4
+@d = common dso_local global [5 x i32] zeroinitializer, align 16
+@e = common dso_local global [4 x [4 x i32]] zeroinitializer, align 16
 @.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @.str.1 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
 @.str.2 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
 @.str.3 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
-define dso_local i32 @main() {
-  %1 = alloca i32
-  store i32 1, i32* %1
-  br label %2
-
-2:                                                ; preds = %10, %0
-  %3 = icmp ne i32 1, 0
-  br i1 %3, label %4, label %11
-
-4:                                                ; preds = %2
-  %5 = load i32, i32* %1
-  %6 = icmp eq i32 %5, 0
-  br i1 %6, label %7, label %8
-
-7:                                                ; preds = %4
-  store i32 0, i32* %1
-  br label %10
-
-8:                                                ; preds = %4
-  br label %11
-
-9:                                                ; No predecessors!
-  br label %10
-
-10:                                               ; preds = %9, %7
-  br label %2
-
-11:                                               ; preds = %8, %2
-  ret i32 1
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca i32, align 4
+  store i32 0, i32* %1, align 4
+  %3 = load i32, i32* getelementptr inbounds ([2 x [1 x i32]], [2 x [1 x i32]]* @c, i64 0, i64 1, i64 0), align 4
+  %4 = load i32, i32* getelementptr inbounds ([2 x [3 x i32]], [2 x [3 x i32]]* @b, i64 0, i64 0, i64 0), align 16
+  %5 = add nsw i32 %3, %4
+  %6 = load i32, i32* getelementptr inbounds ([2 x [1 x i32]], [2 x [1 x i32]]* @c, i64 0, i64 0, i64 0), align 4
+  %7 = add nsw i32 %5, %6
+  %8 = load i32, i32* getelementptr inbounds ([3 x i32], [3 x i32]* @a, i64 0, i64 1), align 4
+  %9 = add nsw i32 %7, %8
+  %10 = load i32, i32* getelementptr inbounds ([5 x i32], [5 x i32]* @d, i64 0, i64 4), align 16
+  %11 = add nsw i32 %9, %10
+  store i32 %11, i32* %2, align 4
+  %12 = load i32, i32* %2, align 4
+  ret i32 %12
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -155,7 +148,7 @@ define dso_local void @putarray(i32 %0, i32* %1) #0 {
 attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 
-!llvm.ident = !{!0}
+!llvm.ident = !{!0, !0}
 !llvm.module.flags = !{!1}
 
 !0 = !{!"clang version 10.0.0-4ubuntu1 "}
