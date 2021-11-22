@@ -109,7 +109,12 @@ public class Parser {
         int nowLevel =0;
         while(nowLevel>-1){
             Token token = Token.nextToken("const init");
-            if(token.getLexcial() == Lexical.LBRACE) nowLevel++;
+            if(token.getLexcial() == Lexical.LBRACE) {
+                nowLevel++;
+                if(Token.getNextToken().getLexcial() == Lexical.RBRACE)
+                    list.add(Utils.allocateConst(0));
+                // bug const int c[4][2] = {{1}, {3},{},{1}}; 在{} 先填个零，剩下的下面会直接填上的
+            }
             else if(token.getLexcial() == Lexical.RBRACE){
                 for(int i=(list.size()-1)%satisfiedList.get(nowLevel);i<satisfiedList.get(nowLevel)-1;i++){
                     list.add(Utils.allocateConst(0));
@@ -128,9 +133,9 @@ public class Parser {
                 else list.add(parseExp());
             }
         }
-//            for(int i=0;i<list.size();i++){
-//                System.out.printf("%d ",Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
-//            }
+            for(int i=0;i<list.size();i++){
+                System.out.printf("%d ",Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
+            }
 
         return Utils.makeConstArray(null,3,dismension,list);
     }
@@ -169,25 +174,27 @@ public class Parser {
         Token identToken = Token.nextToken("ident");
         int varAddr = 0;
         ArrayList<Integer> arrayDismension = new ArrayList<>();
-        Boolean isArray = false;
+        int atom = 0,length = 1; // 数组维度的最小值 ： a[3][4] 即atom = 4
         while(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
-            isArray = true;
             int constAddr = parseConstExp();
-            arrayDismension.add(Utils.getSymbolItemByAddress(constAddr).getValueInt());
-            Token.exceptNextToken(Lexical.RBRACKET); // ]
+            atom = Utils.getSymbolItemByAddress(constAddr).getValueInt(); // update atom
+            length *= atom;
+            if(atom == 0){throw  new CompileException("array size == 0");}
+            arrayDismension.add(atom);
+            Token.exceptNextToken(Lexical.RBRACKET);// ]
         }Token.previousToken();
         if(!Token.isAssign(Token.nextTokenLexcial("="))){
             if(Utils.isGlobal()){
-                Utils.allocateGlobalVariable(identToken,0,isArray?4:0,true,SymbolItem.ADDRESS_NOT_ASSIGN);
+                Utils.allocateGlobalVariable(identToken,0,atom!=0?4:0,true,SymbolItem.ADDRESS_NOT_ASSIGN);
             }else{
-                varAddr = Utils.allocateVariable(identToken,isArray?4:0, Utils.getNowFunction());
+                varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, Utils.getNowFunction());
 //                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
             }
             Token.previousToken();
             return;
         }
 
-        int valueAddr = parseInitVal();
+        int valueAddr = parseInitVal(arrayDismension);
         if(Utils.isGlobal()) {
             if(Utils.getSymbolItemByAddress(valueAddr).isConstant() == false){
                 throw  new CompileException("global assign is not a constant");
@@ -200,7 +207,10 @@ public class Parser {
         midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         return;
     }
-    public static int parseInitVal() throws CompileException {
+    public static int parseInitVal(ArrayList<Integer> dismension) throws CompileException {
+        if(Token.nextTokenLexcial("{") == Lexical.LBRACE){
+            return parseArrayRead(dismension,0);
+        }
         return parseExp();
     }
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
