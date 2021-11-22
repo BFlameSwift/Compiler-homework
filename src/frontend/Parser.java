@@ -68,29 +68,71 @@ public class Parser {
             throw new CompileException("Parser const def Error is not Ident");
         }
         ArrayList<Integer> arrayDismension = new ArrayList<>();
-        Boolean isArray = false;
+        int atom = 0; // 数组维度的最小值 ： a[3][4] 即atom = 4
         while(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
-            isArray = true;
             int constAddr = parseConstExp();
-            arrayDismension.add(Utils.getSymbolItemByAddress(constAddr).getValueInt());
+            atom = Utils.getSymbolItemByAddress(constAddr).getValueInt(); // update atom
+            if(atom == 0){throw  new CompileException("array size == 0");}
+            arrayDismension.add(atom);
             Token.exceptNextToken(Lexical.RBRACKET);
         }Token.previousToken();
+
         Token.exceptNextToken(Lexical.ASSIGN);
-        int valueConstInitvalAddress = parseConstInitVal();
+        int valueConstInitvalAddress = parseConstInitVal(arrayDismension);
         frontend.SymbolItem constItem = Utils.getSymbolItemByAddress(valueConstInitvalAddress);
         if(constItem.kind == 0){
             throw new CompileException("const cant assign by var");
         }
         if(Utils.isGlobal()){
-            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),isArray?3:1,false,arrayDismension);
+            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),atom==0?3:1,false,arrayDismension);
         }else{
             Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(), Utils.getNowFunction());
         }
 
 
     }
+    public static ArrayList<Integer> makeSatisfyList(ArrayList<Integer> list){
+        int len = list.size();
+        ArrayList<Integer> newList = (ArrayList<Integer> )list.clone();
+        for(int i=len-2;i>=0;i--){
+            newList.set(i,newList.get(i)*newList.get(i+1));
+        }
+        return newList;
+    }
     // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
-    public static int parseConstInitVal() throws CompileException {
+    public static int parseConstInitVal(ArrayList<Integer> dismension) throws CompileException {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> satisfiedList = makeSatisfyList(dismension);
+        int nowLevel = 0;
+
+        if(Token.nextTokenLexcial("{") == Lexical.LBRACE){
+            nowLevel ++;
+            while(nowLevel>0){
+                Token token = Token.nextToken("const init");
+                if(token.getLexcial() == Lexical.LBRACE) nowLevel++;
+                else if(token.getLexcial() == Lexical.RBRACE){
+                    for(int i=(list.size()-1)%satisfiedList.get(nowLevel);i<satisfiedList.get(nowLevel)-1;i++){
+                        list.add(Utils.allocateConst(0));
+                    }
+                    nowLevel -- ;
+                }else if(token.getLexcial() == Lexical.SEMICOLON){
+                    if(nowLevel>0){
+                        throw new CompileException("array assign is not end!!");
+                    }
+                }else if(token.getLexcial() == Lexical.COMMA){
+                    continue;
+                }else {
+                    Token.previousToken();
+                    list.add(parseConstExp());
+                }
+            }
+            for(int i=0;i<list.size();i++){
+                System.out.printf("%d ",list.get(i));
+            }
+            Token.exceptNextToken(Lexical.SEMICOLON);
+            return Utils.makeConstArray(null,3,dismension,list);
+        }
+        Token.previousToken();
         return parseConstExp();
     }
     // ConstExp     -> AddExp

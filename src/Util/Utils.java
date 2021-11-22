@@ -120,6 +120,9 @@ public class Utils {
         putblockSymbolTable(symbolItem,blockIndex);
         return nowAddress;
     }
+    public static int allocateConst(int value) throws CompileException {
+        return storeConstVariable(null,value,null);
+    }
     public static int putNewSymbol(SymbolItem symbolItem){
         addressSymbolTable.put(++nowAddress,symbolItem);
         symbolItem.setLoadAddress(nowAddress);
@@ -406,5 +409,13 @@ public class Utils {
     }
     public static void endBlockJumpOutput(){
         Parser.midCodeOut.add("br label "+Analysis.LEAVE_ADDRESS);
+    }
+    public static int makeConstArray(String name,int kind,ArrayList<Integer> dismension,ArrayList<Integer> arrayAddrList){
+        SymbolItem item = new SymbolItem(name,kind);
+        item.length = 0;//TODO
+        item.parametersList = dismension;
+        item.arrayAddrList = arrayAddrList;
+        item.setAddress((++constAddress));
+        return constAddress;
     }
 }
