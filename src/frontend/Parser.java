@@ -101,6 +101,11 @@ public class Parser {
         for(int i=len-2;i>=0;i--){
             newList.set(i,newList.get(i)*newList.get(i+1));
         }
+        System.out.println("make satisfy list");
+        for(int i:newList){
+            System.out.printf("%d ",i);
+        }
+        System.out.println("end make ");
         return newList;
     }
     public static int parseArrayRead(ArrayList<Integer> dismension,int type) throws CompileException {

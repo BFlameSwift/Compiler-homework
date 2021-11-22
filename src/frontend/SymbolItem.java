@@ -36,15 +36,16 @@ public class SymbolItem {
     public int arrayTransAddr(ArrayList<Integer> list) throws CompileException {
         if(list.size() != parametersList.size()){
             throw new CompileException("array size not match");
-        }ArrayList valueList = new ArrayList();
-        for(int addr:list){
+        }
+        ArrayList<Integer> valueList = new ArrayList<Integer>();
+        for (int addr :list){
             valueList.add(Utils.getSymbolItemByAddress(addr).getValueInt());
         }
-        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(valueList);
+        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(parametersList);
         int ret = 0;
-        for(int i=0;i<list.size()-1;i++){
-            ret += list.get(i)*satisfiedList.get(i+1);
-        }ret += list.get(list.size()-1);
+        for(int i=0;i<valueList.size()-1;i++){
+            ret += valueList.get(i)*satisfiedList.get(i+1);
+        }ret += valueList.get(valueList.size()-1);
         System.out.println("ret addr："+ret);
         return ret;
     }
