@@ -187,8 +187,7 @@ public class Parser {
             if(Utils.isGlobal()){
                 Utils.allocateGlobalVariable(identToken,0,atom!=0?4:0,true,Utils.makeEmptyArray(arrayDismension));
             }else{
-                varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, Utils.getNowFunction());
-//                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
+                    varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, Utils.getNowFunction());
             }
             Token.previousToken();
             return;
@@ -202,15 +201,19 @@ public class Parser {
             Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),atom==0?0:4,false,valueAddr);
             return;
         }
-        varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
-        varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
-        midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
+        if(atom ==0){
+            varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
+            varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
+            midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
+        }else{
+            Utils.storeArrayItem(identToken.getValue(),4,length,valueAddr,Utils.getNowFunction());
+        }
         return;
     }
     public static int parseInitVal(ArrayList<Integer> dismension) throws CompileException {
         if(Token.nextTokenLexcial("{") == Lexical.LBRACE){
             return parseArrayRead(dismension,0);
-        }
+        }Token.previousToken();
         return parseExp();
     }
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block

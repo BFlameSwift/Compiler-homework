@@ -1,8 +1,8 @@
 
 
 int main() {
+    int b = 1;
+   int c[4] = {b};
 
-const int  c[6][2] = {},n=2;
-
-    return n;
+    return 0;
 }

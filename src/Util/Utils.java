@@ -147,9 +147,10 @@ public class Utils {
         symbolItem.setAddress((++nowAddress));
 
 //        nowAddress ++;
-        Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
-        //TODO 根据不同函数进入不同的Map块
+
+
         putAddressSymbol(nowAddress,symbolItem);
+        Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
         putallocalSymbolTable(symbolItem,funcName);
         putblockSymbolTable(symbolItem,blockIndex);
         return nowAddress;
@@ -255,8 +256,10 @@ public class Utils {
         ArrayList<Integer> valueAddrList = valueItem.arrayAddrList;
         int len  = valueAddrList.size();
         for(int i = 0; i < len; i++){
+            System.out.println("arr addr:"+valueAddrList.get(i));
+            System.out.println("    load addr"+getSymbolItemByAddress(valueAddrList.get(i)).getLoadAddress());
             String str= "%"+(++nowAddress)+" = "+"getelementptr"+"i32.i32* "+"%";
-            putAddressSymbol(nowAddress,getSymbolItemByAddress(valueAddrList.get(i)));
+            putAddressSymbol(nowAddress,new SymbolItem(null,0));
             str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getAddress();
             str += ", i32 0, i32 "+i;
             Parser.midCodeOut.add(str);
