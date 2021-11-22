@@ -62,8 +62,9 @@ public class Utils {
     public static int getBlockIndex() {
         return blockIndex;
     }
-    public static String allocateVariableOutput(int varialeAddr){
-        return "%"+varialeAddr+" = alloca i32";
+    public static String allocateVariableOutput(int varAddr) throws CompileException {
+        SymbolItem item = getSymbolItemByAddress(varAddr);
+        return "%"+varAddr+" = alloca "+(item.isArray()?"[ "+item.length+" x i32 ]":"i32");
     }
     public static void putGlobalInBlock0(String symbolName, SymbolItem symbolItem){
         try{
@@ -84,12 +85,36 @@ public class Utils {
         }// TODO 区域内已经存在同名变量
 
     }
-    public static String allocateGlobalVariableOutput(Token token, int value, int kind, Boolean isCommon){
+    // 生成一个长度指定的常量数组
+    public static int makeEmptyArray(ArrayList<Integer> parametersList) {
+        int length = 1;
+        for(int i=0;i<parametersList.size();i++){
+            length *= parametersList.get(i);
+        }
+        SymbolItem item = new SymbolItem(null,3,1,length,parametersList);
+        putAddressSymbol((++constAddress),item);
+        return constAddress;
+    }
+    public static String makeArrayWholeAssignStr(int arrayAddr) throws CompileException {
+        String retStr = "[ ";
+        SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
+        int len = arrayItem.length;
+        for(int i=0;i<len-1;i++){
+            retStr += "i32 "+getSymbolItemByAddress(arrayItem.arrayAddrList.get(i)).getValueInt()+", ";
+        }retStr += "i32 "+getSymbolItemByAddress(arrayItem.arrayAddrList.get(arrayItem.length-1)).getValueInt()+" ]";
+        return retStr;
+    }
+    public static String allocateGlobalVariableOutput(Token token, int value, int kind, Boolean isCommon,int arrayAddr) throws CompileException {
         String retStr = "";
         retStr += token.getValue(); retStr += " = ";
-        retStr += isCommon?"common ":""; retStr += "dso_local ";
-        retStr += kind == 0?"global i32 ":"constant i32 ";
-        retStr += value+", align 4";
+        retStr += (isCommon||(kind<2))?"common ":""; retStr += "dso_local ";
+        retStr += kind == 0||kind == 4?"global i32 ":"constant i32 ";
+        if(kind ==3||kind ==4){
+            SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
+            retStr += "[" + arrayItem.length + " x i32 ]";
+            retStr += isCommon?" zeroinitializer":makeArrayWholeAssignStr(arrayAddr);
+        }else
+            retStr += value+", align 4";
         return retStr;
     }
     public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon,int arrayAddr) throws Util.CompileException {
@@ -98,7 +123,7 @@ public class Utils {
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value,getBlockIndex());
         symbolItem.blockIndex = 0;
         symbolItem.setAddress((++globalAddress));
-        if(kind == 3){
+        if(kind == 3||kind == 4){
             SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
             symbolItem.parametersList = arrayItem.parametersList;
             symbolItem.length = arrayItem.length;
@@ -111,7 +136,8 @@ public class Utils {
             throw new Util.CompileException("this variable name"+symbolName+"has been allocate");
         }globalSymbolTable.put(symbolName,symbolItem);
         putGlobalInBlock0(symbolName,symbolItem);
-        Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon));
+
+        Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon,arrayAddr));
     }
     public static int allocateVariable(Token token, int kind, String funcName) throws Util.CompileException {
         String symbolName = token.getValue();
@@ -216,11 +242,27 @@ public class Utils {
         SymbolItem item = new SymbolItem(name,kind,1,length,arrayItem.parametersList);
         item.arrayAddrList = arrayItem.arrayAddrList;
 
-        if(kind==3) item.setAddress((++constAddress));
+        if(kind==3) item.setAddress((++nowAddress));
         else item.setAddress((++nowAddress));
         putAddressSymbol(item.getAddress(),item);
-
+        Parser.midCodeOut.add(allocateVariableOutput(item.getAddress()));
+        storeArrayOutput(item.getAddress(),arrayValueAddr);
         return item.getAddress();
+    }
+    public static void storeArrayOutput(int arrayAddr,int valueAddr) throws CompileException {
+        SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
+        SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
+        ArrayList<Integer> valueAddrList = valueItem.arrayAddrList;
+        int len  = valueAddrList.size();
+        for(int i = 0; i < len; i++){
+            String str= "%"+(++nowAddress)+" = "+"getelementptr"+"i32.i32* "+"%";
+            putAddressSymbol(nowAddress,getSymbolItemByAddress(valueAddrList.get(i)));
+            str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getAddress();
+            str += ", i32 0, i32 "+i;
+            Parser.midCodeOut.add(str);
+            Parser.midCodeOut.add(storeVariableOutput(valueAddrList.get(i),nowAddress));
+        }
+
     }
     public static int storeConstVariable(String name,int value,String funcName) throws Util.CompileException {
         SymbolItem item = new SymbolItem(name,1,value,getBlockIndex());
@@ -229,7 +271,6 @@ public class Utils {
             putblockSymbolTable(item,blockIndex);
             putallocalSymbolTable(item,funcName);
         }putAddressSymbol(constAddress,item);
-
         return item.getAddress();
     }
     public static int putNewVariable(String name,int value,String funcName) throws Util.CompileException {
@@ -436,7 +477,8 @@ public class Utils {
     }
     public static int makeConstArray(String name,int kind,ArrayList<Integer> dismension,ArrayList<Integer> arrayAddrList){
         SymbolItem item = new SymbolItem(name,kind);
-        item.length = 0;//TODO
+        item.length = 1;
+        for(int i=0;i<dismension.size();i++) item.length *= dismension.get(i);
         item.parametersList = dismension;
         item.arrayAddrList = arrayAddrList;
         item.setValueInt(0);

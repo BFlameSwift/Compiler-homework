@@ -33,7 +33,17 @@ public class SymbolItem {
     public void setValueInt(int valueInt) {
         this.valueInt = valueInt;
     }
-
+    public int arrayTransAddr(ArrayList<Integer> list) throws CompileException {
+        if(list.size() != parametersList.size()){
+            throw new CompileException("array size not match");
+        }
+        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(list);
+        int ret = 0;
+        for(int i=0;i<list.size()-1;i++){
+            ret += list.get(i)*satisfiedList.get(i+1);
+        }ret += list.get(list.size()-1);
+        return ret;
+    }
     private int address = 0;
     private int loadAddress = 0;
     public Boolean isGlobal(){
@@ -44,6 +54,8 @@ public class SymbolItem {
             throw new CompileException("load address = 0");
         }
         return loadAddress;
+    }public Boolean isArray(){
+        return kind ==3||kind ==4;
     }
 
     public void setLoadAddress(int loadAddress) {

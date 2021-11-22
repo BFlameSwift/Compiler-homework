@@ -1,8 +1,8 @@
 
-int main(){
 
-        const int c[4][2] = {{1}, {3},{},{1}};
-        return 0;
+int main() {
 
+const int  c[6][2] = {},n=2;
 
+    return n;
 }

@@ -126,7 +126,7 @@ public class Parser {
                 }
             }else if(token.getLexcial() == Lexical.COMMA){
                 continue;
-            }else {
+            }else {// 只剩下表达式了
                 Token.previousToken();
                 if(type == 1)
                     list.add(parseConstExp());
@@ -135,7 +135,7 @@ public class Parser {
         }
             for(int i=0;i<list.size();i++){
                 System.out.printf("%d ",Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
-            }
+            }System.out.println();
 
         return Utils.makeConstArray(null,3,dismension,list);
     }
@@ -185,7 +185,7 @@ public class Parser {
         }Token.previousToken();
         if(!Token.isAssign(Token.nextTokenLexcial("="))){
             if(Utils.isGlobal()){
-                Utils.allocateGlobalVariable(identToken,0,atom!=0?4:0,true,SymbolItem.ADDRESS_NOT_ASSIGN);
+                Utils.allocateGlobalVariable(identToken,0,atom!=0?4:0,true,Utils.makeEmptyArray(arrayDismension));
             }else{
                 varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, Utils.getNowFunction());
 //                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
@@ -199,7 +199,7 @@ public class Parser {
             if(Utils.getSymbolItemByAddress(valueAddr).isConstant() == false){
                 throw  new CompileException("global assign is not a constant");
             }
-            Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false,SymbolItem.ADDRESS_NOT_ASSIGN);
+            Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),atom==0?0:4,false,valueAddr);
             return;
         }
         varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
