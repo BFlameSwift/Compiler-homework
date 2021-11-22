@@ -92,13 +92,21 @@ public class Utils {
         retStr += value+", align 4";
         return retStr;
     }
-    public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon,ArrayList<Integer> array) throws Util.CompileException {
+    public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon,int arrayAddr) throws Util.CompileException {
         // 声明全局变量，value 为数值，king种类， common是否初始化了数值
         String symbolName = token.getValue();
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value,getBlockIndex());
         symbolItem.blockIndex = 0;
         symbolItem.setAddress((++globalAddress));
+        if(kind == 3){
+            SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
+            symbolItem.parametersList = arrayItem.parametersList;
+            symbolItem.length = arrayItem.length;
+            symbolItem.arrayAddrList = arrayItem.arrayAddrList;
+        }
+
         putAddressSymbol(globalAddress-1,symbolItem);
+
         if(globalSymbolTable.containsKey(symbolName)){
             throw new Util.CompileException("this variable name"+symbolName+"has been allocate");
         }globalSymbolTable.put(symbolName,symbolItem);
@@ -121,6 +129,10 @@ public class Utils {
         return nowAddress;
     }
     public static int allocateConst(int value) throws CompileException {
+        if(value==0 && getSymbolItemByAddress(constAddress).getValueInt() == 0){
+            return constAddress;
+        }//稍微省点地址。
+
         return storeConstVariable(null,value,null);
     }
     public static int putNewSymbol(SymbolItem symbolItem){
@@ -197,6 +209,18 @@ public class Utils {
         }
         symbolItem.setValueInt(value);
         return symbolItem.getAddress();
+    }
+    public static int  storeArrayItem(String name,int kind,int length,int arrayValueAddr,String funcName) throws CompileException {
+        SymbolItem arrayItem = getSymbolItemByAddress(arrayValueAddr);
+
+        SymbolItem item = new SymbolItem(name,kind,1,length,arrayItem.parametersList);
+        item.arrayAddrList = arrayItem.arrayAddrList;
+
+        if(kind==3) item.setAddress((++constAddress));
+        else item.setAddress((++nowAddress));
+        putAddressSymbol(item.getAddress(),item);
+
+        return item.getAddress();
     }
     public static int storeConstVariable(String name,int value,String funcName) throws Util.CompileException {
         SymbolItem item = new SymbolItem(name,1,value,getBlockIndex());
@@ -376,10 +400,10 @@ public class Utils {
         Parser.midCodeOut.add("declare i32 @getch()");
         Parser.midCodeOut.add("declare void @putint(i32)");
         Parser.midCodeOut.add("declare void @putch(i32)");
-        SymbolItem getint = new SymbolItem("@getint",2,0,1,0);
-        SymbolItem getch = new SymbolItem("@getch",2,0,1,0);
-        SymbolItem putint = new SymbolItem("@putint",2,0,0,1);
-        SymbolItem putch = new SymbolItem("@putch",2,0,0,1);
+        SymbolItem getint = new SymbolItem("@getint",2,0,0,null);
+        SymbolItem getch = new SymbolItem("@getch",2,0,0,null);
+        SymbolItem putint = new SymbolItem("@putint",2,0,1,new ArrayList<Integer>(){{add(1);}});
+        SymbolItem putch = new SymbolItem("@putch",2,0,1,new ArrayList<Integer>(){{add(1);}});
         allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
         funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
     }
@@ -415,7 +439,9 @@ public class Utils {
         item.length = 0;//TODO
         item.parametersList = dismension;
         item.arrayAddrList = arrayAddrList;
+        item.setValueInt(0);
         item.setAddress((++constAddress));
+        putAddressSymbol(constAddress,item);
         return constAddress;
     }
 }

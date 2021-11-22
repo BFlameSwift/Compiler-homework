@@ -88,12 +88,13 @@ public class SymbolItem {
         length = 0; parametersList = new ArrayList<Integer>();
         this.valueInt = valueInt;
     }
-    public SymbolItem(String name,int kind,int valueInt,int type,int length){
+    public SymbolItem(String name,int kind,int type,int length,ArrayList<Integer> parametersList){
         this.name = name;
         this.kind = kind;
         address = ADDRESS_NOT_ASSIGN;
         this.type = type;
-        this.length = length; parametersList = new ArrayList<Integer>();
+        this.length = length;
+        this.parametersList = parametersList;
         this.valueInt = valueInt;
     }
     // TODO 函数与数组时新增

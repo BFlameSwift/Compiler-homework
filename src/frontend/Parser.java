@@ -68,13 +68,14 @@ public class Parser {
             throw new CompileException("Parser const def Error is not Ident");
         }
         ArrayList<Integer> arrayDismension = new ArrayList<>();
-        int atom = 0; // 数组维度的最小值 ： a[3][4] 即atom = 4
+        int atom = 0,length = 1; // 数组维度的最小值 ： a[3][4] 即atom = 4
         while(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
             int constAddr = parseConstExp();
             atom = Utils.getSymbolItemByAddress(constAddr).getValueInt(); // update atom
+            length *= atom;
             if(atom == 0){throw  new CompileException("array size == 0");}
             arrayDismension.add(atom);
-            Token.exceptNextToken(Lexical.RBRACKET);
+            Token.exceptNextToken(Lexical.RBRACKET);// ]
         }Token.previousToken();
 
         Token.exceptNextToken(Lexical.ASSIGN);
@@ -84,12 +85,15 @@ public class Parser {
             throw new CompileException("const cant assign by var");
         }
         if(Utils.isGlobal()){
-            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),atom==0?3:1,false,arrayDismension);
+            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),atom==0?1:3,false,valueConstInitvalAddress);
+
         }else{
-            Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(), Utils.getNowFunction());
+            if(atom ==0) // 非数组
+                Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(), Utils.getNowFunction());
+            else{
+                Utils.storeArrayItem(identToken.getValue(),3,length,valueConstInitvalAddress,Utils.getNowFunction());
+            }
         }
-
-
     }
     public static ArrayList<Integer> makeSatisfyList(ArrayList<Integer> list){
         int len = list.size();
@@ -99,38 +103,41 @@ public class Parser {
         }
         return newList;
     }
-    // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
-    public static int parseConstInitVal(ArrayList<Integer> dismension) throws CompileException {
+    public static int parseArrayRead(ArrayList<Integer> dismension,int type) throws CompileException {
         ArrayList<Integer> list = new ArrayList<Integer>();
         ArrayList<Integer> satisfiedList = makeSatisfyList(dismension);
-        int nowLevel = 0;
-
-        if(Token.nextTokenLexcial("{") == Lexical.LBRACE){
-            nowLevel ++;
-            while(nowLevel>0){
-                Token token = Token.nextToken("const init");
-                if(token.getLexcial() == Lexical.LBRACE) nowLevel++;
-                else if(token.getLexcial() == Lexical.RBRACE){
-                    for(int i=(list.size()-1)%satisfiedList.get(nowLevel);i<satisfiedList.get(nowLevel)-1;i++){
-                        list.add(Utils.allocateConst(0));
-                    }
-                    nowLevel -- ;
-                }else if(token.getLexcial() == Lexical.SEMICOLON){
-                    if(nowLevel>0){
-                        throw new CompileException("array assign is not end!!");
-                    }
-                }else if(token.getLexcial() == Lexical.COMMA){
-                    continue;
-                }else {
-                    Token.previousToken();
-                    list.add(parseConstExp());
+        int nowLevel =0;
+        while(nowLevel>-1){
+            Token token = Token.nextToken("const init");
+            if(token.getLexcial() == Lexical.LBRACE) nowLevel++;
+            else if(token.getLexcial() == Lexical.RBRACE){
+                for(int i=(list.size()-1)%satisfiedList.get(nowLevel);i<satisfiedList.get(nowLevel)-1;i++){
+                    list.add(Utils.allocateConst(0));
                 }
+                nowLevel -- ;
+            }else if(token.getLexcial() == Lexical.SEMICOLON){
+                if(nowLevel>0){
+                    throw new CompileException("array assign is not end!!");
+                }
+            }else if(token.getLexcial() == Lexical.COMMA){
+                continue;
+            }else {
+                Token.previousToken();
+                if(type == 1)
+                    list.add(parseConstExp());
+                else list.add(parseExp());
             }
-            for(int i=0;i<list.size();i++){
-                System.out.printf("%d ",list.get(i));
-            }
-            Token.exceptNextToken(Lexical.SEMICOLON);
-            return Utils.makeConstArray(null,3,dismension,list);
+        }
+//            for(int i=0;i<list.size();i++){
+//                System.out.printf("%d ",Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
+//            }
+
+        return Utils.makeConstArray(null,3,dismension,list);
+    }
+    // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
+    public static int parseConstInitVal(ArrayList<Integer> dismension) throws CompileException {
+        if(Token.nextTokenLexcial("{") == Lexical.LBRACE){
+           return parseArrayRead(dismension,1);
         }
         Token.previousToken();
         return parseConstExp();
@@ -171,7 +178,7 @@ public class Parser {
         }Token.previousToken();
         if(!Token.isAssign(Token.nextTokenLexcial("="))){
             if(Utils.isGlobal()){
-                Utils.allocateGlobalVariable(identToken,0,isArray?4:0,true,arrayDismension);
+                Utils.allocateGlobalVariable(identToken,0,isArray?4:0,true,SymbolItem.ADDRESS_NOT_ASSIGN);
             }else{
                 varAddr = Utils.allocateVariable(identToken,isArray?4:0, Utils.getNowFunction());
 //                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
@@ -185,7 +192,7 @@ public class Parser {
             if(Utils.getSymbolItemByAddress(valueAddr).isConstant() == false){
                 throw  new CompileException("global assign is not a constant");
             }
-            Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false,arrayDismension);
+            Utils.allocateGlobalVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false,SymbolItem.ADDRESS_NOT_ASSIGN);
             return;
         }
         varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
