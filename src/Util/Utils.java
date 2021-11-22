@@ -108,13 +108,13 @@ public class Utils {
         String retStr = "";
         retStr += token.getValue(); retStr += " = ";
         retStr += (isCommon||(kind<2))?"common ":""; retStr += "dso_local ";
-        retStr += kind == 0||kind == 4?"global i32 ":"constant i32 ";
+        retStr += kind == 0||kind == 4?"global ":"constant ";
         if(kind ==3||kind ==4){
             SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
-            retStr += "[" + arrayItem.length + " x i32 ]";
-            retStr += isCommon?" zeroinitializer":makeArrayWholeAssignStr(arrayAddr);
+            retStr += "[" + arrayItem.length + " x i32 ] ";
+            retStr += isCommon?" zeroinitializer ":makeArrayWholeAssignStr(arrayAddr);
         }else
-            retStr += value+", align 4";
+            retStr +="i32 "+ value+", align 4";
         return retStr;
     }
     public static void allocateGlobalVariable(Token token, int value, int kind, Boolean isCommon,int arrayAddr) throws Util.CompileException {
@@ -258,7 +258,7 @@ public class Utils {
         for(int i = 0; i < len; i++){
             System.out.println("arr addr:"+valueAddrList.get(i));
             System.out.println("    load addr"+getSymbolItemByAddress(valueAddrList.get(i)).getLoadAddress());
-            String str= "%"+(++nowAddress)+" = "+"getelementptr"+"i32.i32* "+"%";
+            String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%";
             putAddressSymbol(nowAddress,new SymbolItem(null,-2));
             str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getAddress();
             str += ", i32 0, i32 "+i;
