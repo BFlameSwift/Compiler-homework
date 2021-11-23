@@ -3,7 +3,11 @@ source_filename = "llvm-link"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-@n = dso_local global i32 0
+@TAPE_LEN = dso_local constant i32 65536, align 4
+@BUFFER_LEN = dso_local constant i32 32768, align 4
+@tape = dso_local global [65536 x i32] zeroinitializer
+@program = dso_local global [32768 x i32] zeroinitializer
+@ptr = dso_local global i32 0, align 4
 @.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @.str.1 = private unnamed_addr constant [3 x i8] c"%c\00", align 1
 @.str.2 = private unnamed_addr constant [4 x i8] c"%d:\00", align 1
@@ -11,187 +15,233 @@ target triple = "x86_64-pc-linux-gnu"
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
 define dso_local i32 @main() {
-  %1 = add i32 0, 5
-  store i32 %1, i32* @n
-  %2 = alloca i32
-  %3 = add i32 0, 3
-  store i32 %3, i32* %2
-  %4 = alloca [5 x i32]
-  %5 = add i32 0, 3
-  %6 = add i32 0, 4
-  %7 = add i32 0, 5
-  %8 = add i32 0, 6
-  %9 = add i32 0, 7
-  %10 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 0
-  %11 = getelementptr i32, i32* %10, i32 0
-  store i32 %5, i32* %11
-  %12 = getelementptr i32, i32* %10, i32 1
-  store i32 %6, i32* %12
-  %13 = getelementptr i32, i32* %10, i32 2
-  store i32 %7, i32* %13
-  %14 = getelementptr i32, i32* %10, i32 3
-  store i32 %8, i32* %14
-  %15 = getelementptr i32, i32* %10, i32 4
-  store i32 %9, i32* %15
-  %16 = alloca i32
-  %17 = alloca i32
-  %18 = add i32 0, 0
-  store i32 %18, i32* %17
-  %19 = add i32 0, 0
-  store i32 %19, i32* %16
-  %20 = alloca i32
-  br label %pym1
+  %1 = alloca i32
+  store i32 0, i32* %1
+  %2 = call i32 @getint()
+  %3 = alloca i32
+  store i32 %2, i32* %3
+  br label %4
 
-pym1:                                             ; preds = %pym4, %0
-  %21 = load i32, i32* %17
-  %22 = load i32, i32* @n
-  %23 = icmp slt i32 %21, %22
-  br i1 %23, label %pym2, label %pym3
+4:                                                ; preds = %8, %0
+  %5 = load i32, i32* %1
+  %6 = load i32, i32* %3
+  %7 = icmp slt i32 %5, %6
+  br i1 %7, label %8, label %16
 
-pym2:                                             ; preds = %pym1
-  %24 = load i32, i32* %17
-  %25 = load i32, i32* %2
-  %26 = add i32 0, 1
-  %27 = sub i32 %25, %26
-  %28 = icmp slt i32 %24, %27
-  br i1 %28, label %pym5, label %pym6
+8:                                                ; preds = %4
+  %9 = load i32, i32* %1
+  %10 = add i32 %9, 0
+  %11 = call i32 @getch()
+  %12 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
+  %13 = getelementptr i32, i32* %12, i32 %10
+  store i32 %11, i32* %13
+  %14 = load i32, i32* %1
+  %15 = add i32 %14, 1
+  store i32 %15, i32* %1
+  br label %4
 
-pym5:                                             ; preds = %pym2
-  %29 = load i32, i32* %16
-  %30 = load i32, i32* %17
-  %31 = mul i32 %30, 1
-  %32 = add i32 0, %31
-  %33 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %32
-  %34 = load i32, i32* %33
-  %35 = add i32 %29, %34
-  store i32 %35, i32* %16
-  br label %pym4
+16:                                               ; preds = %4
+  %17 = load i32, i32* %1
+  %18 = add i32 %17, 0
+  %19 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
+  %20 = getelementptr i32, i32* %19, i32 %18
+  store i32 0, i32* %20
+  %21 = alloca i32
+  %22 = alloca i32
+  store i32 0, i32* %1
+  br label %23
 
-pym6:                                             ; preds = %pym2
-  %36 = load i32, i32* %17
-  %37 = load i32, i32* %2
-  %38 = add i32 0, 1
-  %39 = sub i32 %37, %38
-  %40 = icmp eq i32 %36, %39
-  br i1 %40, label %pym7, label %pym8
+23:                                               ; preds = %136, %16
+  %24 = load i32, i32* %1
+  %25 = add i32 %24, 0
+  %26 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
+  %27 = getelementptr i32, i32* %26, i32 %25
+  %28 = load i32, i32* %27
+  %29 = icmp ne i32 %28, 0
+  br i1 %29, label %30, label %139
 
-pym7:                                             ; preds = %pym6
-  %41 = add i32 0, 0
-  %42 = mul i32 %41, 1
-  %43 = add i32 0, %42
-  %44 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %43
-  %45 = load i32, i32* %44
-  store i32 %45, i32* %20
-  %46 = add i32 0, 0
-  %47 = mul i32 %46, 1
-  %48 = add i32 0, %47
-  %49 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %48
-  %50 = load i32, i32* %16
-  %51 = load i32, i32* %2
-  %52 = sdiv i32 %50, %51
-  store i32 %52, i32* %49
-  br label %pym4
+30:                                               ; preds = %23
+  %31 = load i32, i32* %1
+  %32 = add i32 %31, 0
+  %33 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
+  %34 = getelementptr i32, i32* %33, i32 %32
+  %35 = load i32, i32* %34
+  store i32 %35, i32* %21
+  %36 = load i32, i32* %21
+  %37 = icmp eq i32 %36, 62
+  br i1 %37, label %38, label %41
 
-pym8:                                             ; preds = %pym6
-  %53 = load i32, i32* %16
-  %54 = load i32, i32* %17
-  %55 = mul i32 %54, 1
-  %56 = add i32 0, %55
-  %57 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %56
-  %58 = load i32, i32* %57
-  %59 = add i32 %53, %58
-  %60 = load i32, i32* %20
-  %61 = sub i32 %59, %60
-  store i32 %61, i32* %16
-  %62 = load i32, i32* %17
-  %63 = load i32, i32* %2
-  %64 = sub i32 %62, %63
-  %65 = add i32 0, 1
-  %66 = add i32 %64, %65
-  %67 = mul i32 %66, 1
-  %68 = add i32 0, %67
-  %69 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %68
-  %70 = load i32, i32* %69
-  store i32 %70, i32* %20
-  %71 = load i32, i32* %17
-  %72 = load i32, i32* %2
-  %73 = sub i32 %71, %72
-  %74 = add i32 0, 1
-  %75 = add i32 %73, %74
-  %76 = mul i32 %75, 1
-  %77 = add i32 0, %76
-  %78 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %77
-  %79 = load i32, i32* %16
-  %80 = load i32, i32* %2
-  %81 = sdiv i32 %79, %80
-  store i32 %81, i32* %78
-  br label %pym4
+38:                                               ; preds = %30
+  %39 = load i32, i32* @ptr
+  %40 = add i32 %39, 1
+  store i32 %40, i32* @ptr
+  br label %136
 
-pym4:                                             ; preds = %pym8, %pym7, %pym5
-  %82 = load i32, i32* %17
-  %83 = add i32 0, 1
-  %84 = add i32 %82, %83
-  store i32 %84, i32* %17
-  br label %pym1
+41:                                               ; preds = %30
+  %42 = load i32, i32* %21
+  %43 = icmp eq i32 %42, 60
+  br i1 %43, label %44, label %47
 
-pym3:                                             ; preds = %pym1
-  %85 = load i32, i32* @n
-  %86 = load i32, i32* %2
-  %87 = sub i32 %85, %86
-  %88 = add i32 0, 1
-  %89 = add i32 %87, %88
-  store i32 %89, i32* %17
-  br label %pym9
+44:                                               ; preds = %41
+  %45 = load i32, i32* @ptr
+  %46 = sub i32 %45, 1
+  store i32 %46, i32* @ptr
+  br label %135
 
-pym9:                                             ; preds = %pym10, %pym3
-  %90 = load i32, i32* %17
-  %91 = load i32, i32* @n
-  %92 = icmp slt i32 %90, %91
-  br i1 %92, label %pym10, label %pym11
+47:                                               ; preds = %41
+  %48 = load i32, i32* %21
+  %49 = icmp eq i32 %48, 43
+  br i1 %49, label %50, label %61
 
-pym10:                                            ; preds = %pym9
-  %93 = load i32, i32* %17
-  %94 = mul i32 %93, 1
-  %95 = add i32 0, %94
-  %96 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %95
-  %97 = add i32 0, 0
-  store i32 %97, i32* %96
-  %98 = load i32, i32* %17
-  %99 = add i32 0, 1
-  %100 = add i32 %98, %99
-  store i32 %100, i32* %17
-  br label %pym9
+50:                                               ; preds = %47
+  %51 = load i32, i32* @ptr
+  %52 = add i32 %51, 0
+  %53 = load i32, i32* @ptr
+  %54 = add i32 %53, 0
+  %55 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %56 = getelementptr i32, i32* %55, i32 %54
+  %57 = load i32, i32* %56
+  %58 = add i32 %57, 1
+  %59 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %60 = getelementptr i32, i32* %59, i32 %52
+  store i32 %58, i32* %60
+  br label %134
 
-pym11:                                            ; preds = %pym9
-  %101 = add i32 0, 0
-  store i32 %101, i32* %17
-  %102 = alloca i32
-  %103 = add i32 0, 0
-  store i32 %103, i32* %102
-  br label %pym12
+61:                                               ; preds = %47
+  %62 = load i32, i32* %21
+  %63 = icmp eq i32 %62, 45
+  br i1 %63, label %64, label %75
 
-pym12:                                            ; preds = %pym13, %pym11
-  %104 = load i32, i32* %17
-  %105 = add i32 0, 5
-  %106 = icmp slt i32 %104, %105
-  br i1 %106, label %pym13, label %pym14
+64:                                               ; preds = %61
+  %65 = load i32, i32* @ptr
+  %66 = add i32 %65, 0
+  %67 = load i32, i32* @ptr
+  %68 = add i32 %67, 0
+  %69 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %70 = getelementptr i32, i32* %69, i32 %68
+  %71 = load i32, i32* %70
+  %72 = sub i32 %71, 1
+  %73 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %74 = getelementptr i32, i32* %73, i32 %66
+  store i32 %72, i32* %74
+  br label %133
 
-pym13:                                            ; preds = %pym12
-  %107 = load i32, i32* %17
-  %108 = mul i32 %107, 1
-  %109 = add i32 0, %108
-  %110 = getelementptr [5 x i32], [5 x i32]* %4, i32 0, i32 %109
-  %111 = load i32, i32* %110
-  call void @putint(i32 %111)
-  %112 = load i32, i32* %17
-  %113 = add i32 0, 1
-  %114 = add i32 %112, %113
-  store i32 %114, i32* %17
-  br label %pym12
+75:                                               ; preds = %61
+  %76 = load i32, i32* %21
+  %77 = icmp eq i32 %76, 46
+  br i1 %77, label %78, label %84
 
-pym14:                                            ; preds = %pym12
-  %115 = add i32 0, 0
-  ret i32 %115
+78:                                               ; preds = %75
+  %79 = load i32, i32* @ptr
+  %80 = add i32 %79, 0
+  %81 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %82 = getelementptr i32, i32* %81, i32 %80
+  %83 = load i32, i32* %82
+  call void @putch(i32 %83)
+  br label %132
+
+84:                                               ; preds = %75
+  %85 = load i32, i32* %21
+  %86 = icmp eq i32 %85, 44
+  br i1 %86, label %87, label %93
+
+87:                                               ; preds = %84
+  %88 = load i32, i32* @ptr
+  %89 = add i32 %88, 0
+  %90 = call i32 @getch()
+  %91 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %92 = getelementptr i32, i32* %91, i32 %89
+  store i32 %90, i32* %92
+  br label %131
+
+93:                                               ; preds = %84
+  %94 = load i32, i32* %21
+  %95 = icmp eq i32 %94, 93
+  %96 = load i32, i32* @ptr
+  %97 = add i32 %96, 0
+  %98 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %99 = getelementptr i32, i32* %98, i32 %97
+  %100 = load i32, i32* %99
+  %101 = zext i1 %95 to i32
+  %102 = and i32 %101, %100
+  %103 = icmp ne i32 %102, 0
+  br i1 %103, label %104, label %130
+
+104:                                              ; preds = %93
+  store i32 1, i32* %22
+  br label %105
+
+105:                                              ; preds = %128, %104
+  %106 = load i32, i32* %22
+  %107 = icmp sgt i32 %106, 0
+  br i1 %107, label %108, label %129
+
+108:                                              ; preds = %105
+  %109 = load i32, i32* %1
+  %110 = sub i32 %109, 1
+  store i32 %110, i32* %1
+  %111 = load i32, i32* %1
+  %112 = add i32 %111, 0
+  %113 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
+  %114 = getelementptr i32, i32* %113, i32 %112
+  %115 = load i32, i32* %114
+  store i32 %115, i32* %21
+  %116 = load i32, i32* %21
+  %117 = icmp eq i32 %116, 91
+  br i1 %117, label %118, label %121
+
+118:                                              ; preds = %108
+  %119 = load i32, i32* %22
+  %120 = sub i32 %119, 1
+  store i32 %120, i32* %22
+  br label %128
+
+121:                                              ; preds = %108
+  %122 = load i32, i32* %21
+  %123 = icmp eq i32 %122, 93
+  br i1 %123, label %124, label %127
+
+124:                                              ; preds = %121
+  %125 = load i32, i32* %22
+  %126 = add i32 %125, 1
+  store i32 %126, i32* %22
+  br label %127
+
+127:                                              ; preds = %124, %121
+  br label %128
+
+128:                                              ; preds = %127, %118
+  br label %105
+
+129:                                              ; preds = %105
+  br label %130
+
+130:                                              ; preds = %129, %93
+  br label %131
+
+131:                                              ; preds = %130, %87
+  br label %132
+
+132:                                              ; preds = %131, %78
+  br label %133
+
+133:                                              ; preds = %132, %64
+  br label %134
+
+134:                                              ; preds = %133, %50
+  br label %135
+
+135:                                              ; preds = %134, %44
+  br label %136
+
+136:                                              ; preds = %135, %38
+  %137 = load i32, i32* %1
+  %138 = add i32 %137, 1
+  store i32 %138, i32* %1
+  br label %23
+
+139:                                              ; preds = %23
+  ret i32 0
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable

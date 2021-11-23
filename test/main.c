@@ -1,18 +1,51 @@
-int field[2];
+const int TAPE_LEN = 65536, BUFFER_LEN = 32768;
+int       tape[TAPE_LEN], program[BUFFER_LEN], ptr = 0;
+
 int main() {
-    int i[1];
-    int j[3];
-    int k;
-    k = getint();
-        field[0] = getint();
-    field[1] = getint();
-
-    j[0 + 0] = -1;
-    j[1]     = j[0] - 2;
-    k        = j[1];
-    j[2]     = 16;
-
-    putint(j[3 - field[0]] + 2 + k);
-
+    int i = 0, len = getint();
+    while (i < len) {
+        program[i] = getch();
+        i          = i + 1;
+    }
+    program[i] = 0;
+    int cur_char, loop;
+    i = 0;
+    while (program[i]) {
+        cur_char = program[i];
+        if (cur_char == 62) {
+            // '>'
+            ptr = ptr + 1;
+        } else if (cur_char == 60) {
+            // '<'
+            ptr = ptr - 1;
+        } else if (cur_char == 43) {
+            // '+'
+            tape[ptr] = tape[ptr] + 1;
+        } else if (cur_char == 45) {
+            // '-'
+            tape[ptr] = tape[ptr] - 1;
+        } else if (cur_char == 46) {
+            // '.'
+            putch(tape[ptr]);
+        } else if (cur_char == 44) {
+            // ','
+            tape[ptr] = getch();
+        } else if (cur_char == 93 && tape[ptr]) {
+            // ']'
+            loop = 1;
+            while (loop > 0) {
+                i        = i - 1;
+                cur_char = program[i];
+                if (cur_char == 91) {
+                    // '['
+                    loop = loop - 1;
+                } else if (cur_char == 93) {
+                    // ']'
+                    loop = loop + 1;
+                }
+            }
+        }
+        i = i + 1;
+    }
     return 0;
 }

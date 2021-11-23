@@ -109,7 +109,7 @@ public class Utils {
     public static String allocateGlobalVariableOutput(Token token, int value, int kind, Boolean isCommon,int arrayAddr) throws CompileException {
         String retStr = "";
         retStr += token.getValue(); retStr += " = ";
-        retStr += (isCommon||(kind<2))?"common ":""; retStr += "dso_local ";
+        retStr += (isCommon&&(kind<2))?"common ":""; retStr += "dso_local ";
         retStr += kind == 0||kind == 4?"global ":"constant ";
         if(kind ==3||kind ==4){
             SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
