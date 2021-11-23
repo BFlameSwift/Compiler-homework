@@ -32,10 +32,7 @@ int main() {
             tape[ptr] = tape[ptr] - 1;
         } else if (cur_char == 46) {
             // '.'
-            putch(tape[ptr]);
-        } else if (cur_char == 44) {
-            // ','
-            tape[ptr] = getch();
+            putint(tape[ptr]);
         } else if (cur_char == 93 && tape[ptr]) {
             // ']'
             loop = 1;
