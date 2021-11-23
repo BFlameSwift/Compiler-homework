@@ -368,7 +368,6 @@ public class Parser {
         }
         else if(token.getLexcial() == Lexical.WHILE_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
-            System.out.println("!!!!! in while");
             Utils.endBlockJumpOutput();int beginCondLoca = midCodeOut.size()-1; int beginCondLabel = Utils.nextLabel();
             Analysis.replacePreciseStr(midCodeOut,beginCondLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
             int condAddr = parseCond();
@@ -396,7 +395,6 @@ public class Parser {
                     throw new CompileException("not continue break!!!");
                 }
             }
-            System.out.println("!!!!! out while");
         }
         else if(token.getLexcial() == Lexical.CONTINUE_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);

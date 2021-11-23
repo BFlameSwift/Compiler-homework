@@ -77,7 +77,7 @@ public class Lexical {
                 //TODO System.out.println(thisStr);
 //                System.out.println("无效word："+thisStr);
                 words.add("非法字符"); //  必定非法的字符
-                
+
 //                return false;
             }
             if(isIdentifier(thisStr)){
@@ -185,7 +185,7 @@ public class Lexical {
         boolean hasError = false;
         while (scanner.hasNextLine()&&!hasError){//逐行读取文件内容
             String line = scanner.nextLine();
-            System.out.println(line);
+//            System.out.println(line);
             hasError = processLine(line,words);
         }
         for (String word : words){
