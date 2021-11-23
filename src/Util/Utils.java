@@ -254,14 +254,16 @@ public class Utils {
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
         SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
         ArrayList<Integer> valueAddrList = valueItem.arrayAddrList;
+        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+"%"+arrayItem.getAddress()+", i32 0, i32 0");
+        arrayItem.setLoadAddress(nowAddress);
         int len  = valueAddrList.size();
         for(int i = 0; i < len; i++){
-            System.out.println("arr addr:"+valueAddrList.get(i));
-            System.out.println("    load addr"+getSymbolItemByAddress(valueAddrList.get(i)).getLoadAddress());
+//            System.out.println("arr addr:"+valueAddrList.get(i));
+//            System.out.println("    load addr"+getSymbolItemByAddress(valueAddrList.get(i)).getLoadAddress());
             String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%";
             putAddressSymbol(nowAddress,new SymbolItem(null,-2));
-            str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getAddress();
-            str += ", i32 0, i32 "+i;
+            str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
+            str += ", i32 "+i;
             Parser.midCodeOut.add(str);
             Parser.midCodeOut.add(storeVariableOutput(valueAddrList.get(i),nowAddress));
         }
