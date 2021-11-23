@@ -25,10 +25,10 @@ public class Utils {
     private static int blockIndex = 0;
 //    private static int blockMaxIndex = 0;
 //    private static int thisFunctionBlockIndex = -1;
-    private static final int CONST_BEGIN_ADDRESS = -1000000;
+    private static final int CONST_BEGIN_ADDRESS = -2147483647;
     private static int constAddress = CONST_BEGIN_ADDRESS;
     private static int nowAddress = 0;
-    public static final int GLOBAL_BEGIN_ADDRESS = -10000;
+    public static final int GLOBAL_BEGIN_ADDRESS = -1000000;
     private static int globalAddress = GLOBAL_BEGIN_ADDRESS;
     private static final String DEFAULT_GLOABL_FUNCTION_NAME = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
     private static String nowFunctionName = DEFAULT_GLOABL_FUNCTION_NAME ;
