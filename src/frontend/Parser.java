@@ -134,9 +134,9 @@ public class Parser {
                 else list.add(parseExp());
             }
         }
-            for(int i=0;i<list.size();i++){
-                System.out.printf("%d ",(Utils.getSymbolItemByAddress(list.get(i))).getValueInt());
-            }System.out.println();
+//            for(int i=0;i<list.size();i++){
+//                System.out.printf("%d ",(Utils.getSymbolItemByAddress(list.get(i))).getValueInt());
+//            }System.out.println();
 
         return Utils.makeConstArray(null,3,dismension,list);
     }

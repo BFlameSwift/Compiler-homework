@@ -258,11 +258,11 @@ public class Utils {
     }
     public static int getArrayElemAddr(int arrayAddr,int locationAddr) throws CompileException {
         SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
-        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+"%"+arrayItem.getAddress()+", i32 0, i32 0");
-//        arrayItem.setAddress( nowAddress);
-        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%";
+        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 0");
+        arrayItem.setLoadAddress( nowAddress);
+        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
         putAddressSymbol(nowAddress,new SymbolItem(null,-2));
-        str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
+//        str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
         SymbolItem locationItem = getSymbolItemByAddress(locationAddr);
         str += ", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr);
         Parser.midCodeOut.add(str);
@@ -325,8 +325,8 @@ public class Utils {
     }
     public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
-        int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue; // 判断新地址的是不是变量 0 是变量，1不是变量
-        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
+        int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
+//        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
             condI1ToI32(address1); condI1ToI32(address2);
         }

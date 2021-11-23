@@ -25,7 +25,7 @@ public class SymbolItem {
     public ArrayList<Integer> arrayAddrList;
     public int getValueInt() throws CompileException {
         if (valueInt == NOT_ASSIGN){
-            throw new CompileException("this symbol"+name+ "is not assign value!!! cant read");
+            throw new CompileException("this symbol "+name+" address  " +address+" not assign value!!! cant read");
         }
         return valueInt;
     }
