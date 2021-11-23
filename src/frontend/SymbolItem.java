@@ -35,19 +35,25 @@ public class SymbolItem {
     }
     public int addrListTransLocation(ArrayList<Integer> list) throws CompileException {
         if(list.size() != parametersList.size()){
+            System.out.println("list");
+            for(int item:list) System.out.printf("%d ",item);
+            System.out.println("parametersList");
+            for(int item:parametersList) System.out.printf("%d ",item);
+            System.out.println("array.name = "+name);
             throw new CompileException("array size not match");
-        }
-        ArrayList<Integer> valueList = new ArrayList<Integer>();
-        for (int addr :list){
-            valueList.add(Utils.getSymbolItemByAddress(addr).getValueInt());
         }
         ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(parametersList);
         int ret = 0;
-        for(int i=0;i<valueList.size()-1;i++){
-            ret += valueList.get(i)*satisfiedList.get(i+1);
-        }ret += valueList.get(valueList.size()-1);
-        System.out.println("ret addr："+ret);
-        return ret;
+        int  distination= Utils.allocateConst(0);
+        for(int i=0;i<list.size()-1;i++){
+            int addItemAddr = Utils.midExpCalculate("mul",list.get(i),Utils.allocateConst(satisfiedList.get(i+1)));
+            distination = Utils.midExpCalculate("add",addItemAddr,distination);
+        }distination = Utils.midExpCalculate("add",list.get(list.size()-1),distination);
+//        for(int i=0;i<valueList.size()-1;i++){
+//            ret += valueList.get(i)*satisfiedList.get(i+1);
+//        }ret += valueList.get(valueList.size()-1);
+        System.out.println("ret addr："+distination+" ret value"+Utils.getSymbolItemByAddress(distination));
+        return distination;
     }
     private int address = 0;
     private int loadAddress = 0;
@@ -75,6 +81,7 @@ public class SymbolItem {
     }
 
     public void setAddress(int address) {
+//        Utils.putAddressSymbol(address,this);
         this.loadAddress = address;
         this.address = address;
     }
@@ -124,7 +131,14 @@ public class SymbolItem {
             out += "This is a const:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
         }else if(kind == 0){
             out += "This is a Variable:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
-        }else{
+        }else if(kind == 2){
+            out += "This is a Function:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
+        }else if(kind == 3){
+            out += "This is a Const Array:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
+        }else if(kind ==4){
+            out += "This is a Variable Array:"+name+" value = "+valueInt+ "in address:"+address+"load addr"+loadAddress;
+        }
+        else{
             out += "not a const or var";
         }
         if(isCond) out += "   cond";
@@ -153,6 +167,15 @@ public class SymbolItem {
             e.printStackTrace();
             for(String str : Parser.midCodeOut){
                 System.out.println(str);
+            }ArrayList<String> itemList = new ArrayList<String>();
+            for(int i=1;i<Utils.getNowAddress();i++){
+                try {
+                    itemList.add(i+" ."+Utils.getSymbolItemByAddress(i).output());
+                }catch (IllegalArgumentException e1){
+                    itemList.add(i+"null");
+                }catch (NullPointerException r){
+                    itemList.add(i+"null");
+                }
             }
             System.exit(-1);
         }

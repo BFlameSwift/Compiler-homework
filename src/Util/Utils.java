@@ -139,16 +139,21 @@ public class Utils {
 
         Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon,arrayAddr));
     }
-    public static int allocateVariable(Token token, int kind, String funcName) throws Util.CompileException {
+    public static int allocateVariable(Token token, int kind,ArrayList<Integer> dismension, String funcName) throws Util.CompileException {
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.blockIndex = getBlockIndex();
         symbolItem.setAddress((++nowAddress));
-
-//        nowAddress ++;
-
-
+        symbolItem.parametersList = dismension;
+        int len = 1;
+        if(kind ==4){ // 是变量数组的话
+            symbolItem.arrayAddrList = new ArrayList<Integer>();
+            for(int i:dismension){
+                len*= i;
+            }symbolItem.length = len;
+            for(int i=0;i<len;i++) symbolItem.arrayAddrList.add(Utils.allocateConst(0));
+        }
         putAddressSymbol(nowAddress,symbolItem);
         Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
         putallocalSymbolTable(symbolItem,funcName);
@@ -247,17 +252,19 @@ public class Utils {
         else item.setAddress((++nowAddress));
         putAddressSymbol(item.getAddress(),item);
         Parser.midCodeOut.add(allocateVariableOutput(item.getAddress()));
+
         storeArrayOutput(item.getAddress(),arrayValueAddr);
         return item.getAddress();
     }
-    public static int getArrayElemAddr(int arrayAddr,int location) throws CompileException {
+    public static int getArrayElemAddr(int arrayAddr,int locationAddr) throws CompileException {
         SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
         Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+"%"+arrayItem.getAddress()+", i32 0, i32 0");
-        arrayItem.setAddress(++ nowAddress);
+//        arrayItem.setAddress( nowAddress);
         String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%";
         putAddressSymbol(nowAddress,new SymbolItem(null,-2));
         str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
-        str += ", i32 "+location;
+        SymbolItem locationItem = getSymbolItemByAddress(locationAddr);
+        str += ", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr);
         Parser.midCodeOut.add(str);
         return nowAddress;
     }

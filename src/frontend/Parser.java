@@ -188,7 +188,7 @@ public class Parser {
             if(Utils.isGlobal()){
                 Utils.allocateGlobalVariable(identToken,0,atom!=0?4:0,true,Utils.makeEmptyArray(arrayDismension));
             }else{
-                    varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, Utils.getNowFunction());
+                    varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, arrayDismension,Utils.getNowFunction());
             }
             Token.previousToken();
             return;
@@ -203,7 +203,7 @@ public class Parser {
             return;
         }
         if(atom ==0){
-            varAddr = Utils.allocateVariable(identToken,0, Utils.getNowFunction());
+            varAddr = Utils.allocateVariable(identToken,0,arrayDismension, Utils.getNowFunction());
             varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
             midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         }else{
@@ -288,7 +288,9 @@ public class Parser {
             return 1;
         }
         else if(Token.isIdent(token.getLexcial())){
-            if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
+            if(Token.isAssign(Token.getNextToken().getLexcial())){ // =
+                Token.nextToken("=");
+                //SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
                 int expAddr = parseExp();
                 int varAddr = Utils.storeVariable(token, Utils.getSymbolItemByAddress(expAddr).getValueInt());
                 midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
@@ -297,28 +299,27 @@ public class Parser {
                 SymbolItem array = Utils.getSymbolItem(token);
                 ArrayList<Integer> getAddrList = new ArrayList<Integer>();
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
-                    getAddrList.add(parseConstExp());
+                    getAddrList.add(parseExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }Token.previousToken();
-                int location = array.addrListTransLocation(getAddrList);
+                int locationAddr = array.addrListTransLocation(getAddrList);
 
                 if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
                     int expAddr = parseExp();
-                    int varAddr = Utils.getArrayElemAddr(array.getAddress(),location);
-                    array.arrayAddrList.set(location,expAddr);
+                    int varAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
+                    array.arrayAddrList.set(Utils.getSymbolItemByAddress(locationAddr).getValueInt(),expAddr);
                     midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
-                    Token.exceptNextToken(Lexical.SEMICOLON);
-                    
+
                 }
             }
             else {
-                Token.previousToken();
+
                 Token.previousToken();
                 if(!Token.isSemicolon(Token.getNextToken().getLexcial())) {
                     parseExp();
+                 }
+                Token.exceptNextToken(Lexical.SEMICOLON);
             }
-            Token.exceptNextToken(Lexical.SEMICOLON);
-       }
         }
         else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
@@ -547,16 +548,17 @@ public class Parser {
                 SymbolItem array = Utils.getSymbolItem(token);
                 ArrayList<Integer> getAddrList = new ArrayList<Integer>();
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
-                    getAddrList.add(parseConstExp());
+                    getAddrList.add(parseExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }Token.previousToken();
-                return array.arrayAddrList.get(array.addrListTransLocation(getAddrList));
+                int locationAddr = array.addrListTransLocation((getAddrList));
+                return Utils.getArrayElemAddr(array.getAddress(),locationAddr);
             }
 
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());
         }
         else{
-            throw new CompileException("Parser Error is not ( or Number in PrimaryExp");
+            throw new CompileException("Parser Error "+token.getValue()+" is not ( or Number in PrimaryExp");
         }
 
     }
