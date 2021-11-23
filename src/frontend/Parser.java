@@ -304,10 +304,11 @@ public class Parser {
 
                 if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
                     int expAddr = parseExp();
-
-                    int varAddr = array.arrayAddrList.get(location);
+                    int varAddr = Utils.getArrayElemAddr(array.getAddress(),location);
+                    array.arrayAddrList.set(location,expAddr);
                     midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
                     Token.exceptNextToken(Lexical.SEMICOLON);
+                    
                 }
             }
             else {

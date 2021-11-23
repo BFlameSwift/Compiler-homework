@@ -250,6 +250,17 @@ public class Utils {
         storeArrayOutput(item.getAddress(),arrayValueAddr);
         return item.getAddress();
     }
+    public static int getArrayElemAddr(int arrayAddr,int location) throws CompileException {
+        SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
+        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+"%"+arrayItem.getAddress()+", i32 0, i32 0");
+        arrayItem.setAddress(++ nowAddress);
+        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%";
+        putAddressSymbol(nowAddress,new SymbolItem(null,-2));
+        str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
+        str += ", i32 "+location;
+        Parser.midCodeOut.add(str);
+        return nowAddress;
+    }
     public static void storeArrayOutput(int arrayAddr,int valueAddr) throws CompileException {
         SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
         SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
