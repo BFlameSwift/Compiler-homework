@@ -333,9 +333,10 @@ public class Utils {
     }
     public static int condI32ToI1(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
+
         if(!item1.isCond){
-//            %99 = icmp ne i32 %98, 0
-            Parser.midCodeOut.add("%"+(++nowAddress)+" = icmp ne i32"+" %"+address+", 0");
+
+            Parser.midCodeOut.add("%"+(++nowAddress)+" = icmp ne i32"+" %"+item1.getLoadAddress()+", 0");
 //            Parser.midCodeOut.add("%"+(++nowAddress)+"= zext i1 %"+(address)+" to i32");
             putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
             item1.setLoadAddress(nowAddress);
@@ -347,6 +348,7 @@ public class Utils {
         if(item1.type == 3){
             SymbolItem theSymbolItem = new SymbolItem(item1.name,0, item1.type,item1.blockIndex);
             putAddressSymbol((++nowAddress),theSymbolItem);
+            item1.setLoadAddress(nowAddress);
             String outStr = "%"+(nowAddress)+" = load i32, i32* "+((item1.isGlobal())?(item1.name):("%"+item1.getAddress()));
             Parser.midCodeOut.add(outStr);
             item1 = theSymbolItem;
@@ -354,8 +356,9 @@ public class Utils {
         return item1.getAddress();
     }
     public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
-        SymbolItem item1 = getSymbolItemByAddress(loadPointer(address1)),item2 = getSymbolItemByAddress(loadPointer(address2));
-
+        SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
+        item1 = Utils.getSymbolItemByAddress(loadPointer(address1));item2 = Utils.getSymbolItemByAddress(loadPointer(address2));
+        address1 = item1.getAddress(); address2 = item2.getAddress();
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
@@ -367,19 +370,17 @@ public class Utils {
 //        int objAddress = nowAddress;
         if(objKind == 0||item1.isCond){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
-
             String outStr = "%"+objAddress+" = ";
-            outStr += Token.isCond(op)?"icmp "+op+" i32 ":op+" i32 ";
+            outStr += Token.isCond(op)?"icmp "+op+" i32 " :(op+((op=="and"||op=="or")?" i1 ":" i32 "));
 
             outStr += (item1.kind == 1)?item1.getValueInt():(!item1.isGlobal())?"%"+item1.getLoadAddress():item1.name;
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.getValueInt():(!item2.isGlobal())?"%"+item2.getLoadAddress():item2.name;
             Parser.midCodeOut.add(outStr);
-            if(Token.isCond(op)){
+            if(Token.isCond(op) || op == "and"||op=="or" ){
                 objIsCond = true;
 //                Parser.midCodeOut.add("%"+Utils.enterIfStmt()+" = zext i1 %"+(Utils.getNowAddress()-1)+" to i32");
             }
-
         }
         putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue,objIsCond));
 
@@ -428,8 +429,6 @@ public class Utils {
         }
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex())); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress+1);
-
-
         return "%"+(++nowAddress)+" = load i32, i32* "+((theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress()));
     }
     public static int enterIfStmt(){

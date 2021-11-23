@@ -51,14 +51,14 @@ define dso_local i32 @main() {
   store i32 0, i32* %1
   br label %23
 
-23:                                               ; preds = %126, %16
+23:                                               ; preds = %135, %16
   %24 = load i32, i32* %1
   %25 = add i32 %24, 0
   %26 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
   %27 = getelementptr i32, i32* %26, i32 %25
   %28 = load i32, i32* %27
   %29 = icmp ne i32 %28, 0
-  br i1 %29, label %30, label %129
+  br i1 %29, label %30, label %138
 
 30:                                               ; preds = %23
   %31 = load i32, i32* %1
@@ -75,7 +75,7 @@ define dso_local i32 @main() {
   %39 = load i32, i32* @ptr
   %40 = add i32 %39, 1
   store i32 %40, i32* @ptr
-  br label %126
+  br label %135
 
 41:                                               ; preds = %30
   %42 = load i32, i32* %21
@@ -86,7 +86,7 @@ define dso_local i32 @main() {
   %45 = load i32, i32* @ptr
   %46 = sub i32 %45, 1
   store i32 %46, i32* @ptr
-  br label %125
+  br label %134
 
 47:                                               ; preds = %41
   %48 = load i32, i32* %21
@@ -105,7 +105,7 @@ define dso_local i32 @main() {
   %59 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
   %60 = getelementptr i32, i32* %59, i32 %52
   store i32 %58, i32* %60
-  br label %124
+  br label %133
 
 61:                                               ; preds = %47
   %62 = load i32, i32* %21
@@ -124,7 +124,7 @@ define dso_local i32 @main() {
   %73 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
   %74 = getelementptr i32, i32* %73, i32 %66
   store i32 %72, i32* %74
-  br label %123
+  br label %132
 
 75:                                               ; preds = %61
   %76 = load i32, i32* %21
@@ -137,93 +137,109 @@ define dso_local i32 @main() {
   %81 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
   %82 = getelementptr i32, i32* %81, i32 %80
   %83 = load i32, i32* %82
-  call void @putint(i32 %83)
-  br label %122
+  call void @putch(i32 %83)
+  br label %131
 
 84:                                               ; preds = %75
   %85 = load i32, i32* %21
-  %86 = icmp eq i32 %85, 93
-  %87 = load i32, i32* @ptr
-  %88 = add i32 %87, 0
-  %89 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
-  %90 = getelementptr i32, i32* %89, i32 %88
-  %91 = load i32, i32* %90
-  %92 = zext i1 %86 to i32
-  %93 = and i32 %92, %91
-  %94 = icmp ne i32 %93, 0
-  br i1 %94, label %95, label %121
+  %86 = icmp eq i32 %85, 44
+  br i1 %86, label %87, label %93
 
-95:                                               ; preds = %84
+87:                                               ; preds = %84
+  %88 = load i32, i32* @ptr
+  %89 = add i32 %88, 0
+  %90 = call i32 @getch()
+  %91 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %92 = getelementptr i32, i32* %91, i32 %89
+  store i32 %90, i32* %92
+  br label %130
+
+93:                                               ; preds = %84
+  %94 = load i32, i32* %21
+  %95 = icmp eq i32 %94, 93
+  %96 = load i32, i32* @ptr
+  %97 = add i32 %96, 0
+  %98 = getelementptr [65536 x i32], [65536 x i32]* @tape, i32 0, i32 0
+  %99 = getelementptr i32, i32* %98, i32 %97
+  %100 = load i32, i32* %99
+  %101 = icmp ne i32 %100, 0
+  %102 = and i1 %95, %101
+  br i1 %102, label %103, label %129
+
+103:                                              ; preds = %93
   store i32 1, i32* %22
-  br label %96
+  br label %104
 
-96:                                               ; preds = %119, %95
-  %97 = load i32, i32* %22
-  %98 = icmp sgt i32 %97, 0
-  br i1 %98, label %99, label %120
+104:                                              ; preds = %127, %103
+  %105 = load i32, i32* %22
+  %106 = icmp sgt i32 %105, 0
+  br i1 %106, label %107, label %128
 
-99:                                               ; preds = %96
-  %100 = load i32, i32* %1
-  %101 = sub i32 %100, 1
-  store i32 %101, i32* %1
-  %102 = load i32, i32* %1
-  %103 = add i32 %102, 0
-  %104 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
-  %105 = getelementptr i32, i32* %104, i32 %103
-  %106 = load i32, i32* %105
-  store i32 %106, i32* %21
-  %107 = load i32, i32* %21
-  %108 = icmp eq i32 %107, 91
-  br i1 %108, label %109, label %112
+107:                                              ; preds = %104
+  %108 = load i32, i32* %1
+  %109 = sub i32 %108, 1
+  store i32 %109, i32* %1
+  %110 = load i32, i32* %1
+  %111 = add i32 %110, 0
+  %112 = getelementptr [32768 x i32], [32768 x i32]* @program, i32 0, i32 0
+  %113 = getelementptr i32, i32* %112, i32 %111
+  %114 = load i32, i32* %113
+  store i32 %114, i32* %21
+  %115 = load i32, i32* %21
+  %116 = icmp eq i32 %115, 91
+  br i1 %116, label %117, label %120
 
-109:                                              ; preds = %99
-  %110 = load i32, i32* %22
-  %111 = sub i32 %110, 1
-  store i32 %111, i32* %22
-  br label %119
+117:                                              ; preds = %107
+  %118 = load i32, i32* %22
+  %119 = sub i32 %118, 1
+  store i32 %119, i32* %22
+  br label %127
 
-112:                                              ; preds = %99
-  %113 = load i32, i32* %21
-  %114 = icmp eq i32 %113, 93
-  br i1 %114, label %115, label %118
+120:                                              ; preds = %107
+  %121 = load i32, i32* %21
+  %122 = icmp eq i32 %121, 93
+  br i1 %122, label %123, label %126
 
-115:                                              ; preds = %112
-  %116 = load i32, i32* %22
-  %117 = add i32 %116, 1
-  store i32 %117, i32* %22
-  br label %118
-
-118:                                              ; preds = %115, %112
-  br label %119
-
-119:                                              ; preds = %118, %109
-  br label %96
-
-120:                                              ; preds = %96
-  br label %121
-
-121:                                              ; preds = %120, %84
-  br label %122
-
-122:                                              ; preds = %121, %78
-  br label %123
-
-123:                                              ; preds = %122, %64
-  br label %124
-
-124:                                              ; preds = %123, %50
-  br label %125
-
-125:                                              ; preds = %124, %44
+123:                                              ; preds = %120
+  %124 = load i32, i32* %22
+  %125 = add i32 %124, 1
+  store i32 %125, i32* %22
   br label %126
 
-126:                                              ; preds = %125, %38
-  %127 = load i32, i32* %1
-  %128 = add i32 %127, 1
-  store i32 %128, i32* %1
+126:                                              ; preds = %123, %120
+  br label %127
+
+127:                                              ; preds = %126, %117
+  br label %104
+
+128:                                              ; preds = %104
+  br label %129
+
+129:                                              ; preds = %128, %93
+  br label %130
+
+130:                                              ; preds = %129, %87
+  br label %131
+
+131:                                              ; preds = %130, %78
+  br label %132
+
+132:                                              ; preds = %131, %64
+  br label %133
+
+133:                                              ; preds = %132, %50
+  br label %134
+
+134:                                              ; preds = %133, %44
+  br label %135
+
+135:                                              ; preds = %134, %38
+  %136 = load i32, i32* %1
+  %137 = add i32 %136, 1
+  store i32 %137, i32* %1
   br label %23
 
-129:                                              ; preds = %23
+138:                                              ; preds = %23
   ret i32 0
 }
 
