@@ -261,7 +261,8 @@ public class Utils {
         Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 0");
         arrayItem.setLoadAddress( nowAddress);
         String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
-        putAddressSymbol(nowAddress,new SymbolItem(null,-2));
+        putAddressSymbol(nowAddress,new SymbolItem(null,-2,3,0,null));
+
 //        str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
         SymbolItem locationItem = getSymbolItemByAddress(locationAddr);
         str += ", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr);
@@ -307,7 +308,7 @@ public class Utils {
     }
 
     public static String storeVariableOutput(int valueAddr,int varAddr) throws Util.CompileException {
-        SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
+        SymbolItem valueItem = getSymbolItemByAddress(loadPointer(valueAddr));
         SymbolItem varItem = getSymbolItemByAddress(varAddr);
         String retStr = "store i32 ";
         retStr += valueItem.kind == 1?valueItem.getValueInt():"%"+valueItem.getLoadAddress();
@@ -323,8 +324,20 @@ public class Utils {
         }
         return nowAddress;
     }
+    public static int loadPointer(int address) throws CompileException {
+        SymbolItem item1 = getSymbolItemByAddress(address);
+        if(item1.type == 3){
+            SymbolItem theSymbolItem = new SymbolItem(item1.name,0, item1.type,item1.blockIndex);
+            putAddressSymbol((++nowAddress),theSymbolItem);
+            String outStr = "%"+(nowAddress)+" = load i32, i32* "+((item1.isGlobal())?(item1.name):("%"+item1.getAddress()));
+            Parser.midCodeOut.add(outStr);
+            item1 = theSymbolItem;
+        }
+        return item1.getAddress();
+    }
     public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
-        SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
+        SymbolItem item1 = getSymbolItemByAddress(loadPointer(address1)),item2 = getSymbolItemByAddress(loadPointer(address2));
+
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
 //        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){

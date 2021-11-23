@@ -15,7 +15,7 @@ public class SymbolItem {
     public static final int ADDRESS_NOT_ASSIGN = 0;
     public String name;
     public int kind; // var 0,const 1,function 2,const array 3,var array 4
-    public int type; // void 0 int 1,label 2;
+    public int type; // void 0 int 1,label 2,pointer 3;
     public Boolean isCond = false;
     public Boolean isLabel = false;
     private int valueInt;
@@ -75,7 +75,7 @@ public class SymbolItem {
 
     public int getAddress() throws CompileException {
         if( address == 0) {
-            throw new CompileException("Address is not assign");
+            throw new CompileException(name+" Address is not assign");
         }
         return address;
     }
