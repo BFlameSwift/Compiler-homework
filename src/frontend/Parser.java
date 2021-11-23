@@ -40,7 +40,7 @@ public class Parser {
             parseVarDecl();
         }
     }
-    //    ConstDecl    -> 'const' BType ConstDef { ',' ConstDef } ';'
+    //    ConstDecl    -> '' BType ConstDef { ',' ConstDef } ';'
     public static void parseConstDecl() throws CompileException {
         Token.exceptNextToken(Lexical.CONST_DEC);
 
@@ -323,6 +323,7 @@ public class Parser {
         else if(token.getLexcial() == Lexical.IF_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
             int condAddr = parseCond();
+            System.out.println("condAddr !!!!!"+condAddr);
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
             Utils.beforejudgeCondition(condAddr);
             Utils.readyJump();

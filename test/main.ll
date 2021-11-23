@@ -47,7 +47,7 @@ br label %23
 %27 = getelementptr i32,i32* %26, i32 %25
 %28 = load i32, i32* %27
 %29 = icmp ne i32 %28, 0
-br i1 %29, label %30, label %129
+br i1 %29, label %30, label %139
 30:
 %31 = load i32, i32* %1
 %32 = add i32 %31, 0
@@ -62,7 +62,7 @@ br i1 %37, label %38, label %41
 %39 = load i32, i32* @ptr
 %40 = add i32 %39, 1
 store i32 %40, i32* @ptr
-br label %126
+br label %136
 41:
 %42 = load i32, i32* %21
 %43 = icmp eq i32 %42, 60
@@ -71,7 +71,7 @@ br i1 %43, label %44, label %47
 %45 = load i32, i32* @ptr
 %46 = sub i32 %45, 1
 store i32 %46, i32* @ptr
-br label %125
+br label %135
 47:
 %48 = load i32, i32* %21
 %49 = icmp eq i32 %48, 43
@@ -88,7 +88,7 @@ br i1 %49, label %50, label %61
 %59 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
 %60 = getelementptr i32,i32* %59, i32 %52
 store i32 %58, i32* %60
-br label %124
+br label %134
 61:
 %62 = load i32, i32* %21
 %63 = icmp eq i32 %62, 45
@@ -105,7 +105,7 @@ br i1 %63, label %64, label %75
 %73 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
 %74 = getelementptr i32,i32* %73, i32 %66
 store i32 %72, i32* %74
-br label %123
+br label %133
 75:
 %76 = load i32, i32* %21
 %77 = icmp eq i32 %76, 46
@@ -116,75 +116,89 @@ br i1 %77, label %78, label %84
 %81 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
 %82 = getelementptr i32,i32* %81, i32 %80
 %83 = load i32, i32* %82
-call void @putint( i32 %83)
-br label %122
+call void @putch( i32 %83)
+br label %132
 84:
 %85 = load i32, i32* %21
-%86 = icmp eq i32 %85, 93
-%87 = load i32, i32* @ptr
-%88 = add i32 %87, 0
-%89 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
-%90 = getelementptr i32,i32* %89, i32 %88
-%91 = load i32, i32* %90
-%92= zext i1 %86 to i32
-%93 = and i32 %92, %91
-%94 = icmp ne i32 %93, 0
-br i1 %94, label %95, label %121
-95:
+%86 = icmp eq i32 %85, 44
+br i1 %86, label %87, label %93
+87:
+%88 = load i32, i32* @ptr
+%89 = add i32 %88, 0
+%90 = call i32 @getch()
+%91 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
+%92 = getelementptr i32,i32* %91, i32 %89
+store i32 %90, i32* %92
+br label %131
+93:
+%94 = load i32, i32* %21
+%95 = icmp eq i32 %94, 93
+%96 = load i32, i32* @ptr
+%97 = add i32 %96, 0
+%98 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
+%99 = getelementptr i32,i32* %98, i32 %97
+%100 = load i32, i32* %99
+%101= zext i1 %95 to i32
+%102 = and i32 %101, %100
+%103 = icmp ne i32 %102, 0
+br i1 %103, label %104, label %130
+104:
 store i32 1, i32* %22
-br label %96
-96:
-%97 = load i32, i32* %22
-%98 = icmp sgt i32 %97, 0
-br i1 %98, label %99, label %120
-99:
-%100 = load i32, i32* %1
-%101 = sub i32 %100, 1
-store i32 %101, i32* %1
-%102 = load i32, i32* %1
-%103 = add i32 %102, 0
-%104 = getelementptr[ 32768 x i32 ],[32768 x i32 ]* @program, i32 0, i32 0
-%105 = getelementptr i32,i32* %104, i32 %103
-%106 = load i32, i32* %105
-store i32 %106, i32* %21
-%107 = load i32, i32* %21
-%108 = icmp eq i32 %107, 91
-br i1 %108, label %109, label %112
-109:
-%110 = load i32, i32* %22
-%111 = sub i32 %110, 1
-store i32 %111, i32* %22
-br label %119
-112:
-%113 = load i32, i32* %21
-%114 = icmp eq i32 %113, 93
-br i1 %114, label %115, label %118
-115:
-%116 = load i32, i32* %22
-%117 = add i32 %116, 1
-store i32 %117, i32* %22
-br label %118
+br label %105
+105:
+%106 = load i32, i32* %22
+%107 = icmp sgt i32 %106, 0
+br i1 %107, label %108, label %129
+108:
+%109 = load i32, i32* %1
+%110 = sub i32 %109, 1
+store i32 %110, i32* %1
+%111 = load i32, i32* %1
+%112 = add i32 %111, 0
+%113 = getelementptr[ 32768 x i32 ],[32768 x i32 ]* @program, i32 0, i32 0
+%114 = getelementptr i32,i32* %113, i32 %112
+%115 = load i32, i32* %114
+store i32 %115, i32* %21
+%116 = load i32, i32* %21
+%117 = icmp eq i32 %116, 91
+br i1 %117, label %118, label %121
 118:
-br label %119
-119:
-br label %96
-120:
-br label %121
+%119 = load i32, i32* %22
+%120 = sub i32 %119, 1
+store i32 %120, i32* %22
+br label %128
 121:
-br label %122
-122:
-br label %123
-123:
-br label %124
+%122 = load i32, i32* %21
+%123 = icmp eq i32 %122, 93
+br i1 %123, label %124, label %127
 124:
-br label %125
-125:
-br label %126
-126:
-%127 = load i32, i32* %1
-%128 = add i32 %127, 1
-store i32 %128, i32* %1
-br label %23
+%125 = load i32, i32* %22
+%126 = add i32 %125, 1
+store i32 %126, i32* %22
+br label %127
+127:
+br label %128
+128:
+br label %105
 129:
+br label %130
+130:
+br label %131
+131:
+br label %132
+132:
+br label %133
+133:
+br label %134
+134:
+br label %135
+135:
+br label %136
+136:
+%137 = load i32, i32* %1
+%138 = add i32 %137, 1
+store i32 %138, i32* %1
+br label %23
+139:
 ret i32 0
 }

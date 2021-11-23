@@ -1,9 +1,3 @@
-/*
-a brainfuck interpreter
-reference: https://gist.github.com/maxcountryman/1699708
-*/
-
-// tape, input buffer, and read/write pointer
 const int TAPE_LEN = 65536, BUFFER_LEN = 32768;
 int       tape[TAPE_LEN], program[BUFFER_LEN], ptr = 0;
 
@@ -32,7 +26,10 @@ int main() {
             tape[ptr] = tape[ptr] - 1;
         } else if (cur_char == 46) {
             // '.'
-            putint(tape[ptr]);
+            putch(tape[ptr]);
+        } else if (cur_char == 44) {
+            // ','
+            tape[ptr] = getch();
         } else if (cur_char == 93 && tape[ptr]) {
             // ']'
             loop = 1;
