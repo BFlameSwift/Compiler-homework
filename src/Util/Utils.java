@@ -86,12 +86,14 @@ public class Utils {
 
     }
     // 生成一个长度指定的常量数组
-    public static int makeEmptyArray(ArrayList<Integer> parametersList) {
+    public static int makeEmptyArray(ArrayList<Integer> parametersList) throws CompileException {
         int length = 1;
         for(int i=0;i<parametersList.size();i++){
             length *= parametersList.get(i);
         }
         SymbolItem item = new SymbolItem(null,3,1,length,parametersList);
+        item.arrayAddrList = new ArrayList<Integer>();
+        for(int i=0;i<length;i++){item.arrayAddrList.add(Utils.allocateConst(0));}
         putAddressSymbol((++constAddress),item);
         return constAddress;
     }
@@ -339,7 +341,7 @@ public class Utils {
         SymbolItem item1 = getSymbolItemByAddress(loadPointer(address1)),item2 = getSymbolItemByAddress(loadPointer(address2));
 
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
-//        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
+        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
             condI1ToI32(address1); condI1ToI32(address2);
         }

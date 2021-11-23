@@ -2,121 +2,100 @@ declare i32 @getint()
 declare i32 @getch()
 declare void @putint(i32)
 declare void @putch(i32)
-@a = dso_local global [8 x i32 ] [ i32 0, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0 ]
-@b = dso_local constant [8 x i32 ] [ i32 9, i32 2, i32 3, i32 4, i32 1, i32 5, i32 4, i32 0 ]
-@c = dso_local global [8 x i32 ] [ i32 1, i32 2, i32 3, i32 4, i32 6, i32 3, i32 7, i32 8 ]
-@e = dso_local global [8 x i32 ] [ i32 6, i32 7, i32 4, i32 5, i32 5, i32 6, i32 9, i32 10 ]
+@a = common dso_local global [12 x i32 ]  zeroinitializer 
 define dso_local i32@main(){
-%1 = getelementptr[ 8 x i32 ],[8 x i32 ]* @e, i32 0, i32 0
-%2 = getelementptr i32,i32* %1, i32 0
-%3 = getelementptr[ 8 x i32 ],[8 x i32 ]* @e, i32 0, i32 0
-%4 = getelementptr i32,i32* %3, i32 0
-%5 = load i32, i32* %2
-%6 = load i32, i32* %4
-%7 = add i32 %5, %6
-%8 = getelementptr[ 8 x i32 ],[8 x i32 ]* @e, i32 0, i32 0
-%9 = getelementptr i32,i32* %8, i32 0
-%10 = load i32, i32* %9
-%11 = sub i32 %7, %10
-%12 = getelementptr[ 8 x i32 ],[8 x i32 ]* @a, i32 0, i32 0
-%13 = getelementptr i32,i32* %12, i32 0
-%14 = load i32, i32* %13
-%15 = add i32 %11, %14
-call void @putint( i32 %15)
-%16 = alloca [ 8 x i32 ]
-%17 = getelementptr[ 8 x i32 ],[8 x i32 ]* %16, i32 0, i32 0
-%18 = getelementptr i32,i32* %17, i32 0
-store i32 0, i32* %18
-%19 = getelementptr i32,i32* %17, i32 1
-store i32 0, i32* %19
-%20 = getelementptr i32,i32* %17, i32 2
-store i32 0, i32* %20
-%21 = getelementptr i32,i32* %17, i32 3
-store i32 0, i32* %21
-%22 = getelementptr i32,i32* %17, i32 4
-store i32 0, i32* %22
-%23 = getelementptr i32,i32* %17, i32 5
-store i32 0, i32* %23
-%24 = getelementptr i32,i32* %17, i32 6
-store i32 0, i32* %24
-%25 = getelementptr i32,i32* %17, i32 7
-store i32 0, i32* %25
-%26 = alloca [ 8 x i32 ]
-%27 = getelementptr[ 8 x i32 ],[8 x i32 ]* %26, i32 0, i32 0
-%28 = getelementptr i32,i32* %27, i32 0
-store i32 1, i32* %28
-%29 = getelementptr i32,i32* %27, i32 1
-store i32 2, i32* %29
-%30 = getelementptr i32,i32* %27, i32 2
-store i32 3, i32* %30
-%31 = getelementptr i32,i32* %27, i32 3
-store i32 4, i32* %31
-%32 = getelementptr i32,i32* %27, i32 4
-store i32 5, i32* %32
-%33 = getelementptr i32,i32* %27, i32 5
-store i32 6, i32* %33
-%34 = getelementptr i32,i32* %27, i32 6
-store i32 7, i32* %34
-%35 = getelementptr i32,i32* %27, i32 7
-store i32 8, i32* %35
-%36 = alloca [ 8 x i32 ]
-%37 = getelementptr[ 8 x i32 ],[8 x i32 ]* %36, i32 0, i32 0
-%38 = getelementptr i32,i32* %37, i32 0
-store i32 1, i32* %38
-%39 = getelementptr i32,i32* %37, i32 1
-store i32 2, i32* %39
-%40 = getelementptr i32,i32* %37, i32 2
-store i32 3, i32* %40
-%41 = getelementptr i32,i32* %37, i32 3
-store i32 4, i32* %41
-%42 = getelementptr i32,i32* %37, i32 4
-store i32 5, i32* %42
-%43 = getelementptr i32,i32* %37, i32 5
-store i32 6, i32* %43
-%44 = getelementptr i32,i32* %37, i32 6
-store i32 7, i32* %44
-%45 = getelementptr i32,i32* %37, i32 7
-store i32 8, i32* %45
+%1 = alloca i32
+store i32 0, i32* %1
+%2 = alloca i32
+store i32 0, i32* %2
+br label %3
+3:
+%4 = load i32, i32* %1
+%5 = icmp sle i32 %4, 5
+br i1 %5, label %6, label %42
+6:
+%7 = load i32, i32* %1
+%8 = alloca i32
+store i32 %7, i32* %8
+br label %9
+9:
+%10 = load i32, i32* %8
+%11 = icmp sge i32 %10, 0
+br i1 %11, label %12, label %39
+12:
+%13 = load i32, i32* %8
+%14 = icmp slt i32 %13, 4
+%15 = load i32, i32* %1
+%16 = load i32, i32* %8
+%17 = sub i32 %15, %16
+%18 = icmp slt i32 %17, 3
+%19= zext i1 %14 to i32
+%20= zext i1 %18 to i32
+%21 = and i32 %19, %20
+%22 = icmp ne i32 %21, 0
+br i1 %22, label %23, label %36
+23:
+%24 = load i32, i32* %1
+%25 = load i32, i32* %8
+%26 = sub i32 %24, %25
+%27 = load i32, i32* %8
+%28 = mul i32 %26, 4
+%29 = add i32 %28, 0
+%30 = add i32 %27, %29
+%31 = load i32, i32* %2
+%32 = getelementptr[ 12 x i32 ],[12 x i32 ]* @a, i32 0, i32 0
+%33 = getelementptr i32,i32* %32, i32 %30
+store i32 %31, i32* %33
+%34 = load i32, i32* %2
+%35 = add i32 %34, 1
+store i32 %35, i32* %2
+br label %36
+36:
+%37 = load i32, i32* %8
+%38 = sub i32 %37, 1
+store i32 %38, i32* %8
+br label %9
+39:
+%40 = load i32, i32* %1
+%41 = add i32 %40, 1
+store i32 %41, i32* %1
+br label %3
+42:
+store i32 0, i32* %1
+%43 = alloca i32
+store i32 0, i32* %43
+br label %44
+44:
+%45 = load i32, i32* %1
+%46 = icmp slt i32 %45, 3
+br i1 %46, label %47, label %64
+47:
+store i32 0, i32* %43
+br label %48
+48:
+%49 = load i32, i32* %43
+%50 = icmp slt i32 %49, 4
+br i1 %50, label %51, label %61
+51:
+%52 = load i32, i32* %1
+%53 = load i32, i32* %43
+%54 = mul i32 %52, 4
+%55 = add i32 %54, 0
+%56 = add i32 %53, %55
+%57 = getelementptr[ 12 x i32 ],[12 x i32 ]* @a, i32 0, i32 0
+%58 = getelementptr i32,i32* %57, i32 %56
+call void @putint( i32 %58)
+call void @putch( i32 32)
+%59 = load i32, i32* %43
+%60 = add i32 %59, 1
+store i32 %60, i32* %43
+br label %48
+61:
 call void @putch( i32 10)
-%46 = getelementptr[ 8 x i32 ],[8 x i32 ]* @b, i32 0, i32 0
-%47 = getelementptr i32,i32* %46, i32 0
-%48 = getelementptr[ 8 x i32 ],[8 x i32 ]* @b, i32 0, i32 0
-%49 = getelementptr i32,i32* %48, i32 0
-%50 = alloca [ 8 x i32 ]
-%51 = getelementptr[ 8 x i32 ],[8 x i32 ]* %50, i32 0, i32 0
-%52 = getelementptr i32,i32* %51, i32 0
-%53 = load i32, i32* %47
-store i32 %53, i32* %52
-%54 = getelementptr i32,i32* %51, i32 1
-%55 = load i32, i32* %49
-store i32 %55, i32* %54
-%56 = getelementptr i32,i32* %51, i32 2
-store i32 3, i32* %56
-%57 = getelementptr i32,i32* %51, i32 3
-store i32 4, i32* %57
-%58 = getelementptr i32,i32* %51, i32 4
-store i32 5, i32* %58
-%59 = getelementptr i32,i32* %51, i32 5
-store i32 6, i32* %59
-%60 = getelementptr i32,i32* %51, i32 6
-store i32 7, i32* %60
-%61 = getelementptr i32,i32* %51, i32 7
-store i32 8, i32* %61
-%62 = getelementptr[ 8 x i32 ],[8 x i32 ]* @e, i32 0, i32 0
-%63 = getelementptr i32,i32* %62, i32 0
-%64 = getelementptr[ 8 x i32 ],[8 x i32 ]* @e, i32 0, i32 0
-%65 = getelementptr i32,i32* %64, i32 0
-%66 = load i32, i32* %63
-%67 = load i32, i32* %65
-%68 = add i32 %66, %67
-%69 = getelementptr[ 8 x i32 ],[8 x i32 ]* @e, i32 0, i32 0
-%70 = getelementptr i32,i32* %69, i32 0
-%71 = load i32, i32* %70
-%72 = add i32 %68, %71
-%73 = getelementptr[ 8 x i32 ],[8 x i32 ]* @a, i32 0, i32 0
-%74 = getelementptr i32,i32* %73, i32 0
-%75 = load i32, i32* %74
-%76 = add i32 %72, %75
-call void @putint( i32 %76)
+%62 = load i32, i32* %1
+%63 = add i32 %62, 1
+store i32 %63, i32* %1
+br label %44
+64:
 ret i32 0
 }
