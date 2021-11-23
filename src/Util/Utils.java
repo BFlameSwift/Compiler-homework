@@ -129,7 +129,10 @@ public class Utils {
             SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
             symbolItem.parametersList = arrayItem.parametersList;
             symbolItem.length = arrayItem.length;
-            symbolItem.arrayAddrList = arrayItem.arrayAddrList;
+            symbolItem.arrayAddrList = new ArrayList<Integer>();
+            for(int i=0;i<symbolItem.length;i++){
+                symbolItem.arrayAddrList.add(Utils.allocateConst(0));
+            }
         }
 
         putAddressSymbol(globalAddress-1,symbolItem);
@@ -207,6 +210,7 @@ public class Utils {
     }
     // 自小块向大块查找需要的
     public static SymbolItem getSymbolItem(Token token) throws Util.CompileException {
+//        System.out.println("get token"+token);
         int block_index = Utils.blockIndex;
         while(block_index>=1){
 //            System.out.println("finding symbol"+token.getValue()+'\t'+"index"+block_index);
@@ -253,6 +257,7 @@ public class Utils {
         if(kind==3) item.setAddress((++nowAddress));
         else item.setAddress((++nowAddress));
         putAddressSymbol(item.getAddress(),item);
+        putblockSymbolTable(item,blockIndex);
         Parser.midCodeOut.add(allocateVariableOutput(item.getAddress()));
 
         storeArrayOutput(item.getAddress(),arrayValueAddr);
@@ -479,8 +484,8 @@ public class Utils {
         Parser.midCodeOut.add("declare i32 @getch()");
         Parser.midCodeOut.add("declare void @putint(i32)");
         Parser.midCodeOut.add("declare void @putch(i32)");
-        SymbolItem getint = new SymbolItem("@getint",2,0,0,null);
-        SymbolItem getch = new SymbolItem("@getch",2,0,0,null);
+        SymbolItem getint = new SymbolItem("@getint",2,1,0,null);
+        SymbolItem getch = new SymbolItem("@getch",2,1,0,null);
         SymbolItem putint = new SymbolItem("@putint",2,0,1,new ArrayList<Integer>(){{add(1);}});
         SymbolItem putch = new SymbolItem("@putch",2,0,1,new ArrayList<Integer>(){{add(1);}});
         allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");

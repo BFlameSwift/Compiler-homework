@@ -309,7 +309,6 @@ public class Parser {
                     int varAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
                     array.arrayAddrList.set(Utils.getSymbolItemByAddress(locationAddr).getValueInt(),expAddr);
                     midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
-
                 }
             }
             else {
@@ -541,6 +540,7 @@ public class Parser {
         }else if(Token.isIdent(token.getLexcial())){
             if(Token.getNextToken().getLexcial() != Lexical.LBRACKET){
                 SymbolItem lval = Utils.getSymbolItem(token);
+
                 if(lval.kind != 1) {
                     midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
                 }
