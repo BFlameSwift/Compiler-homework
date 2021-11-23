@@ -68,14 +68,14 @@ br label %44
 44:
 %45 = load i32, i32* %1
 %46 = icmp slt i32 %45, 3
-br i1 %46, label %47, label %64
+br i1 %46, label %47, label %65
 47:
 store i32 0, i32* %43
 br label %48
 48:
 %49 = load i32, i32* %43
 %50 = icmp slt i32 %49, 4
-br i1 %50, label %51, label %61
+br i1 %50, label %51, label %62
 51:
 %52 = load i32, i32* %1
 %53 = load i32, i32* %43
@@ -84,18 +84,19 @@ br i1 %50, label %51, label %61
 %56 = add i32 %53, %55
 %57 = getelementptr[ 12 x i32 ],[12 x i32 ]* @a, i32 0, i32 0
 %58 = getelementptr i32,i32* %57, i32 %56
-call void @putint( i32 %58)
+%59 = load i32, i32* %58
+call void @putint( i32 %59)
 call void @putch( i32 32)
-%59 = load i32, i32* %43
-%60 = add i32 %59, 1
-store i32 %60, i32* %43
+%60 = load i32, i32* %43
+%61 = add i32 %60, 1
+store i32 %61, i32* %43
 br label %48
-61:
+62:
 call void @putch( i32 10)
-%62 = load i32, i32* %1
-%63 = add i32 %62, 1
-store i32 %63, i32* %1
+%63 = load i32, i32* %1
+%64 = add i32 %63, 1
+store i32 %64, i32* %1
 br label %44
-64:
+65:
 ret i32 0
 }

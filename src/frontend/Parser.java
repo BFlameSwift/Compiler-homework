@@ -509,7 +509,8 @@ public class Parser {
             ArrayList<Integer> paramAddrList = new ArrayList<>();
             int i;
             for(i=0;i< funcItem.length;){
-                paramAddrList.add(parseExp());
+
+                paramAddrList.add(Utils.loadPointer(parseExp()));
                 i++;
                 if(!Token.isComma(Token.nextTokenLexcial(","))){
                     Token.previousToken();
