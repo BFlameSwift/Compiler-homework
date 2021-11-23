@@ -368,12 +368,12 @@ public class Parser {
         }
         else if(token.getLexcial() == Lexical.WHILE_DEC){
             Token.exceptNextToken(Lexical.LPAREN);
-            Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
+            System.out.println("!!!!! in while");
             Utils.endBlockJumpOutput();int beginCondLoca = midCodeOut.size()-1; int beginCondLabel = Utils.nextLabel();
             Analysis.replacePreciseStr(midCodeOut,beginCondLoca,Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
             int condAddr = parseCond();
             Token.exceptNextToken(Lexical.RPAREN);
-
+            Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
             Utils.beforejudgeCondition(condAddr);Utils.readyJump(); int jumpToloca2 = midCodeOut.size()-1; int condLabel = Utils.nextLabel();
             int stmtRet = parseStmt();
             if(stmtRet == 1){
@@ -396,6 +396,7 @@ public class Parser {
                     throw new CompileException("not continue break!!!");
                 }
             }
+            System.out.println("!!!!! out while");
         }
         else if(token.getLexcial() == Lexical.CONTINUE_DEC){
             Token.exceptNextToken(Lexical.SEMICOLON);

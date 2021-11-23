@@ -1,53 +1,260 @@
-int n;
-int main() {
-    n = 10;
-    int ini_arr[10];
-    ini_arr[0] = 4;
-    ini_arr[1] = 3;
-    ini_arr[2] = 9;
-    ini_arr[3] = 2;
-    ini_arr[4] = 0;
-    ini_arr[5] = 1;
-    ini_arr[6] = 6;
-    ini_arr[7] = 5;
-    ini_arr[8] = 7;
-    ini_arr[9] = 8;
+int __HELLO [
 
-    int sorted_arr[10];
-    int count_arr[10];
-    int i;
-    int j;
-    int k;
-    k = 0;
-    i = 0;
-    j = 0;
-    while (k < 10) {
-        count_arr[k] = 0;
-        k            = k + 1;
-    }
-    while (i < n) {
-        count_arr[ini_arr[i]] = count_arr[ini_arr[i]] + 1;
-        i                     = i + 1;
-    }
-    k = 1;
-    while (k < 10) {
-        count_arr[k] = count_arr[k] + count_arr[k - 1];
-        k            = k + 1;
-    }
-    j = n;
-    while (j > 0) {
-        count_arr[ini_arr[j - 1]]             = count_arr[ini_arr[j - 1]] - 1;
-        sorted_arr[count_arr[ini_arr[j - 1]]] = ini_arr[j - 1];
-        j                                     = j - 1;
-    }
-    i = 0;
-    while (i < n) {
-        int tmp;
-        tmp = sorted_arr[i];
-        putint(tmp);
-        tmp = 10;
-        putch(tmp);
-        i = i + 1;
-    }
-    return 0;
+
+100
+		]
+= {
+87, 101, 108, 99,
+111, 109, 101,
+32, 116, 111,	32,
+116,	 104,
+101, 32, 	74,
+97,
+
+112, 97,
+
+	114, 	105,	32,	80, 97,
+
+
+
+
+114, 107,	 33, 10 }; /* Names of
+kemono
+friends */ int	N4__mE___[6][50]		= { { 83, 97,	97, 98,
+97,
+114,
+117  }, 	{	75, 97, 98,
+
+97,  110
+
+}, {
+
+
+72,
+
+	  97,
+115, 104, 105,
+98, 105, 114, 111,
+
+
+
+
+
+
+107,
+	 111,
+
+
+117
+
+}, { 65, 114,
+
+97,
+
+105,
+103,
+
+117,
+109,
+
+
+			97 },
+	{ 72, 117,
+110, 98, 111, 114,
+117,
+
+116, 111,	  32, 80,
+101, 110,
+
+	103, 105, 	110
+},
+  {	84, 97, 105, 114, 105, 107, 117, 32, 79,
+
+
+111, 107,
+97,
+109,
+
+
+
+
+
+
+ 105	} };
+	int
+
+saY_HeI10_To[40] = { 32,
+115, 97,  121,
+
+		115,
+
+32,
+104,
+
+ 101, 108, 108,	111,
+
+ 32,
+
+
+116, 111,
+32 };	int
+		RET[5]
+=
+{10};  int main( /* no param */ )	{int iNd__1X ;
+iNd__1X		= 0 ;
+while ( __HELLO	[	iNd__1X
+	] ) {
+
+ putch (
+
+		__HELLO
+[ iNd__1X
+]
+	) ; iNd__1X
+=
+iNd__1X
+
+ + 1
+
+;	}	int i =
+ 0 ; /* say
+
+
+	hello to
+ kemono friends
+~      i     */
+while (
+
+ 1 ) {
+
+int _
+ = i
+
+/ 6
+
+; int __
+=
+i % 6
+
+;
+
+	if
+(
+
+_
+
+!=
+
+
+	__ )
+	{
+
+
+ 	iNd__1X		= 0 ;
+ 	while ( N4__mE___
+
+	[ 	_
+ ]
+		[	iNd__1X
+	] ) {
+
+ putch (
+
+N4__mE___
+
+	[ 	_
+ ][ iNd__1X
+]
+	) ; iNd__1X
+=
+iNd__1X
+
+ + 1
+
+;	}
+      iNd__1X		= 0 ;
+      while ( saY_HeI10_To	[	iNd__1X
+	] ) {
+
+ putch (
+
+saY_HeI10_To[ iNd__1X
+]
+	) ; iNd__1X
+=
+iNd__1X
+
+ + 1
+
+;	}
+iNd__1X		= 0 ;
+while ( N4__mE___ [
+
+
+
+__ ]	[	iNd__1X
+	] ) {
+
+ putch (
+
+N4__mE___ [
+
+
+
+__ ][ iNd__1X
+]
+	) ; iNd__1X
+=
+iNd__1X
+
+ + 1
+
+;	}
+
+		iNd__1X		= 0 ;
+
+while ( RET	[	iNd__1X
+	] ) {
+
+ putch (
+
+RET
+
+
+
+[ iNd__1X
+]
+	) ; iNd__1X
+=
+iNd__1X
+
+ + 1
+
+;	}
 }
+/*
+	 do
+
+	linear
+modulo
+to find 	the 	 next pair of friends  */ i = ( i
+*
+
+
+17
+
++	 23
+)
+%
+
+
+32
+
+
+ ;
+if ( i
+==
+	0	) { break ;		}
+
+
+ } return 0; }

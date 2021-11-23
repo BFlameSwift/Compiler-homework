@@ -72,11 +72,13 @@ public class Lexical {
                 Pattern pattern = Pattern.compile(BLANK);
                 if(pattern.matcher(thisStr).matches()){
                     continue;
+
                 }// 跳过空白
                 //TODO System.out.println(thisStr);
 //                System.out.println("无效word："+thisStr);
                 words.add("非法字符"); //  必定非法的字符
-                return false;
+                
+//                return false;
             }
             if(isIdentifier(thisStr)){
                 for(j = i+1;j<lineLen;j++){
@@ -218,10 +220,16 @@ public class Lexical {
     }
 
     public static void main(String[] args) throws FileNotFoundException , CompileException {
+//        System.out.println(isLegalWord("~"));
         ArrayList<frontend.Token> tokens = makeTokenList(args[0]);
+        int while_num = 0;
         for(frontend.Token token :tokens){
+            if(token.getLexcial() ==WHILE_DEC){while_num++;
+
+            }
             System.out.println(token.getValue()+"  "+token.getLexcial());
         }
+        System.out.println(while_num);
     }
 
 }
