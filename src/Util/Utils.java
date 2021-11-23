@@ -265,15 +265,17 @@ public class Utils {
     }
     public static int getArrayElemAddr(int arrayAddr,int locationAddr) throws CompileException {
         SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
-        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 0");
+        SymbolItem locationItem = getSymbolItemByAddress(locationAddr);
+        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr));
         arrayItem.setLoadAddress( nowAddress);
-        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
         putAddressSymbol(nowAddress,new SymbolItem(null,-2,3,0,null));
+//        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
+//        putAddressSymbol(nowAddress,new SymbolItem(null,-2,3,0,null));
 
 //        str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
-        SymbolItem locationItem = getSymbolItemByAddress(locationAddr);
-        str += ", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr);
-        Parser.midCodeOut.add(str);
+
+//        str += ", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr);
+//        Parser.midCodeOut.add(str);
         return nowAddress;
     }
     public static void storeArrayOutput(int arrayAddr,int valueAddr) throws CompileException {
