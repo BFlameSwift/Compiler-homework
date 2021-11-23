@@ -138,8 +138,8 @@ br label %131
 %98 = getelementptr[ 65536 x i32 ],[65536 x i32 ]* @tape, i32 0, i32 0
 %99 = getelementptr i32,i32* %98, i32 %97
 %100 = load i32, i32* %99
-%101= zext i1 %95 to i32
-%102 = and i32 %101, %100
+%101 = icmp ne i32 %99, 0
+%102 = and i32 %95, %100
 %103 = icmp ne i32 %102, 0
 br i1 %103, label %104, label %130
 104:

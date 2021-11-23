@@ -331,6 +331,17 @@ public class Utils {
         }
         return nowAddress;
     }
+    public static int condI32ToI1(int address) throws CompileException {
+        SymbolItem item1 = getSymbolItemByAddress(address);
+        if(!item1.isCond){
+//            %99 = icmp ne i32 %98, 0
+            Parser.midCodeOut.add("%"+(++nowAddress)+" = icmp ne i32"+" %"+address+", 0");
+//            Parser.midCodeOut.add("%"+(++nowAddress)+"= zext i1 %"+(address)+" to i32");
+            putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
+            item1.setLoadAddress(nowAddress);
+        }
+        return nowAddress;
+    }
     public static int loadPointer(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
         if(item1.type == 3){
@@ -348,7 +359,8 @@ public class Utils {
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
-            condI1ToI32(address1); condI1ToI32(address2);
+//            condI1ToI32(address1);condI1ToI32(address2);
+            condI32ToI1(address1); condI32ToI1(address2);
         }
         int objAddress = (objKind == 0||(objKind==1&&item1.isCond))?(++nowAddress):(++constAddress);// 将常量与变量计算分区
         Boolean objIsCond = false;
