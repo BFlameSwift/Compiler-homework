@@ -166,7 +166,7 @@ public class Utils {
         return nowAddress;
     }
     public static int allocateConst(int value) throws CompileException {
-        if(value==0 && getSymbolItemByAddress(constAddress).getValueInt() == 0){
+        if(value==0 &&constAddress>CONST_BEGIN_ADDRESS&& getSymbolItemByAddress(constAddress).getValueInt() == 0){
             return constAddress;
         }//稍微省点地址。
 
