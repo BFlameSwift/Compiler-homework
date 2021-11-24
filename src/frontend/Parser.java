@@ -16,9 +16,10 @@ public class Parser {
     public static void parseCompUnit()throws CompileException {
         int lexcial = Token.getNextToken().getLexcial();
         while(Token.isCompUnit(lexcial)){
-            if(Token.isFuncType(lexcial))  {if(!parseFuncDef()) {
-                parseDecl();
-            }
+            if(Token.isFuncType(lexcial))  {
+                if(!parseFuncDef()) {
+                    parseDecl();
+                }
             }
             else if(Token.isDecl(lexcial)) {
                 parseDecl();
@@ -217,6 +218,40 @@ public class Parser {
         }Token.previousToken();
         return parseExp();
     }
+//    FuncType     -> 'void' | 'int'
+    public static int parseFuncType() throws  CompileException {
+        int nextLexical = Token.nextTokenLexcial("int or void");
+        if(nextLexical == Lexical.INT_DEC)
+            return 1;
+        else if(nextLexical == Lexical.VOID_DEC)
+            return 0;
+        else{
+            throw new CompileException("Fun type not  a int or void");
+        }
+    }
+//    FuncFParams  -> FuncFParam { ',' FuncFParam } // [new]
+//    FuncFParam   -> BType Ident ['[' ']' { '[' Exp ']' }] // [new]
+    public static void parseFuncParams() throws CompileException{
+
+        while(Token.nextTokenLexcial("int") == Lexical.INT_DEC){
+
+            Token ident = Token.nextToken("ident");
+            ArrayList<Integer> dismension = new ArrayList<Integer>();
+            if(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
+                Token.exceptNextToken(Lexical.RBRACKET);
+                dismension.add(Utils.allocateConst(0));
+                while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
+                    dismension.add(parseConstExp());
+                    Token.exceptNextToken(Lexical.RBRACKET);
+                }
+            }Token.previousToken();
+            if(Token.getNextToken().getLexcial() != Lexical.COMMA){
+                Token.nextToken(")");
+                break;
+            }Token.exceptNextToken(Lexical.COMMA);
+        }Token.previousToken();
+    }
+
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
     public static Boolean parseFuncDef()throws CompileException {
         Token funcDef = Token.nextToken("FuncDef");
@@ -224,12 +259,14 @@ public class Parser {
         // 如果下一个不是函数定义，则可能是变量定义，先回退
         if(Token.getNextToken().getLexcial() != Lexical.LPAREN) {
             Token.previousToken();
-            Token.previousToken(); return false;
+            Token.previousToken();
+            return false;
         }
-
 
         Token.exceptNextToken(Lexical.LPAREN);
         // TODO 函数参数
+        if(Token.getNextToken().getLexcial()!=Lexical.RPAREN)
+            parseFuncParams();
         Token.exceptNextToken(Lexical.RPAREN);
         midCodeOut.add("define dso_local i32"+funcName+"(){");
         Utils.enterFunction(funcName); // 进入函数

@@ -67,7 +67,7 @@ public class Token {
     }
 
     public static int nextTokenLexcial(String expect) throws CompileException {
-//        System.out.println("token next"+'\t'+getPreviousToken().getValue()+'\t'+"except"+expect);  // Debug 用
+        System.out.println("token next"+'\t'+getPreviousToken().getValue()+'\t'+"except"+expect);  // Debug 用
         if(tokenIterator.hasNext()){
             return tokenIterator.next().getLexcial();
         }else{
@@ -76,7 +76,7 @@ public class Token {
     }
 
     public static Token nextToken(String expect) throws CompileException {
-//        System.out.println("token next"+'\t'+getPreviousToken().getValue()+'\t'+"except"+expect);
+        System.out.println("token next"+'\t'+getPreviousToken().getValue()+'\t'+"except"+expect);
         if(tokenIterator.hasNext()){
             return tokenIterator.next();
         }else{
@@ -85,7 +85,7 @@ public class Token {
     }
 
     public static Token previousToken() throws CompileException {
-//        System.out.println("token previous"+'\t'+getPreviousToken().getValue()+'\t');
+        System.out.println("token previous"+'\t'+getPreviousToken().getValue()+'\t');
         if(tokenIterator.hasPrevious()){
             return tokenIterator.previous();
         }else{
