@@ -233,12 +233,15 @@ public class Parser {
 //    FuncFParam   -> BType Ident ['[' ']' { '[' Exp ']' }] // [new]
     public static int parseFuncParams() throws CompileException{
         SymbolItem function = Utils.getSymbolItemByAddress(Utils.makeNewFakeFunction());
+
         while(Token.nextTokenLexcial("int") == Lexical.INT_DEC){
+            function.length ++;
             Token ident = Token.nextToken("ident");
             ArrayList<Integer> dismension = new ArrayList<Integer>();
             if(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
                 Token.exceptNextToken(Lexical.RBRACKET);
                 dismension.add(Utils.allocateConst(0));
+
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
                     dismension.add(parseConstExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
@@ -265,11 +268,12 @@ public class Parser {
 
         Token.exceptNextToken(Lexical.LPAREN);
         // TODO 函数参数
-        if(Token.getNextToken().getLexcial()!=Lexical.RPAREN) {
-            int functionAddr = parseFuncParams();
-            Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
+//        if(Token.getNextToken().getLexcial()!=Lexical.RPAREN) {
+        int functionAddr = parseFuncParams();
+        System.out.println(Utils.getSymbolItemByAddress(functionAddr).length);
+        Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
 
-        }
+//        }
 
         Token.exceptNextToken(Lexical.RPAREN);
         midCodeOut.add("define dso_local i32"+funcName+"(){");
