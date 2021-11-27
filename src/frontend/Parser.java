@@ -231,10 +231,9 @@ public class Parser {
     }
 //    FuncFParams  -> FuncFParam { ',' FuncFParam } // [new]
 //    FuncFParam   -> BType Ident ['[' ']' { '[' Exp ']' }] // [new]
-    public static void parseFuncParams() throws CompileException{
-
+    public static int parseFuncParams() throws CompileException{
+        SymbolItem function = Utils.getSymbolItemByAddress(Utils.makeNewFakeFunction());
         while(Token.nextTokenLexcial("int") == Lexical.INT_DEC){
-
             Token ident = Token.nextToken("ident");
             ArrayList<Integer> dismension = new ArrayList<Integer>();
             if(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
@@ -250,6 +249,7 @@ public class Parser {
                 break;
             }Token.exceptNextToken(Lexical.COMMA);
         }Token.previousToken();
+        return function.getAddress();
     }
 
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
@@ -265,8 +265,12 @@ public class Parser {
 
         Token.exceptNextToken(Lexical.LPAREN);
         // TODO 函数参数
-        if(Token.getNextToken().getLexcial()!=Lexical.RPAREN)
-            parseFuncParams();
+        if(Token.getNextToken().getLexcial()!=Lexical.RPAREN) {
+            int functionAddr = parseFuncParams();
+            Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
+
+        }
+
         Token.exceptNextToken(Lexical.RPAREN);
         midCodeOut.add("define dso_local i32"+funcName+"(){");
         Utils.enterFunction(funcName); // 进入函数
@@ -592,7 +596,6 @@ public class Parser {
                 int locationAddr = array.addrListTransLocation((getAddrList));
                 return Utils.getArrayElemAddr(array.getAddress(),locationAddr);
             }
-
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());
         }
         else{

@@ -40,6 +40,9 @@ public class Utils {
     }
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
+        for(int i=0;i<=nowAddress ;i++){
+            addressSymbolTable.remove(i);
+        }
 //        thisFunctionBlockIndex = blockMaxIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
 //        blockIndex = blockMaxIndex;
     }
@@ -58,7 +61,14 @@ public class Utils {
         map.clear();
         blockIndex --;
     }
-
+    public static void setFunctionName(String name,SymbolItem function) throws CompileException {
+        if(funcSymbolTable.containsKey(name)){
+            throw new CompileException("this function has been defined");
+        }
+        function.name = name;
+        funcSymbolTable.put(name,function);
+        return ;
+    }
     public static int getBlockIndex() {
         return blockIndex;
     }
@@ -297,6 +307,11 @@ public class Utils {
         }
 
     }
+    public static int makeNewFakeFunction() throws CompileException {
+        SymbolItem item  = new SymbolItem(null,2,1,0,new ArrayList<Integer>());
+        putAddressSymbol((++constAddress),item);
+        return item.getAddress();
+    }
     public static int storeConstVariable(String name,int value,String funcName) throws Util.CompileException {
         SymbolItem item = new SymbolItem(name,1,value,getBlockIndex());
         item.setAddress(++ constAddress);
@@ -497,12 +512,17 @@ public class Utils {
         Parser.midCodeOut.add("declare i32 @getch()");
         Parser.midCodeOut.add("declare void @putint(i32)");
         Parser.midCodeOut.add("declare void @putch(i32)");
+        Parser.midCodeOut.add("declare i32 @getarray(i32*)\n" +"declare void @putarray(i32, i32*)");
         SymbolItem getint = new SymbolItem("@getint",2,1,0,null);
         SymbolItem getch = new SymbolItem("@getch",2,1,0,null);
         SymbolItem putint = new SymbolItem("@putint",2,0,1,new ArrayList<Integer>(){{add(1);}});
         SymbolItem putch = new SymbolItem("@putch",2,0,1,new ArrayList<Integer>(){{add(1);}});
+        SymbolItem getarray = new SymbolItem("@getarray",2,1,1,new ArrayList<Integer>(){{add(3);}});
+        SymbolItem putarray = new SymbolItem("@putarray",2,0,2,new ArrayList<Integer>(){{add(1);add(3);}});
         allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
         funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
+        allFuncList.add(getarray.name);        allFuncList.add(putarray.name); funcSymbolTable.put(getarray.name,getarray);funcSymbolTable.put(putarray.name,putarray);
+
     }
     // 判断函数是否是i1类型。如果不是需要进行转换
     public static int  beforejudgeCondition(int condAddr) throws CompileException {
