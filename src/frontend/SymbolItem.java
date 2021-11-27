@@ -12,13 +12,15 @@ import java.util.ArrayList;
  */
 public class SymbolItem {
     public static final int NOT_ASSIGN = -1239032;
-    public static final int ADDRESS_NOT_ASSIGN = 0;
+    public static final int ADDRESS_NOT_ASSIGN = -114514;
     public String name;
     public int kind; // var 0,const 1,function 2,const array 3,var array 4
     public int type; // void 0 int 1,label 2,pointer 3;
     public Boolean isCond = false;
     public Boolean isLabel = false;
     private int valueInt;
+    private int address = ADDRESS_NOT_ASSIGN;
+    private int loadAddress = ADDRESS_NOT_ASSIGN;
     public int length; // 数组总长度，函数变量参数数目
     public int blockIndex = 0;
     public ArrayList<Integer> parametersList; // 参数类型  可以用作数据的对应维度的大小以及参数的类型
@@ -55,14 +57,13 @@ public class SymbolItem {
         System.out.println("ret addr："+distination+" ret value"+Utils.getSymbolItemByAddress(distination));
         return distination;
     }
-    private int address = 0;
-    private int loadAddress = 0;
+
     public Boolean isGlobal(){
         return address>=Utils.GLOBAL_BEGIN_ADDRESS && address <0;
     }
     public int getLoadAddress() throws CompileException {
-        if(loadAddress == 0){
-            throw new CompileException("load address = 0");
+        if(loadAddress == ADDRESS_NOT_ASSIGN){
+            throw new CompileException("load address = 114514");
         }
         return loadAddress;
     }public Boolean isArray(){
@@ -74,7 +75,7 @@ public class SymbolItem {
     }
 
     public int getAddress() throws CompileException {
-        if( address == 0) {
+        if( address == ADDRESS_NOT_ASSIGN) {
             throw new CompileException(name+" Address is not assign");
         }
         return address;

@@ -44,12 +44,14 @@ public class Utils {
 
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
-        nowAddress ++;
+//        nowAddress ++;
         for(int i=0;i<=nowAddress ;i++){
             addressSymbolTable.remove(i);
         }
-//        thisFunctionBlockIndex = blockMaxIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
-//        blockIndex = blockMaxIndex;
+    }
+
+    public static int assignedAddress(){
+        return (++nowAddress);
     }
 
     public static int getNowAddress() {
@@ -253,8 +255,7 @@ public class Utils {
         }return item;
     }
     public static int storeVariable(Token token, int value) throws Util.CompileException {
-        // TODO 自下向上查找变量 而后区分出不同类型的变量并赋值
-        // TODO 暂时认为只有一个块
+
         SymbolItem symbolItem = new SymbolItem(null,-1); // 随便初始化一个。。后面会覆盖掉
         symbolItem = getSymbolVariable(token);
         if(symbolItem.isConstant()){

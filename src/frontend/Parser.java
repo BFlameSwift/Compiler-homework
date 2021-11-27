@@ -233,7 +233,7 @@ public class Parser {
 //    FuncFParam   -> BType Ident ['[' ']' { '[' Exp ']' }] // [new]
     public static int parseFuncParams() throws CompileException{
         SymbolItem function = Utils.getSymbolItemByAddress(Utils.makeNewFakeFunction());
-
+        String paramOut = "";
         while(Token.nextTokenLexcial("int") == Lexical.INT_DEC){
             function.length ++;
             Token ident = Token.nextToken("ident");
@@ -246,12 +246,32 @@ public class Parser {
                     dismension.add(parseConstExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }
-            }Token.previousToken();
+                paramOut+="i32* %"+Utils.assignedAddress();
+                SymbolItem item = new SymbolItem(ident.getValue(),0,3,dismension.size(),dismension);
+                Utils.putAddressSymbol(Utils.getNowAddress(),item);
+            }else{
+                paramOut += "i32 %"+Utils.assignedAddress();
+                Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(ident.getValue(),0));
+            }
+
+            Token.previousToken();
             if(Token.getNextToken().getLexcial() != Lexical.COMMA){
                 Token.nextToken(")");
                 break;
             }Token.exceptNextToken(Lexical.COMMA);
+            paramOut+= ", ";
         }Token.previousToken();
+        midCodeOut.set(midCodeOut.size()-1,midCodeOut.get(midCodeOut.size()-1)+paramOut+"){");
+        // 将各个变量赋值到下面
+        for(int i=0;i<function.length;i++){
+            // 符号被依次存到这些地址中，逐一取出处理
+            // type == 3 表示为指针的数组类型
+            SymbolItem item = Utils.getSymbolItemByAddress(i);
+            Token paramToken = new Token(-1,item.name,-1);
+            int varAddr = Utils.allocateVariable(paramToken,item.kind==3?4:0,item.parametersList,function.name);
+            Utils.storeVariableOutput(item.getAddress(),varAddr);
+        }
+
         return function.getAddress();
     }
 
@@ -265,19 +285,17 @@ public class Parser {
             Token.previousToken();
             return false;
         }
-
+        midCodeOut.add("define dso_local i32"+funcName+"(");
         Token.exceptNextToken(Lexical.LPAREN);
-        // TODO 函数参数
-//        if(Token.getNextToken().getLexcial()!=Lexical.RPAREN) {
+
         int functionAddr = parseFuncParams();
         System.out.println(Utils.getSymbolItemByAddress(functionAddr).length);
         Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
-
-//        }
-
         Token.exceptNextToken(Lexical.RPAREN);
-        midCodeOut.add("define dso_local i32"+funcName+"(){");
+
         Utils.enterFunction(funcName); // 进入函数
+//        midCodeOut.set(midCodeOut.size()-1,midCodeOut.get(midCodeOut.size()-1)+"){");
+
         parseBlock();
 
         midCodeOut.add("}");
