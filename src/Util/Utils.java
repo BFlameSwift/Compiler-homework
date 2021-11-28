@@ -416,7 +416,8 @@ public class Utils {
         item1 = Utils.getSymbolItemByAddress(loadPointerValue(address1));item2 = Utils.getSymbolItemByAddress(loadPointerValue(address2));
         address1 = item1.getAddress(); address2 = item2.getAddress();
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
-        objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
+        if (objKind == 1)
+            objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
 //            condI1ToI32(address1);condI1ToI32(address2);
             condI32ToI1(address1); condI32ToI1(address2);

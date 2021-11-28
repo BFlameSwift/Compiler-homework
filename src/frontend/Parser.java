@@ -291,7 +291,6 @@ public class Parser {
 
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
     public static Boolean parseFuncDef()throws CompileException {
-
         Token funcDef = Token.nextToken("FuncDef");
         String funcName = parseIdent();
 //        Token functionType = Token.previousToken();

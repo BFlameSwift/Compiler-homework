@@ -1,18 +1,18 @@
-void set1(int pos, int arr[]) {
-    arr[pos] = 1;
+int fib(int n) {
+	if (n == 0)
+		return 0;
+	if (n == 1)
+		return 1;
+	int p;
+	p = n - 1;
+	int q;
+	q = n - 2;
+	return fib(p) + fib(q);
 }
 
 int main() {
-    int a[2][5];
-    int n;
-    n = getarray(a[0]);
-    getarray(a[1]);
-    int i = 0;
-    while (i < n) {
-        set1(i, a[i % 2]);
-        i = i + 1;
-    }
-    putarray(n, a[0]);
-    putarray(n, a[1]);
+	int tmp;
+	tmp = 10;
+	putint(fib(tmp));
     return 0;
 }
