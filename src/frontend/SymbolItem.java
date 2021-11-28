@@ -54,7 +54,7 @@ public class SymbolItem {
         }
         ArrayList<Integer> constArraySizeList = new ArrayList<>();
         for(int i=0; i<list.size(); i++){
-            constArraySizeList.add(Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
+            constArraySizeList.add(Utils.getSymbolItemByAddress(parametersList.get(i)).getValueInt());
         }
         ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(constArraySizeList);
         int ret = 0;
@@ -63,7 +63,9 @@ public class SymbolItem {
             int addItemAddr = Utils.midExpCalculate("mul",list.get(i),Utils.allocateConst(satisfiedList.get(i+1)));
             distination = Utils.midExpCalculate("add",addItemAddr,distination);
         }distination = Utils.midExpCalculate("add",list.get(list.size()-1),distination);
-       
+//        if(Utils.getSymbolItemByAddress(distination).isConstant()){
+//            Parser.midCodeOut.add(Utils.getSymbolItemByAddress(distination).getValueInt()+"");
+//        }
 //        for(int i=0;i<valueList.size()-1;i++){
 //            ret += valueList.get(i)*satisfiedList.get(i+1);
 //        }ret += valueList.get(valueList.size()-1);

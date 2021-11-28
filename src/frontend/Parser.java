@@ -99,10 +99,13 @@ public class Parser {
             newList.set(i,newList.get(i)*newList.get(i+1));
         }
         System.out.println("make satisfy list");
-        for(int i:newList){
-            System.out.printf("%d ",i);
-        }
-        System.out.println("end make ");
+//        String satisfyOutput = "";
+//        for(int i:newList){
+//            satisfyOutput += i+" ";
+////            System.out.printf("%d ",i);
+//        }
+//        midCodeOut.add(satisfyOutput);
+//        System.out.println("end make ");
         return newList;
     }
     public static int parseArrayRead(ArrayList<Integer> dismension,int type) throws CompileException {
