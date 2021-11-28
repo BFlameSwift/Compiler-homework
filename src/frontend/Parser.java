@@ -312,12 +312,20 @@ public class Parser {
         Token.exceptNextToken(Lexical.RPAREN);
 
         int funcRet = parseBlock();
-//        if(funcRet == 1||function.type == 0){
-//            // 函数有void但是却又返回值
-//            throw  new CompileException("Function is void but has return i32");
-//        }
-        if(funcRet== -1){
-            midCodeOut.add("ret void");
+        Boolean hasRet = false;
+        for(int i=midCodeOut.size()-1;i>=0;i--){
+            String[] strs = midCodeOut.get(i).split("\\s+");
+//            System.out.println(strs[0]);
+            if(strs[0].equals ("br")||strs[0].equals("ret")){
+                hasRet = true;
+                break;
+            }
+            if(strs[0].substring(strs[0].length()-1,strs[0].length()).equals(":") ){
+                break;
+            }
+        }
+        if(!hasRet){
+            midCodeOut.add("ret "+(funcDef.getLexcial() == Lexical.INT_DEC?"i32 0":"void"));
         }
         midCodeOut.add("}");
         return true;

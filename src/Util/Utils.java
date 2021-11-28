@@ -515,6 +515,7 @@ public class Utils {
             outputStr+="i32 ";
 
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
+//            if(item.parametersList.size()!=funcItem.)
             if(item.type == 3) outputStr += "* ";
             outputStr += item.kind == 1?item.getValueInt():"%"+item.getLoadAddress();
             if(i<funcItem.length-1) outputStr+=", ";

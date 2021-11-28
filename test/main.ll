@@ -4,193 +4,271 @@ declare void @putint(i32)
 declare void @putch(i32)
 declare i32 @getarray(i32*)
 declare void @putarray(i32, i32*)
-@n = common dso_local global i32 0, align 4
-define dso_local i32 @swap(i32* %0, i32 %1, i32 %2){
-%4 = alloca i32* 
-store i32* %0, i32* * %4
+define dso_local i32 @func1(i32 %0, i32 %1, i32 %2){
+%4 = alloca i32 
+store i32 %0, i32* %4
 %5 = alloca i32 
 store i32 %1, i32* %5
 %6 = alloca i32 
 store i32 %2, i32* %6
-%7 = alloca i32 
-%8 = load i32, i32* %5
-%9 = add i32 %8, 0
-%10 = load i32* , i32* * %4
-%11 = getelementptr i32, i32* %10, i32 %9
-%12 = load i32, i32* %11
-store i32 %12, i32* %7
-%13 = load i32, i32* %5
-%14 = add i32 %13, 0
-%15 = load i32, i32* %6
-%16 = add i32 %15, 0
-%17 = load i32* , i32* * %4
-%18 = getelementptr i32, i32* %17, i32 %16
-%19 = load i32* , i32* * %4
-%20 = getelementptr i32, i32* %19, i32 %14
-%21 = load i32, i32* %18
-store i32 %21, i32* %20
-%22 = load i32, i32* %6
-%23 = add i32 %22, 0
-%24 = load i32, i32* %7
-%25 = load i32* , i32* * %4
-%26 = getelementptr i32, i32* %25, i32 %23
-store i32 %24, i32* %26
-ret i32 0
-}
-define dso_local i32 @heap_ajust(i32* %0, i32 %1, i32 %2){
-%4 = alloca i32* 
-store i32* %0, i32* * %4
-%5 = alloca i32 
-store i32 %1, i32* %5
-%6 = alloca i32 
-store i32 %2, i32* %6
-%7 = alloca i32 
-%8 = load i32, i32* %5
-store i32 %8, i32* %7
-%9 = alloca i32 
-%10 = load i32, i32* %7
-%11 = mul i32 %10, 2
-%12 = add i32 %11, 1
-store i32 %12, i32* %9
-br label %13
+%7 = load i32, i32* %6
+%8 = icmp eq i32 %7, 0
+br i1 %8, label %9, label %14
+9:
+%10 = load i32, i32* %4
+%11 = load i32, i32* %5
+%12 = mul i32 %10, %11
+ret i32 %12
 13:
-%14 = load i32, i32* %9
-%15 = load i32, i32* %6
-%16 = add i32 %15, 1
-%17 = icmp slt i32 %14, %16
-br i1 %17, label %18, label %62
-18:
-%19 = load i32, i32* %9
-%20 = load i32, i32* %6
-%21 = icmp slt i32 %19, %20
-%22 = load i32, i32* %9
-%23 = add i32 %22, 0
-%24 = load i32* , i32* * %4
-%25 = getelementptr i32, i32* %24, i32 %23
-%26 = load i32, i32* %9
-%27 = add i32 %26, 1
-%28 = add i32 %27, 0
-%29 = load i32* , i32* * %4
-%30 = getelementptr i32, i32* %29, i32 %28
-%31 = load i32, i32* %25
-%32 = load i32, i32* %30
-%33 = icmp slt i32 %31, %32
-%34 = and i1 %21, %33
-br i1 %34, label %35, label %38
-35:
-%36 = load i32, i32* %9
-%37 = add i32 %36, 1
-store i32 %37, i32* %9
-br label %38
-38:
-%39 = load i32, i32* %7
-%40 = add i32 %39, 0
-%41 = load i32* , i32* * %4
-%42 = getelementptr i32, i32* %41, i32 %40
-%43 = load i32, i32* %9
-%44 = add i32 %43, 0
-%45 = load i32* , i32* * %4
-%46 = getelementptr i32, i32* %45, i32 %44
-%47 = load i32, i32* %42
-%48 = load i32, i32* %46
-%49 = icmp sgt i32 %47, %48
-br i1 %49, label %50, label %52
-50:
-ret i32 0
-51:
-br label %61
-52:
-%53 = load i32*, i32* * %4
-%54 = load i32, i32* %7
-%55 = load i32, i32* %9
-%56 = call i32 @swap(i32 * %53, i32 %54, i32 %55)
-store i32 %56, i32* %7
-%57 = load i32, i32* %9
-store i32 %57, i32* %7
-%58 = load i32, i32* %7
-%59 = mul i32 %58, 2
-%60 = add i32 %59, 1
-store i32 %60, i32* %9
-br label %61
-61:
-br label %13
-62:
+br label %21
+14:
+%15 = load i32, i32* %4
+%16 = load i32, i32* %5
+%17 = load i32, i32* %6
+%18 = sub i32 %16, %17
+%19 = call i32 @func1(i32 %15, i32 %18, i32 0)
+ret i32 %19
+20:
+br label %21
+21:
 ret i32 0
 }
-define dso_local i32 @heap_sort(i32* %0, i32 %1){
-%3 = alloca i32* 
-store i32* %0, i32* * %3
+define dso_local i32 @func2(i32 %0, i32 %1){
+%3 = alloca i32 
+store i32 %0, i32* %3
 %4 = alloca i32 
 store i32 %1, i32* %4
-%5 = alloca i32 
-%6 = alloca i32 
-%7 = load i32, i32* %4
-%8 = sdiv i32 %7, 2
-%9 = sub i32 %8, 1
-store i32 %9, i32* %5
-br label %10
-10:
-%11 = load i32, i32* %5
-%12 = icmp sgt i32 %11, -1
-br i1 %12, label %13, label %22
+%5 = load i32, i32* %4
+%6 = icmp ne i32 %5, 0
+br i1 %6, label %7, label %13
+7:
+%8 = load i32, i32* %3
+%9 = load i32, i32* %4
+%10 = srem i32 %8, %9
+%11 = call i32 @func2(i32 %10, i32 0)
+ret i32 %11
+12:
+br label %16
 13:
-%14 = load i32, i32* %4
-%15 = sub i32 %14, 1
-store i32 %15, i32* %6
-%16 = load i32*, i32* * %3
-%17 = load i32, i32* %5
-%18 = load i32, i32* %6
-%19 = call i32 @heap_ajust(i32 * %16, i32 %17, i32 %18)
-store i32 %19, i32* %6
-%20 = load i32, i32* %5
-%21 = sub i32 %20, 1
-store i32 %21, i32* %5
-br label %10
-22:
-%23 = load i32, i32* %4
-%24 = sub i32 %23, 1
-store i32 %24, i32* %5
-br label %25
-25:
-%26 = load i32, i32* %5
-%27 = icmp sgt i32 %26, 0
-br i1 %27, label %28, label %42
-28:
-%29 = alloca i32 
-store i32 0, i32* %29
-%30 = load i32*, i32* * %3
-%31 = load i32, i32* %29
-%32 = load i32, i32* %5
-%33 = call i32 @swap(i32 * %30, i32 %31, i32 %32)
-store i32 %33, i32* %6
-%34 = load i32, i32* %5
-%35 = sub i32 %34, 1
-store i32 %35, i32* %6
-%36 = load i32*, i32* * %3
-%37 = load i32, i32* %29
-%38 = load i32, i32* %6
-%39 = call i32 @heap_ajust(i32 * %36, i32 %37, i32 %38)
-store i32 %39, i32* %6
-%40 = load i32, i32* %5
-%41 = sub i32 %40, 1
-store i32 %41, i32* %5
-br label %25
-42:
+%14 = load i32, i32* %3
+ret i32 %14
+15:
+br label %16
+16:
+ret i32 0
+}
+define dso_local i32 @func3(i32 %0, i32 %1){
+%3 = alloca i32 
+store i32 %0, i32* %3
+%4 = alloca i32 
+store i32 %1, i32* %4
+%5 = load i32, i32* %4
+%6 = icmp eq i32 %5, 0
+br i1 %6, label %7, label %11
+7:
+%8 = load i32, i32* %3
+%9 = add i32 %8, 1
+ret i32 %9
+10:
+br label %17
+11:
+%12 = load i32, i32* %3
+%13 = load i32, i32* %4
+%14 = add i32 %12, %13
+%15 = call i32 @func3(i32 %14, i32 0)
+ret i32 %15
+16:
+br label %17
+17:
+ret i32 0
+}
+define dso_local i32 @func4(i32 %0, i32 %1, i32 %2){
+%4 = alloca i32 
+store i32 %0, i32* %4
+%5 = alloca i32 
+store i32 %1, i32* %5
+%6 = alloca i32 
+store i32 %2, i32* %6
+%7 = load i32, i32* %4
+%8 = icmp ne i32 %7, 0
+br i1 %8, label %9, label %12
+9:
+%10 = load i32, i32* %5
+ret i32 %10
+11:
+br label %15
+12:
+%13 = load i32, i32* %6
+ret i32 %13
+14:
+br label %15
+15:
+ret i32 0
+}
+define dso_local i32 @func5(i32 %0){
+%2 = alloca i32 
+store i32 %0, i32* %2
+%3 = load i32, i32* %2
+%4 = mul i32 %3, -1
+ret i32 %4
+}
+define dso_local i32 @func6(i32 %0, i32 %1){
+%3 = alloca i32 
+store i32 %0, i32* %3
+%4 = alloca i32 
+store i32 %1, i32* %4
+%5 = load i32, i32* %3
+%6 = load i32, i32* %4
+%7 = icmp ne i32 %5, 0
+%8 = icmp ne i32 %6, 0
+%9 = and i1 %7, %8
+br i1 %9, label %10, label %12
+10:
+ret i32 1
+11:
+br label %14
+12:
+ret i32 0
+13:
+br label %14
+14:
+ret i32 0
+}
+define dso_local i32 @func7(i32 %0){
+%2 = alloca i32 
+store i32 %0, i32* %2
+%3 = load i32, i32* %2
+%4 = icmp eq i32 %3, 0
+br i1 %4, label %5, label %7
+5:
+ret i32 1
+6:
+br label %9
+7:
+ret i32 0
+8:
+br label %9
+9:
 ret i32 0
 }
 define dso_local i32 @main(){
-%1 = alloca [ 10 x i32 ]
-%2 = getelementptr[ 10 x i32 ],[10 x i32 ]* %1, i32 0, i32 0
-%3 = call i32 @getarray(i32 * %2)
-store i32 %3, i32* @n
+%1 = call i32 @getint()
+%2 = alloca i32 
+store i32 %1, i32* %2
+%3 = call i32 @getint()
 %4 = alloca i32 
-store i32 0, i32* %4
-%5 = getelementptr[ 10 x i32 ],[10 x i32 ]* %1, i32 0, i32 0
-%6 = load i32, i32* @n
-%7 = call i32 @heap_sort(i32 * %5, i32 %6)
-store i32 %7, i32* %4
-%8 = load i32, i32* @n
-%9 = getelementptr[ 10 x i32 ],[10 x i32 ]* %1, i32 0, i32 0
-call void @putarray(i32 %8, i32 * %9)
+store i32 %3, i32* %4
+%5 = call i32 @getint()
+%6 = alloca i32 
+store i32 %5, i32* %6
+%7 = call i32 @getint()
+%8 = alloca i32 
+store i32 %7, i32* %8
+%9 = alloca [ 10 x i32 ]
+%10 = alloca i32 
+store i32 0, i32* %10
+br label %11
+11:
+%12 = load i32, i32* %10
+%13 = icmp slt i32 %12, 10
+br i1 %13, label %14, label %21
+14:
+%15 = load i32, i32* %10
+%16 = add i32 %15, 0
+%17 = call i32 @getint()
+%18 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 %16
+store i32 %17, i32* %18
+%19 = load i32, i32* %10
+%20 = add i32 %19, 1
+store i32 %20, i32* %10
+br label %11
+21:
+%22 = load i32, i32* %2
+%23 = call i32 @func7(i32 %22)
+%24 = load i32, i32* %4
+%25 = call i32 @func5(i32 %24)
+%26 = call i32 @func6(i32 %23, i32 %25)
+%27 = load i32, i32* %6
+%28 = call i32 @func2(i32 %26, i32 %27)
+%29 = load i32, i32* %8
+%30 = call i32 @func3(i32 %28, i32 %29)
+%31 = call i32 @func5(i32 %30)
+%32 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 0
+%33 = load i32, i32* %32
+%34 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 1
+%35 = load i32, i32* %34
+%36 = call i32 @func5(i32 %35)
+%37 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 2
+%38 = load i32, i32* %37
+%39 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 3
+%40 = load i32, i32* %39
+%41 = call i32 @func7(i32 %40)
+%42 = call i32 @func6(i32 %38, i32 %41)
+%43 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 4
+%44 = load i32, i32* %43
+%45 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 5
+%46 = load i32, i32* %45
+%47 = call i32 @func7(i32 %46)
+%48 = call i32 @func2(i32 %44, i32 %47)
+%49 = call i32 @func4(i32 %36, i32 %42, i32 %48)
+%50 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 6
+%51 = load i32, i32* %50
+%52 = call i32 @func3(i32 %49, i32 %51)
+%53 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 7
+%54 = load i32, i32* %53
+%55 = call i32 @func2(i32 %52, i32 %54)
+%56 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 8
+%57 = load i32, i32* %56
+%58 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 9
+%59 = load i32, i32* %58
+%60 = call i32 @func7(i32 %59)
+%61 = call i32 @func3(i32 %57, i32 %60)
+%62 = load i32, i32* %2
+%63 = call i32 @func1(i32 %55, i32 %61, i32 %62)
+%64 = call i32 @func4(i32 %31, i32 %33, i32 %63)
+%65 = load i32, i32* %4
+%66 = load i32, i32* %6
+%67 = call i32 @func7(i32 %66)
+%68 = load i32, i32* %8
+%69 = call i32 @func3(i32 %67, i32 %68)
+%70 = call i32 @func2(i32 %65, i32 %69)
+%71 = call i32 @func3(i32 %64, i32 %70)
+%72 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 0
+%73 = load i32, i32* %72
+%74 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 1
+%75 = load i32, i32* %74
+%76 = call i32 @func1(i32 %71, i32 %73, i32 %75)
+%77 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 2
+%78 = load i32, i32* %77
+%79 = call i32 @func2(i32 %76, i32 %78)
+%80 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 3
+%81 = load i32, i32* %80
+%82 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 4
+%83 = load i32, i32* %82
+%84 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 5
+%85 = load i32, i32* %84
+%86 = call i32 @func5(i32 %85)
+%87 = call i32 @func3(i32 %83, i32 %86)
+%88 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 6
+%89 = load i32, i32* %88
+%90 = call i32 @func5(i32 %89)
+%91 = call i32 @func2(i32 %87, i32 %90)
+%92 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 7
+%93 = load i32, i32* %92
+%94 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 8
+%95 = load i32, i32* %94
+%96 = call i32 @func7(i32 %95)
+%97 = call i32 @func1(i32 %91, i32 %93, i32 %96)
+%98 = getelementptr[ 10 x i32 ],[10 x i32 ]* %9, i32 0, i32 9
+%99 = load i32, i32* %98
+%100 = call i32 @func5(i32 %99)
+%101 = call i32 @func2(i32 %97, i32 %100)
+%102 = load i32, i32* %2
+%103 = call i32 @func3(i32 %101, i32 %102)
+%104 = call i32 @func1(i32 %79, i32 %81, i32 %103)
+%105 = alloca i32 
+store i32 %104, i32* %105
+%106 = load i32, i32* %105
+call void @putint(i32 %106)
 ret i32 0
 }
