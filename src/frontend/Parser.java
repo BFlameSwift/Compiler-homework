@@ -640,7 +640,7 @@ public class Parser {
             int value = Integer.parseInt(token.getValue());
             return Utils.storeConstVariable(null,value, Utils.getNowFunction());
         }else if(Token.isIdent(token.getLexcial())){
-            if(Token.getNextToken().getLexcial() != Lexical.LBRACKET && (!(Utils.getSymbolItem(token)).isArray())){
+            if(Token.getNextToken().getLexcial() != Lexical.LBRACKET && (!(Utils.getSymbolItem(token)).isArray()  && (!(Utils.getSymbolItem(token)).isPointer()  ))){
                 SymbolItem lval = Utils.getSymbolItem(token);
                 if(lval.kind != 1) {
 
@@ -663,6 +663,7 @@ public class Parser {
                 int retAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
 
                 if (dismensionDiff > 0) Utils.getSymbolItemByAddress(retAddr).setPointer();
+//                System.out.println("array:::"+array.name+dismensionDiff);
                 Utils.getSymbolItemByAddress(retAddr).pointerDismension = dismensionDiff;
                 return retAddr;
             }

@@ -522,7 +522,7 @@ public class Utils {
             outputStr+="i32 ";
 
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
-
+            System.out.println(i+"///function:"+funcItem.name+funcItem.arrayAddrList.get(i)+"  "+item.pointerDismension);
             if(item.pointerDismension != funcItem.arrayAddrList.get(i)){
                 throw new CompileException("function param dismension is not match");
             }
