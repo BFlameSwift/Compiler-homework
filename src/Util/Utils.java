@@ -508,7 +508,7 @@ public class Utils {
         SymbolItem funcItem = funcSymbolTable.get(name);
         String outputStr = "";
 
-//        System.out.println(funcItem.name);
+//        System.out.println(funcItem.name+"!!!!!!!!!!!!!!!!!!!!!!!!!");
 //        for(int i=0;i<paramAddrList.size();i++){
 //            System.out.println(Utils.getSymbolItemByAddress(paramAddrList.get(i)).output());
 //        }
@@ -522,7 +522,7 @@ public class Utils {
             outputStr+="i32 ";
 
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
-            System.out.println(i+"///function:"+funcItem.name+funcItem.arrayAddrList.get(i)+"  "+item.pointerDismension);
+//            System.out.println(i+"///function:"+funcItem.name+funcItem.arrayAddrList.get(i)+"  "+item.pointerDismension);
             if(item.pointerDismension != funcItem.arrayAddrList.get(i)){
                 throw new CompileException("function param dismension is not match");
             }
@@ -551,11 +551,12 @@ public class Utils {
         Parser.midCodeOut.add("declare i32 @getarray(i32*)\n" +"declare void @putarray(i32, i32*)");
         SymbolItem getint = new SymbolItem("@getint",2,1,0,null);
         SymbolItem getch = new SymbolItem("@getch",2,1,0,null);
-        SymbolItem putint = new SymbolItem("@putint",2,0,1,new ArrayList<Integer>(){{add(0);}});
-        SymbolItem putch = new SymbolItem("@putch",2,0,1,new ArrayList<Integer>(){{add(0);}});
-        SymbolItem getarray = new SymbolItem("@getarray",2,1,1,new ArrayList<Integer>(){{add(1);}});
-        SymbolItem putarray = new SymbolItem("@putarray",2,0,2,new ArrayList<Integer>(){{add(0);add(1);}});
+        SymbolItem putint = new SymbolItem("@putint",2,0,1,new ArrayList<Integer>(){{add(1);}});
+        SymbolItem putch = new SymbolItem("@putch",2,0,1,new ArrayList<Integer>(){{add(1);}});
+        SymbolItem getarray = new SymbolItem("@getarray",2,1,1,new ArrayList<Integer>(){{add(3);}});
+        SymbolItem putarray = new SymbolItem("@putarray",2,0,2,new ArrayList<Integer>(){{add(1);add(3);}});
         putint.arrayAddrList.add(0); putch.arrayAddrList.add(0); putarray.arrayAddrList.add(0);putarray.arrayAddrList.add(1);
+        getarray.arrayAddrList.add(1);
         allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
         funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
         allFuncList.add(getarray.name);        allFuncList.add(putarray.name); funcSymbolTable.put(getarray.name,getarray);funcSymbolTable.put(putarray.name,putarray);

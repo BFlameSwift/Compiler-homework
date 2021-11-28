@@ -234,13 +234,14 @@ public class Parser {
     public static int parseFuncParams() throws CompileException{
         SymbolItem function = Utils.getSymbolItemByAddress(Utils.makeNewFakeFunction());
         String paramOut = "";
+
         while(Token.nextTokenLexcial("int") == Lexical.INT_DEC){
             function.length ++;
             Token ident = Token.nextToken("ident");
             ArrayList<Integer> dismension = new ArrayList<Integer>();
             if(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
                 Token.exceptNextToken(Lexical.RBRACKET);
-                dismension.add(Utils.allocateConst(0));
+                dismension.add(0);
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
                     dismension.add(parseConstExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
@@ -250,12 +251,13 @@ public class Parser {
                 function.arrayAddrList.add(dismension.size());
 //                System.out.println("is pointer");
                 Utils.putAddressSymbol(Utils.getNowAddress(),item);
+
             }else{
                 paramOut += "i32 %"+Utils.assignedAddress();
                 function.arrayAddrList.add(0);
                 Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(ident.getValue(),0));
             }
-
+//            function.arrayAddrList.add(identDismensiion);
             Token.previousToken();
             if(Token.getNextToken().getLexcial() != Lexical.COMMA){
                 Token.nextToken(")");

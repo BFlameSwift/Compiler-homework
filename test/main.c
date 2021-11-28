@@ -1,21 +1,73 @@
-int exgcd(int a, int b, int x[], int y[]) {
-    if (b == 0) {
-        x[0] = 1;
-        y[0] = 0;
-        return a;
-    } else {
-        int r = exgcd(b, a % b, x, y);
-        int t = x[0];
-        x[0]  = y[0];
-        y[0]  = (t - a / b * y[0]);
-        return r;
+int n;
+int Merge(int array[], int low, int middle, int high) {
+    int n1;
+    n1 = middle - low + 1;
+    int n2;
+    n2 = high - middle;
+    int L[10];
+    int R[10];
+    int i;
+    i = 0;
+    int j;
+    j = 0;
+
+    while (i < n1) {
+        L[i] = array[i + low];
+        i    = i + 1;
     }
+    while (j < n2) {
+        R[j] = array[j + middle + 1];
+        j    = j + 1;
+    }
+    i = 0;
+    j = 0;
+    int k;
+    k = low;
+    while (i != n1 && j != n2) {
+        if (L[i] < R[j] + 1) {
+            array[k] = L[i];
+            k        = k + 1;
+            i        = i + 1;
+        } else {
+            array[k] = R[j];
+            k        = k + 1;
+            j        = j + 1;
+        }
+    }
+    while (i < n1) {
+        array[k] = L[i];
+        k        = k + 1;
+        i        = i + 1;
+    }
+    while (j < n2) {
+        array[k] = R[j];
+        k        = k + 1;
+        j        = j + 1;
+    }
+    return 0;
+}
+
+int MergeSort(int array[], int p, int q) {
+    if (p < q) {
+        int mid;
+        mid = (p + q) / 2;
+        int tmp;
+        tmp = MergeSort(array, p, mid);
+        tmp = mid + 1;
+        tmp = MergeSort(array, tmp, q);
+        tmp = Merge(array, p, mid, q);
+    }
+    return 0;
 }
 
 int main() {
-    int a = 7, b = 15, x[1] = {1}, y[1] = {1};
-    exgcd(a, b, x, y);
-    x[0] = (x[0] % b + b) % b;
-    putint(x[0]);
+    int a[10];
+    n = getarray(a);
+    int i;
+    i = 0;
+    int tmp;
+    tmp = n - 1;
+    i   = MergeSort(a, i, tmp);
+    putarray(n, a);
     return 0;
 }

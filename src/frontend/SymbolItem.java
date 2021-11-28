@@ -44,7 +44,8 @@ public class SymbolItem {
 //            System.out.println("parametersList");
             for(int item:parametersList) System.out.printf("%d ",item);
 //            System.out.println("array.name = "+name);
-            throw new CompileException("array size not match");
+
+            throw new CompileException("array size not match"+"is"+name+"  "+parametersList.size());
         }else if (list.size() < parametersList.size()){
             addressIsArray = true;
             while(list.size() != parametersList.size()) {
