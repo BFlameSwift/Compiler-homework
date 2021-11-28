@@ -387,9 +387,11 @@ public class Utils {
         return item1.getAddress();
     }
     public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
+
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         item1 = Utils.getSymbolItemByAddress(loadPointer(address1));item2 = Utils.getSymbolItemByAddress(loadPointer(address2));
         address1 = item1.getAddress(); address2 = item2.getAddress();
+
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
@@ -466,23 +468,7 @@ public class Utils {
         return ++nowAddress;
     }
 
-    // find by funcname
-//    public static SymbolItem getSymbolItem(Token ident, String funcName) throws Util.CompileException {
-//        SymbolItem theSymbolItem = new SymbolItem("get_symbol example",-1);
-//
-//        try {
-//            theSymbolItem = allLocalSymbolTable.get(funcName).get(ident.getValue());
-//            if(! allLocalSymbolTable.get(funcName).containsKey(ident.getValue())){
-//                throw new Util.CompileException("this symbol"+ident.getValue()+"is not defined !!!");
-//            }
-//        }catch (Util.CompileException e1){
-//            throw new Util.CompileException("this symbol "+ident.getValue()+" is not defined !!!");
-//        }
-//        catch(Exception e){
-//            throw new Util.CompileException("This ident"+ident.getValue()+"is not define");
-//        }
-//        return theSymbolItem;
-//    }
+
     public static int callFunction(String name,ArrayList<Integer> paramAddrList) throws Util.CompileException {
         if(!funcSymbolTable.containsKey(name)){
             throw new Util.CompileException("cant find  this function");
@@ -505,26 +491,12 @@ public class Utils {
         }outputStr+=")";
         Parser.midCodeOut.add(outputStr);
         if( funcItem.type == 1){
+//            Parser.midCodeOut.add("a function put in "+nowAddress);
             funcItem.setLoadAddress(nowAddress);
-            addressSymbolTable.put(nowAddress,funcItem);
+            putAddressSymbol(nowAddress,new SymbolItem("loadfunc"+funcItem.name,0,funcItem.getValueInt(),getBlockIndex()));
         }
+//        Parser.midCodeOut.add((funcItem.type == 1?nowAddress:0)+"");
         return funcItem.type == 1?nowAddress:0;
-    }
-
-
-    public static int getIdentLVal(Token ident, String funcName) throws Util.CompileException {
-        // TODO 正确的找到真正数值
-       int ret = -1;
-       try {
-          ret =  allLocalSymbolTable.get(funcName).get(ident.getValue()).getValueInt();
-       }catch(Exception e){
-           throw new Util.CompileException("This ident"+ident.getValue()+"is not define");
-       }
-        SymbolItem thisSymbol = allLocalSymbolTable.get(funcName).get(ident.getValue());
-//       if(thisSymbol.constInt == SymbolItem.NOT_ASSIGN){
-//           throw new CompileException("This ident"+ident.getValue()+"is not Assign");
-//       }
-       return ret;
     }
 
     public static void initIOFunctions() {

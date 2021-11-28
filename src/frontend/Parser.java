@@ -501,6 +501,7 @@ public class Parser {
     // AddExp       -> MulExp  | AddExp ('+' | '−') MulExp
     public static int parseAddExp()throws CompileException {
         int addExpAddress = parseMulExp();
+
         //todo 可以简化步骤
         while(Token.isUnaryOp(Token.nextTokenLexcial("+ or -"))){
             String op = Token.getPreviousToken().getValue();
@@ -518,9 +519,11 @@ public class Parser {
     // MulExp       -> UnaryExp  | MulExp ('*' | '/' | '%') UnaryExp
     public static int parseMulExp()throws CompileException {
         int mulExpAddress = parseUnaryExp();
+//        Parser.midCodeOut.add(mulExpAddress+"");
         while(Token.isLevel3Operator(Token.nextTokenLexcial("* / %"))){
             String op = Token.getPreviousToken().getValue();
             int unaryExpAddress = parseUnaryExp();
+
             if("mul".equals(op) || "sdiv".equals(op)|| "srem".equals(op)) {
                 mulExpAddress = Utils.midExpCalculate(op,mulExpAddress,unaryExpAddress);
             }else{
@@ -576,7 +579,6 @@ public class Parser {
             ArrayList<Integer> paramAddrList = new ArrayList<>();
             int i;
             for(i=0;i< funcItem.length;){
-
                 paramAddrList.add(Utils.loadPointer(parseExp()));
                 i++;
                 if(!Token.isComma(Token.nextTokenLexcial(","))){
@@ -612,6 +614,7 @@ public class Parser {
 
                 if(lval.kind != 1) {
                     midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
+                    return Utils.getNowAddress();
                 }
                 return lval.getLoadAddress();
             }else{

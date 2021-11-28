@@ -4,35 +4,45 @@ declare void @putint(i32)
 declare void @putch(i32)
 declare i32 @getarray(i32*)
 declare void @putarray(i32, i32*)
-define dso_local i32@gcd(i32 %0, i32 %1){
-%3 = alloca i32 
-store i32 %0, i32* %3
-%4 = alloca i32 
-store i32 %1, i32* %4
-%5 = load i32, i32* %4
-%6 = icmp eq i32 %5, 0
-br i1 %6, label %7, label %10
+define dso_local i32@fib(i32 %0){
+%2 = alloca i32 
+store i32 %0, i32* %2
+%3 = load i32, i32* %2
+%4 = icmp eq i32 %3, 0
+br i1 %4, label %5, label %7
+5:
+ret i32 0
+6:
+br label %7
 7:
-%8 = load i32, i32* %3
-ret i32 %8
-9:
-br label %10
+%8 = load i32, i32* %2
+%9 = icmp eq i32 %8, 1
+br i1 %9, label %10, label %12
 10:
-%11 = load i32, i32* %4
-%12 = load i32, i32* %3
-%13 = load i32, i32* %4
-%14 = srem i32 %12, %13
-%15 = call i32 @gcd(i32 %11, i32 %14)
-ret i32 %15
+ret i32 1
+11:
+br label %12
+12:
+%13 = alloca i32 
+%14 = load i32, i32* %2
+%15 = sub i32 %14, 1
+store i32 %15, i32* %13
+%16 = alloca i32 
+%17 = load i32, i32* %2
+%18 = sub i32 %17, 2
+store i32 %18, i32* %16
+%19 = load i32, i32* %16
+%20 = call i32 @fib(i32 %19)
+%21 = load i32, i32* %13
+%22 = call i32 @fib(i32 %21)
+%23 = add i32 %20, %22
+ret i32 %23
 }
 define dso_local i32@main(){
 %1 = alloca i32 
-store i32 100, i32* %1
-%2 = alloca i32 
-store i32 48, i32* %2
-%3 = load i32, i32* %1
-%4 = load i32, i32* %2
-%5 = call i32 @gcd(i32 %3, i32 %4)
-call void @putint(i32 %5)
+store i32 10, i32* %1
+%2 = load i32, i32* %1
+%3 = call i32 @fib(i32 %2)
+call void @putint(i32 %3)
 ret i32 0
 }
