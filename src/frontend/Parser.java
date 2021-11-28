@@ -247,10 +247,12 @@ public class Parser {
                 }
                 paramOut+="i32* %"+Utils.assignedAddress();
                 SymbolItem item = new SymbolItem(ident.getValue(),0,3,dismension.size(),dismension);
+                function.arrayAddrList.add(dismension.size());
 //                System.out.println("is pointer");
                 Utils.putAddressSymbol(Utils.getNowAddress(),item);
             }else{
                 paramOut += "i32 %"+Utils.assignedAddress();
+                function.arrayAddrList.add(0);
                 Utils.putAddressSymbol(Utils.getNowAddress(),new SymbolItem(ident.getValue(),0));
             }
 
@@ -259,6 +261,7 @@ public class Parser {
                 Token.nextToken(")");
                 break;
             }Token.exceptNextToken(Lexical.COMMA);
+
             paramOut+= ", ";
         }Token.previousToken();
         midCodeOut.set(midCodeOut.size()-1,midCodeOut.get(midCodeOut.size()-1)+paramOut+"){");
@@ -608,7 +611,7 @@ public class Parser {
             int i;
             for(i=0;i< funcItem.length;){
                 paramAddrList.add(Utils.loadPointerValue(parseExp()));
-                i++;
+                i++;//故意，有原因的
                 if(!Token.isComma(Token.nextTokenLexcial(","))){
                     Token.previousToken();
                     break;
@@ -648,18 +651,19 @@ public class Parser {
                 return lval.getLoadAddress();
             }else{
                 SymbolItem array = Utils.getSymbolItem(token);
+
                 ArrayList<Integer> getAddrList = new ArrayList<Integer>();
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
                     getAddrList.add(parseExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }Token.previousToken();
-                Boolean retIsPointer = false;
-                if(getAddrList.size()<array.parametersList.size()){
-                    retIsPointer = true;
-                }
+                int dismensionDiff = array.parametersList.size() - getAddrList.size();
+
                 int locationAddr = array.addrListTransLocation((getAddrList));
                 int retAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
-                if (retIsPointer) Utils.getSymbolItemByAddress(retAddr).setPointer();
+
+                if (dismensionDiff == 0) Utils.getSymbolItemByAddress(retAddr).setPointer();
+                Utils.getSymbolItemByAddress(retAddr).pointerDismension = dismensionDiff;
                 return retAddr;
             }
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());

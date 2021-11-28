@@ -401,6 +401,7 @@ public class Utils {
         SymbolItem item1 = getSymbolItemByAddress(address);
         if(item1.type == 3 && !item1.isPointer() ){
             SymbolItem theSymbolItem = new SymbolItem(item1.name,0, item1.type,item1.blockIndex);
+            theSymbolItem.parametersList = item1.parametersList;
             putAddressSymbol((++nowAddress),theSymbolItem);
             item1.setLoadAddress(nowAddress);
             String outStr = "%"+(nowAddress)+" = load i32" +
@@ -506,6 +507,12 @@ public class Utils {
         }
         SymbolItem funcItem = funcSymbolTable.get(name);
         String outputStr = "";
+
+//        System.out.println(funcItem.name);
+//        for(int i=0;i<paramAddrList.size();i++){
+//            System.out.println(Utils.getSymbolItemByAddress(paramAddrList.get(i)).output());
+//        }
+
         if(funcItem.type == 1){// 是否有返回值
             outputStr += "%"+(++nowAddress)+" = ";
         }
@@ -515,7 +522,11 @@ public class Utils {
             outputStr+="i32 ";
 
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
-//            if(item.parametersList.size()!=funcItem.)
+
+            if(item.pointerDismension != funcItem.arrayAddrList.get(i)){
+                throw new CompileException("function param dismension is not match");
+            }
+//            System.out.println("!!!!!"+item.name);
             if(item.type == 3) outputStr += "* ";
             outputStr += item.kind == 1?item.getValueInt():"%"+item.getLoadAddress();
             if(i<funcItem.length-1) outputStr+=", ";
@@ -544,6 +555,7 @@ public class Utils {
         SymbolItem putch = new SymbolItem("@putch",2,0,1,new ArrayList<Integer>(){{add(1);}});
         SymbolItem getarray = new SymbolItem("@getarray",2,1,1,new ArrayList<Integer>(){{add(3);}});
         SymbolItem putarray = new SymbolItem("@putarray",2,0,2,new ArrayList<Integer>(){{add(1);add(3);}});
+        putint.arrayAddrList.add(0); putch.arrayAddrList.add(0); putarray.arrayAddrList.add(0);putarray.arrayAddrList.add(1);
         allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
         funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
         allFuncList.add(getarray.name);        allFuncList.add(putarray.name); funcSymbolTable.put(getarray.name,getarray);funcSymbolTable.put(putarray.name,putarray);

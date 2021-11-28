@@ -23,8 +23,9 @@ public class SymbolItem {
     private int loadAddress = ADDRESS_NOT_ASSIGN;
     public int length; // 数组总长度，函数变量参数数目
     public int blockIndex = 0;
-    public ArrayList<Integer> parametersList; // 参数类型  可以用作数据的对应维度的大小以及参数的类型
-    public ArrayList<Integer> arrayAddrList;
+    public int pointerDismension = 0;
+    public ArrayList<Integer> parametersList = new ArrayList<>();; // 参数类型  可以用作数据的对应维度的大小以及参数的类型
+    public ArrayList<Integer> arrayAddrList= new ArrayList<>();;
     public int getValueInt() throws CompileException {
         if (valueInt == NOT_ASSIGN){
             throw new CompileException("this symbol "+name+" address  " +address+" not assign value!!! cant read");
