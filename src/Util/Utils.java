@@ -374,18 +374,17 @@ public class Utils {
     }
     public static int condI1ToI32(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
+//        System.out.println("zexttttttttttttt "+address+" "+nowAddress);
         if(item1.isCond){
             Parser.midCodeOut.add("%"+(++nowAddress)+"= zext i1 %"+(address)+" to i32");
-            putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
+            putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),false));
             item1.setLoadAddress(nowAddress);
         }
         return nowAddress;
     }
     public static int condI32ToI1(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
-
         if(!item1.isCond){
-
             Parser.midCodeOut.add("%"+(++nowAddress)+" = icmp ne i32"+" %"+item1.getLoadAddress()+", 0");
 //            Parser.midCodeOut.add("%"+(++nowAddress)+"= zext i1 %"+(address)+" to i32");
             putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
@@ -427,13 +426,19 @@ public class Utils {
 //            condI1ToI32(address1);condI1ToI32(address2);
             condI32ToI1(address1); condI32ToI1(address2);
         }
+
+//        if(item1.isCond && !(op.equals("and")||op.equals("or"))){
+//            condI1ToI32(item1.getLoadAddress());
+//        }
         int objAddress = (objKind == 0||(objKind==1&&item1.isCond))?(++nowAddress):(++constAddress);// 将常量与变量计算分区
         Boolean objIsCond = false;
 //        int objAddress = nowAddress;
         if(objKind == 0||item1.isCond){// 是变量就输出过程
             // 选择计算的目标变量，如果是变量就是输出，换言之：折叠左侧常量计算
+
             String outStr = "%"+objAddress+" = ";
-            outStr += Token.isCond(op)?"icmp "+op+" i32 " :(op+((op=="and"||op=="or")?" i1 ":" i32 "));
+            outStr += Token.isCond(op)?"icmp "+op+" i32 " :(op+((op.equals("and")||op.equals("or"))?" i1 ":" i32 "));
+
 
             outStr += (item1.kind == 1)?item1.getValueInt():(!item1.isGlobal())?"%"+item1.getLoadAddress():item1.name;
             outStr += ", ";

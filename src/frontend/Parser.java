@@ -598,7 +598,8 @@ public class Parser {
             if(notCount%2==1){
 //                primaryAddr = Utils.putNewVariable(null,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(), Utils.getNowFunction());
                 int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction());
-                primaryAddr = Utils.midExpCalculate("eq",(Utils.getNowAddress()-1),newZeroAddr);
+//                primaryAddr = Utils.midExpCalculate("eq",(Utils.getNowAddress()-1),newZeroAddr);
+                primaryAddr = Utils.midExpCalculate("eq",(Utils.getNowAddress()),newZeroAddr);
                 Utils.putAddressSymbol(primaryAddr,new SymbolItem(null,0,1-Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),true));
 //                midCodeOut.add("%"+Utils.getNowAddress()+" = icmp eq i32 %"++", 0");
             }
