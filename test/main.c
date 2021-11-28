@@ -1,18 +1,17 @@
-int fib(int n) {
-	if (n == 0)
-		return 0;
-	if (n == 1)
-		return 1;
-	int p;
-	p = n - 1;
-	int q;
-	q = n - 2;
-	return fib(p) + fib(q);
+int a;
+int r;
+int fac(int x) {
+    if (x < 2)
+        return 1;
+    a = x - 1;
+    r = fac(a);
+    r = x * r;
+    return r;
 }
 
 int main() {
-	int tmp;
-	tmp = 10;
-	putint(fib(tmp));
+    int a;
+    a = 5;
+    putint(fac(a));
     return 0;
 }

@@ -192,10 +192,12 @@ public class Utils {
         return nowAddress;
     }
     public static int allocateConst(int value) throws CompileException {
-        SymbolItem item = getSymbolItemByAddress(constAddress);
-        if(value==0 &&constAddress>CONST_BEGIN_ADDRESS&& item.getValueInt() == 0&&item.isConstant()){
-            return constAddress;
-        }//稍微省点地址。
+        if(constAddress>CONST_BEGIN_ADDRESS){
+            SymbolItem item = getSymbolItemByAddress(constAddress);
+            if(value==0 &&constAddress>CONST_BEGIN_ADDRESS&& item.getValueInt() == 0&&item.isConstant()){
+                return constAddress;
+            }//稍微省点地址。
+        }
 
         return storeConstVariable(null,value,null);
     }
