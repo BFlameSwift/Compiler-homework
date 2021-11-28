@@ -98,11 +98,11 @@ public class Parser {
         for(int i=len-2;i>=0;i--){
             newList.set(i,newList.get(i)*newList.get(i+1));
         }
-        System.out.println("make satisfy list");
-        for(int i:newList){
-            System.out.printf("%d ",i);
-        }
-        System.out.println("end make ");
+//        System.out.println("make satisfy list");
+//        for(int i:newList){
+//            System.out.printf("%d ",i);
+//        }
+//        System.out.println("end make ");
         return newList;
     }
     public static int parseArrayRead(ArrayList<Integer> dismension,int type) throws CompileException {
@@ -320,7 +320,7 @@ public class Parser {
                 hasRet = true;
                 break;
             }
-            if(strs[0].substring(strs[0].length()-1,strs[0].length()).equals(":") ){
+            if(strs[0].substring(strs[0].length()-1,strs[0].length()).equals(":") || strs[strs.length-1].substring(strs[strs.length-1].length()-1).equals("{")){
                 break;
             }
         }
@@ -375,7 +375,7 @@ public class Parser {
             if(Token.getNextToken().getLexcial() == Lexical.SEMICOLON){
                 return -1;// return ;
             }
-            int expAddress = parseExp();
+            int expAddress = Utils.loadPointerValue(parseExp());
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
             String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getLoadAddress();

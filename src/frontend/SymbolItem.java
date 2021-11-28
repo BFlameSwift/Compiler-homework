@@ -38,11 +38,11 @@ public class SymbolItem {
     public int addrListTransLocation(ArrayList<Integer> list) throws CompileException {
         Boolean addressIsArray = false;
         if(list.size() > parametersList.size()){
-            System.out.println("list");
+//            System.out.println("list");
             for(int item:list) System.out.printf("%d ",item);
-            System.out.println("parametersList");
+//            System.out.println("parametersList");
             for(int item:parametersList) System.out.printf("%d ",item);
-            System.out.println("array.name = "+name);
+//            System.out.println("array.name = "+name);
             throw new CompileException("array size not match");
         }else if (list.size() < parametersList.size()){
             addressIsArray = true;
@@ -61,7 +61,7 @@ public class SymbolItem {
 //            ret += valueList.get(i)*satisfiedList.get(i+1);
 //        }ret += valueList.get(valueList.size()-1);
 //        if(addressIsArray) Utils.getSymbolItemByAddress(distination).setPointer();
-        System.out.println("ret addr："+distination+" ret value"+Utils.getSymbolItemByAddress(distination));
+//        System.out.println("ret addr："+distination+" ret value"+Utils.getSymbolItemByAddress(distination));
         return distination;
     }
 

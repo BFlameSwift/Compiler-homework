@@ -194,11 +194,10 @@ public class Utils {
     public static int allocateConst(int value) throws CompileException {
         if(constAddress>CONST_BEGIN_ADDRESS){
             SymbolItem item = getSymbolItemByAddress(constAddress);
-            if(value==0 &&constAddress>CONST_BEGIN_ADDRESS&& item.getValueInt() == 0&&item.isConstant()){
+            if(item.getValueInt() == value&&item.kind == 1){
                 return constAddress;
             }//稍微省点地址。
         }
-
         return storeConstVariable(null,value,null);
     }
     public static int putNewSymbol(SymbolItem symbolItem){
@@ -339,7 +338,7 @@ public class Utils {
     }
     public static int storeConstVariable(String name,int value,String funcName) throws Util.CompileException {
         SymbolItem item = new SymbolItem(name,1,value,getBlockIndex());
-        item.setAddress(++ constAddress);
+        item.setAddress((++ constAddress));
         if(name != null){
             putblockSymbolTable(item,blockIndex);
             putallocalSymbolTable(item,funcName);
@@ -417,6 +416,7 @@ public class Utils {
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
         item1 = Utils.getSymbolItemByAddress(loadPointerValue(address1));item2 = Utils.getSymbolItemByAddress(loadPointerValue(address2));
         address1 = item1.getAddress(); address2 = item2.getAddress();
+//        Parser.midCodeOut.add(item1.output()+item2.output());
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         if (objKind == 1)
             objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
