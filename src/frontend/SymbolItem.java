@@ -63,11 +63,13 @@ public class SymbolItem {
     }
     public int getLoadAddress() throws CompileException {
         if(loadAddress == ADDRESS_NOT_ASSIGN){
-            throw new CompileException("load address = 114514");
+            throw new CompileException("load address = -114514");
         }
         return loadAddress;
     }public Boolean isArray(){
         return kind ==3||kind ==4;
+    }public Boolean isPointer(){
+        return type == 3 &&(kind!=3&&kind != 4);
     }
 
     public void setLoadAddress(int loadAddress) {
@@ -165,11 +167,11 @@ public class SymbolItem {
             Parser.parseCompUnit();
         }catch (CompileException e){
 //            System.out.println(e);
-            e.printStackTrace();
+//            e.printStackTrace();
             for(String str : Parser.midCodeOut){
                 System.out.println(str);
             }ArrayList<String> itemList = new ArrayList<String>();
-            for(int i=1;i<Utils.getNowAddress();i++){
+            for(int i=3;i<Utils.getNowAddress();i++){
                 try {
                     itemList.add(i+" ."+Utils.getSymbolItemByAddress(i).output());
                 }catch (IllegalArgumentException e1){
@@ -179,22 +181,27 @@ public class SymbolItem {
                 }
             }
             System.exit(-1);
-        }
-        ArrayList<String> itemList = new ArrayList<String>();
-        for(int i=1;i<Utils.getNowAddress();i++){
-            try {
-                itemList.add(i+" ."+Utils.getSymbolItemByAddress(i).output());
-            }catch (IllegalArgumentException e){
-                itemList.add(i+"null");
-            }catch (NullPointerException r){
-                itemList.add(i+"null");
+        }finally {
+            ArrayList<String> itemList = new ArrayList<String>();
+            for(int i=1;i<Utils.getNowAddress();i++) {
+                try {
+                    itemList.add(i + " ." + Utils.getSymbolItemByAddress(i).output());
+                } catch (IllegalArgumentException e) {
+                    itemList.add(i + "null");
+                } catch (NullPointerException r) {
+                    itemList.add(i + "null");
+                }
+            } Parser.outputFile("./test/symbolItem.txt",itemList);
+
+            for(String str : Parser.midCodeOut){
+                System.out.println(str);
             }
-        }Parser.outputFile("./test/symbolItem.txt",itemList);
+            for(String str: itemList){
+                System.out.println(str);
+            }
+        }
 
-
-        for(String str : Parser.midCodeOut){
-            System.out.println(str);
-        } Parser.outputFile(args[1],Parser.midCodeOut );
+        Parser.outputFile(args[1],Parser.midCodeOut );
 
         System.exit(0);
 

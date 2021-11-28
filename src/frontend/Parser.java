@@ -3,6 +3,7 @@ package frontend;
 import Util.CompileException;
 import Util.Utils;
 import ir.Analysis;
+import jdk.jshell.execution.Util;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -263,15 +264,19 @@ public class Parser {
         }Token.previousToken();
         midCodeOut.set(midCodeOut.size()-1,midCodeOut.get(midCodeOut.size()-1)+paramOut+"){");
         // 将各个变量赋值到下面
+        Utils.assignedAddress(); // addr ++
+        Utils.prepareFunctionParams();
         for(int i=0;i<function.length;i++){
             // 符号被依次存到这些地址中，逐一取出处理
             // type == 3 表示为指针的数组类型
             SymbolItem item = Utils.getSymbolItemByAddress(i);
             Token paramToken = new Token(-1,item.name,-1);
-            int varAddr = Utils.allocateVariable(paramToken,item.kind==3?4:0,item.parametersList,function.name);
-            Utils.storeVariableOutput(item.getAddress(),varAddr);
+            int varAddr = Utils.allocateVariable(paramToken,item.kind==3?4 :0,item.parametersList,function.name);
+            System.out.println(Utils.getSymbolItemByAddress(varAddr).name+Utils.getSymbolItemByAddress(varAddr).getAddress());
+            Utils.storeVariable(paramToken,3);
+            midCodeOut.add(Utils.storeVariableOutput(item.getAddress(),varAddr));
         }
-
+        Utils.endFunctionParams();
         return function.getAddress();
     }
 
@@ -287,14 +292,13 @@ public class Parser {
         }
         midCodeOut.add("define dso_local i32"+funcName+"(");
         Token.exceptNextToken(Lexical.LPAREN);
-
+        Utils.enterFunction(funcName); // 进入函数
         int functionAddr = parseFuncParams();
+        SymbolItem function = Utils.getSymbolItemByAddress(functionAddr);
         System.out.println(Utils.getSymbolItemByAddress(functionAddr).length);
         Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
         Token.exceptNextToken(Lexical.RPAREN);
 
-        Utils.enterFunction(funcName); // 进入函数
-//        midCodeOut.set(midCodeOut.size()-1,midCodeOut.get(midCodeOut.size()-1)+"){");
 
         parseBlock();
 
@@ -310,6 +314,7 @@ public class Parser {
     // Block        -> '{' { BlockItem } '}'
     public static int parseBlock()throws CompileException {
         Utils.enterBlock(); //blockindex ++;
+
         Token.exceptNextToken(Lexical.LBRACE);   //midCodeOut.add("{");
         int blockHasRet = 0;
         while (!Token.judgeNextToken(Lexical.RBRACE)) {
@@ -345,7 +350,7 @@ public class Parser {
             int expAddress = parseExp();
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
-            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getAddress();
+            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getLoadAddress();
             midCodeOut.add("ret i32 "+retStr);
             Token.exceptNextToken(Lexical.SEMICOLON);
             return 1;
@@ -582,7 +587,8 @@ public class Parser {
                 throw new CompileException("Parse Error ident param is lack");
             }
             Token.exceptNextToken(Lexical.RPAREN);
-            return processIOFunc(thisToken.getValue(),paramAddrList);
+            return Utils.callFunction(thisToken.getValue(),paramAddrList);
+//            return processIOFunc(thisToken.getValue(),paramAddrList);
         }
 
         else{
@@ -716,7 +722,18 @@ public class Parser {
             int address = paramAddrList.get(0);
             System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
             return saveAddress;
-        }else{
+        }else if("@puarray".equals(funcName)){
+            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+            int address = paramAddrList.get(0);
+//            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
+            return saveAddress;
+        }else if("@getarray".equals(funcName)){
+            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+            int address = paramAddrList.get(0);
+//            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
+            return saveAddress;
+        }
+        else{
             throw new CompileException("IOFunction error");
         }
     }

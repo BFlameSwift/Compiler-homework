@@ -44,10 +44,9 @@ public class Utils {
 
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
+        nowAddress=-1 ;
 //        nowAddress ++;
-        for(int i=0;i<=nowAddress ;i++){
-            addressSymbolTable.remove(i);
-        }
+
     }
 
     public static int assignedAddress(){
@@ -57,7 +56,13 @@ public class Utils {
     public static int getNowAddress() {
         return nowAddress;
     }
-
+    public static void prepareFunctionParams() {
+        blockSymbolTable.add(new HashMap<String, SymbolItem>());
+        blockIndex++;
+    }
+    public static void endFunctionParams() {
+        blockIndex--;
+    }
     public static void enterBlock(){
         blockIndex ++;
 //        blockMaxIndex = Math.max(blockMaxIndex, blockIndex);
@@ -65,6 +70,9 @@ public class Utils {
     }
     public static void quitBlock(){
         Map<String, SymbolItem> map = blockSymbolTable.get(blockIndex);
+//        for(int i=0;i<=nowAddress ;i++){
+//            addressSymbolTable.remove(i);
+//        }
         map.clear();
         blockIndex --;
     }
@@ -81,7 +89,7 @@ public class Utils {
     }
     public static String allocateVariableOutput(int varAddr) throws CompileException {
         SymbolItem item = getSymbolItemByAddress(varAddr);
-        return "%"+varAddr+" = alloca "+(item.isArray()?"[ "+item.length+" x i32 ]":"i32");
+        return "%"+varAddr+" = alloca "+(item.isArray()?"[ "+item.length+" x i32 ]":"i32"+(item.isPointer()?"* ":" "));
     }
     public static void putGlobalInBlock0(String symbolName, SymbolItem symbolItem){
         try{
@@ -487,13 +495,19 @@ public class Utils {
         outputStr += "call "; outputStr += (funcItem.type == 1)?"i32":"void";
         outputStr+=" "+name+"(";
         for(int i=0;i<funcItem.length;i++){
-            outputStr+=" i32 ";
+            outputStr+="i32 ";
+
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
             outputStr += item.kind == 1?item.getValueInt():"%"+item.getLoadAddress();
+            if(i<funcItem.length-1) outputStr+=", ";
 //        "%"+paramAddrList.get(i);
 //            outputStr += " ";
         }outputStr+=")";
         Parser.midCodeOut.add(outputStr);
+        if( funcItem.type == 1){
+            funcItem.setLoadAddress(nowAddress);
+            addressSymbolTable.put(nowAddress,funcItem);
+        }
         return funcItem.type == 1?nowAddress:0;
     }
 
