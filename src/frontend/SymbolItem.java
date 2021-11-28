@@ -63,9 +63,7 @@ public class SymbolItem {
             int addItemAddr = Utils.midExpCalculate("mul",list.get(i),Utils.allocateConst(satisfiedList.get(i+1)));
             distination = Utils.midExpCalculate("add",addItemAddr,distination);
         }distination = Utils.midExpCalculate("add",list.get(list.size()-1),distination);
-        if(Utils.getSymbolItemByAddress(distination).isConstant()){
-            Parser.midCodeOut.add(Utils.getSymbolItemByAddress(distination).getValueInt()+"");
-        }
+       
 //        for(int i=0;i<valueList.size()-1;i++){
 //            ret += valueList.get(i)*satisfiedList.get(i+1);
 //        }ret += valueList.get(valueList.size()-1);
