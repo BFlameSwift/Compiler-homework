@@ -333,6 +333,7 @@ public class Parser {
             midCodeOut.add("ret "+(funcDef.getLexcial() == Lexical.INT_DEC?"i32 0":"void"));
         }
         midCodeOut.add("}");
+        Utils.quitFunction();
         return true;
     }
 

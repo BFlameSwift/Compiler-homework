@@ -45,8 +45,9 @@ public class Utils {
     public static void enterFunction(String funcName){
         nowFunctionName = funcName;
         nowAddress=-1 ;
-//        nowAddress ++;
-
+    }
+    public static void quitFunction(){
+        nowFunctionName = DEFAULT_GLOABL_FUNCTION_NAME;
     }
 
     public static int assignedAddress(){
@@ -65,6 +66,7 @@ public class Utils {
     }
     public static void enterBlock(){
         blockIndex ++;
+
 //        blockMaxIndex = Math.max(blockMaxIndex, blockIndex);
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
