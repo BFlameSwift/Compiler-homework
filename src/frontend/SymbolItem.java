@@ -31,18 +31,27 @@ public class SymbolItem {
         }
         return valueInt;
     }
-
+    public void setPointer(){
+        kind = 0;
+        type = 3;
+    }
     public void setValueInt(int valueInt) {
         this.valueInt = valueInt;
     }
     public int addrListTransLocation(ArrayList<Integer> list) throws CompileException {
-        if(list.size() != parametersList.size()){
+        Boolean addressIsArray = false;
+        if(list.size() > parametersList.size()){
             System.out.println("list");
             for(int item:list) System.out.printf("%d ",item);
             System.out.println("parametersList");
             for(int item:parametersList) System.out.printf("%d ",item);
             System.out.println("array.name = "+name);
             throw new CompileException("array size not match");
+        }else if (list.size() < parametersList.size()){
+            addressIsArray = true;
+            while(list.size() != parametersList.size()) {
+                list.add(Utils.allocateConst(0));
+            }
         }
         ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(parametersList);
         int ret = 0;
@@ -54,6 +63,7 @@ public class SymbolItem {
 //        for(int i=0;i<valueList.size()-1;i++){
 //            ret += valueList.get(i)*satisfiedList.get(i+1);
 //        }ret += valueList.get(valueList.size()-1);
+//        if(addressIsArray) Utils.getSymbolItemByAddress(distination).setPointer();
         System.out.println("ret addr："+distination+" ret value"+Utils.getSymbolItemByAddress(distination));
         return distination;
     }
@@ -69,7 +79,8 @@ public class SymbolItem {
     }public Boolean isArray(){
         return kind ==3||kind ==4;
     }public Boolean isPointer(){
-        return type == 3 &&(kind!=3&&kind != 4);
+        return type == 3 &&kind ==0;
+//        return type == 3;
     }
 
     public void setLoadAddress(int loadAddress) {

@@ -3,7 +3,6 @@ package frontend;
 import Util.CompileException;
 import Util.Utils;
 import ir.Analysis;
-import jdk.jshell.execution.Util;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -190,7 +189,7 @@ public class Parser {
             if(Utils.isGlobal()){
                 Utils.allocateGlobalVariable(identToken,0,atom!=0?4:0,true,Utils.makeEmptyArray(arrayDismension));
             }else{
-                    varAddr = Utils.allocateVariable(identToken,atom!=0?4:0, arrayDismension,Utils.getNowFunction());
+                    varAddr = Utils.allocateVariable(identToken,atom!=0?4:0,0, arrayDismension,Utils.getNowFunction());
             }
             Token.previousToken();
             return;
@@ -205,7 +204,7 @@ public class Parser {
             return;
         }
         if(atom ==0){
-            varAddr = Utils.allocateVariable(identToken,0,arrayDismension, Utils.getNowFunction());
+            varAddr = Utils.allocateVariable(identToken,0,0,arrayDismension, Utils.getNowFunction());
             varAddr = Utils.storeVariable(identToken, Utils.getSymbolItemByAddress(valueAddr).getValueInt());
             midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
         }else{
@@ -242,13 +241,13 @@ public class Parser {
             if(Token.nextTokenLexcial("[") == Lexical.LBRACKET){
                 Token.exceptNextToken(Lexical.RBRACKET);
                 dismension.add(Utils.allocateConst(0));
-
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
                     dismension.add(parseConstExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }
                 paramOut+="i32* %"+Utils.assignedAddress();
                 SymbolItem item = new SymbolItem(ident.getValue(),0,3,dismension.size(),dismension);
+//                System.out.println("is pointer");
                 Utils.putAddressSymbol(Utils.getNowAddress(),item);
             }else{
                 paramOut += "i32 %"+Utils.assignedAddress();
@@ -271,10 +270,20 @@ public class Parser {
             // type == 3 表示为指针的数组类型
             SymbolItem item = Utils.getSymbolItemByAddress(i);
             Token paramToken = new Token(-1,item.name,-1);
-            int varAddr = Utils.allocateVariable(paramToken,item.kind==3?4 :0,item.parametersList,function.name);
-            System.out.println(Utils.getSymbolItemByAddress(varAddr).name+Utils.getSymbolItemByAddress(varAddr).getAddress());
+            int varAddr  =0;
+            if(item.isPointer()){
+                varAddr = Utils.allocateVariable(paramToken,0,3,item.parametersList,function.name);
+                midCodeOut.add(Utils.storePointerOutput(item.getAddress(),varAddr));
+            }
+
+            else{
+                varAddr = Utils.allocateVariable(paramToken,0,1,item.parametersList,function.name);
+                midCodeOut.add(Utils.storeVariableOutput(item.getAddress(),varAddr));
+            }
             Utils.storeVariable(paramToken,3);
-            midCodeOut.add(Utils.storeVariableOutput(item.getAddress(),varAddr));
+            System.out.println(Utils.getSymbolItemByAddress(varAddr).name+Utils.getSymbolItemByAddress(varAddr).getAddress());
+
+
         }
         Utils.endFunctionParams();
         return function.getAddress();
@@ -282,26 +291,35 @@ public class Parser {
 
     // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
     public static Boolean parseFuncDef()throws CompileException {
+
         Token funcDef = Token.nextToken("FuncDef");
         String funcName = parseIdent();
+//        Token functionType = Token.previousToken();
         // 如果下一个不是函数定义，则可能是变量定义，先回退
         if(Token.getNextToken().getLexcial() != Lexical.LPAREN) {
             Token.previousToken();
             Token.previousToken();
             return false;
         }
-        midCodeOut.add("define dso_local i32"+funcName+"(");
+        midCodeOut.add("define dso_local "+(funcDef.getLexcial() == Lexical.INT_DEC?"i32 ":"void ")
+                +funcName+"(");
         Token.exceptNextToken(Lexical.LPAREN);
         Utils.enterFunction(funcName); // 进入函数
         int functionAddr = parseFuncParams();
         SymbolItem function = Utils.getSymbolItemByAddress(functionAddr);
+        function.type = (funcDef.getLexcial() == Lexical.IF_DEC?1:0);
         System.out.println(Utils.getSymbolItemByAddress(functionAddr).length);
         Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
         Token.exceptNextToken(Lexical.RPAREN);
 
-
-        parseBlock();
-
+        int funcRet = parseBlock();
+//        if(funcRet == 1||function.type == 0){
+//            // 函数有void但是却又返回值
+//            throw  new CompileException("Function is void but has return i32");
+//        }
+        if(funcRet== -1){
+            midCodeOut.add("ret void");
+        }
         midCodeOut.add("}");
         return true;
     }
@@ -347,6 +365,9 @@ public class Parser {
     public static int parseStmt()throws CompileException {
         Token token = Token.nextToken("exp or Lval = Exp or return or block or if");
         if(token.judgeThis(Lexical.RETURN_DEC)){
+            if(Token.getNextToken().getLexcial() == Lexical.SEMICOLON){
+                return -1;// return ;
+            }
             int expAddress = parseExp();
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
@@ -375,7 +396,7 @@ public class Parser {
                 if(Token.isAssign(Token.nextTokenLexcial("="))){//SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
                     int expAddr = parseExp();
                     int varAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
-                    array.arrayAddrList.set(Utils.getSymbolItemByAddress(locationAddr).getValueInt(),expAddr);
+//                    array.arrayAddrList.set(Utils.getSymbolItemByAddress(locationAddr).getValueInt(),expAddr);
                     midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
                 }
             }
@@ -400,7 +421,7 @@ public class Parser {
             Utils.nextLabel();
             int stmtRet = parseStmt();
             int jumpToloca1 =0;
-            if(stmtRet == 1){
+            if(stmtRet == 1 || stmtRet == -1){
                 int label = Utils.nextLabel();
             }Utils.endBlockJumpOutput(); // 如果stmt中没有ret continue break等结束块语句
             jumpToloca1 = midCodeOut.size() - 1;
@@ -410,7 +431,7 @@ public class Parser {
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
                  stmtRet = parseStmt();
-                if(stmtRet == 1){
+                if(stmtRet == 1 || stmtRet == -1){
                     Utils.nextLabel();
                 }
                     Utils.endBlockJumpOutput();
@@ -444,7 +465,7 @@ public class Parser {
             Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
             Utils.beforejudgeCondition(condAddr);Utils.readyJump(); int jumpToloca2 = midCodeOut.size()-1; int condLabel = Utils.nextLabel();
             int stmtRet = parseStmt();
-            if(stmtRet == 1){
+            if(stmtRet == 1 || stmtRet == -1){
                 int label = Utils.nextLabel();
             }
             Utils.endBlockJumpOutput(); int endCycleLoca = midCodeOut.size() - 1;
@@ -501,8 +522,6 @@ public class Parser {
     // AddExp       -> MulExp  | AddExp ('+' | '−') MulExp
     public static int parseAddExp()throws CompileException {
         int addExpAddress = parseMulExp();
-
-        //todo 可以简化步骤
         while(Token.isUnaryOp(Token.nextTokenLexcial("+ or -"))){
             String op = Token.getPreviousToken().getValue();
 //            System.out.println("this op:"+op);
@@ -579,7 +598,7 @@ public class Parser {
             ArrayList<Integer> paramAddrList = new ArrayList<>();
             int i;
             for(i=0;i< funcItem.length;){
-                paramAddrList.add(Utils.loadPointer(parseExp()));
+                paramAddrList.add(Utils.loadPointerValue(parseExp()));
                 i++;
                 if(!Token.isComma(Token.nextTokenLexcial(","))){
                     Token.previousToken();
@@ -624,8 +643,14 @@ public class Parser {
                     getAddrList.add(parseExp());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }Token.previousToken();
+                Boolean retIsPointer = false;
+                if(getAddrList.size()<array.parametersList.size()){
+                    retIsPointer = true;
+                }
                 int locationAddr = array.addrListTransLocation((getAddrList));
-                return Utils.getArrayElemAddr(array.getAddress(),locationAddr);
+                int retAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
+                if (retIsPointer) Utils.getSymbolItemByAddress(retAddr).setPointer();
+                return retAddr;
             }
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());
         }

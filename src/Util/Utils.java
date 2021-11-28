@@ -169,19 +169,20 @@ public class Utils {
 
         Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon,arrayAddr));
     }
-    public static int allocateVariable(Token token, int kind,ArrayList<Integer> dismension, String funcName) throws Util.CompileException {
+    public static int allocateVariable(Token token, int kind,int type,ArrayList<Integer> dismension, String funcName) throws Util.CompileException {
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
-        SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
+        SymbolItem symbolItem =  new SymbolItem(symbolName,kind,type,0,dismension);
         symbolItem.blockIndex = getBlockIndex();
         symbolItem.setAddress((++nowAddress));
         symbolItem.parametersList = dismension;
         int len = 1;
-        if(kind ==4){ // 是变量数组的话
+        if(kind ==4 || type == 3){ // 是变量数组的话
             symbolItem.arrayAddrList = new ArrayList<Integer>();
             for(int i:dismension){
                 len*= i;
-            }symbolItem.length = len;
+            }
+            symbolItem.length = len;
             for(int i=0;i<len;i++) symbolItem.arrayAddrList.add(Utils.allocateConst(0));
         }
         putAddressSymbol(nowAddress,symbolItem);
@@ -191,7 +192,8 @@ public class Utils {
         return nowAddress;
     }
     public static int allocateConst(int value) throws CompileException {
-        if(value==0 &&constAddress>CONST_BEGIN_ADDRESS&& getSymbolItemByAddress(constAddress).getValueInt() == 0){
+        SymbolItem item = getSymbolItemByAddress(constAddress);
+        if(value==0 &&constAddress>CONST_BEGIN_ADDRESS&& item.getValueInt() == 0&&item.isConstant()){
             return constAddress;
         }//稍微省点地址。
 
@@ -262,6 +264,7 @@ public class Utils {
             throw new Util.CompileException("This ident "+token.getValue()+"is not a variable");
         }return item;
     }
+
     public static int storeVariable(Token token, int value) throws Util.CompileException {
 
         SymbolItem symbolItem = new SymbolItem(null,-1); // 随便初始化一个。。后面会覆盖掉
@@ -290,7 +293,13 @@ public class Utils {
     public static int getArrayElemAddr(int arrayAddr,int locationAddr) throws CompileException {
         SymbolItem arrayItem = getSymbolItemByAddress(arrayAddr);
         SymbolItem locationItem = getSymbolItemByAddress(locationAddr);
-        Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr));
+        if (!arrayItem.isPointer()){
+            Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr));
+        }else{
+            loadPointerAddress(arrayItem.getAddress());
+            Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+" i32"+", i32* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getLoadAddress())+", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr));
+
+        }
         arrayItem.setLoadAddress( nowAddress);
         putAddressSymbol(nowAddress,new SymbolItem(null,-2,3,0,null));
 //        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
@@ -344,9 +353,16 @@ public class Utils {
         }putAddressSymbol(nowAddress,item);
         return item.getAddress();
     }
-
+    public static String storePointerOutput(int valueAddr,int varAddr) throws Util.CompileException {
+        SymbolItem valueItem = getSymbolItemByAddress(valueAddr);
+        SymbolItem varItem = getSymbolItemByAddress(varAddr);
+        String retStr = "store i32* ";
+        retStr += valueItem.kind == 1?valueItem.getValueInt():"%"+valueItem.getLoadAddress();
+        retStr += ", i32* * "+((varItem.isGlobal())?varItem.name:"%"+varAddr);
+        return retStr;
+    }
     public static String storeVariableOutput(int valueAddr,int varAddr) throws Util.CompileException {
-        SymbolItem valueItem = getSymbolItemByAddress(loadPointer(valueAddr));
+        SymbolItem valueItem = getSymbolItemByAddress(loadPointerValue(valueAddr));
         SymbolItem varItem = getSymbolItemByAddress(varAddr);
         String retStr = "store i32 ";
         retStr += valueItem.kind == 1?valueItem.getValueInt():"%"+valueItem.getLoadAddress();
@@ -374,13 +390,21 @@ public class Utils {
         }
         return nowAddress;
     }
-    public static int loadPointer(int address) throws CompileException {
+    public static int loadPointerAddress(int address) throws CompileException {
+        Parser.midCodeOut.add("%" +(++nowAddress)+ " = load i32* , i32* * "+"%"+address);
+        putAddressSymbol(nowAddress,new SymbolItem(null,1,3,0,null));
+        Utils.getSymbolItemByAddress(address).setLoadAddress(nowAddress);
+        return nowAddress;
+    }
+    public static int loadPointerValue(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
-        if(item1.type == 3){
+        if(item1.type == 3 && !item1.isPointer() ){
             SymbolItem theSymbolItem = new SymbolItem(item1.name,0, item1.type,item1.blockIndex);
             putAddressSymbol((++nowAddress),theSymbolItem);
             item1.setLoadAddress(nowAddress);
-            String outStr = "%"+(nowAddress)+" = load i32, i32* "+((item1.isGlobal())?(item1.name):("%"+item1.getAddress()));
+            String outStr = "%"+(nowAddress)+" = load i32" +(item1.isPointer()?"*":"")+
+                    ", i32* "
+                    +((item1.isGlobal())?(item1.name):("%"+item1.getAddress()));
             Parser.midCodeOut.add(outStr);
             item1 = theSymbolItem;
         }
@@ -389,9 +413,8 @@ public class Utils {
     public static int midExpCalculate(String op,int address1,int address2) throws Util.CompileException {
 
         SymbolItem item1 = getSymbolItemByAddress(address1),item2 = getSymbolItemByAddress(address2);
-        item1 = Utils.getSymbolItemByAddress(loadPointer(address1));item2 = Utils.getSymbolItemByAddress(loadPointer(address2));
+        item1 = Utils.getSymbolItemByAddress(loadPointerValue(address1));item2 = Utils.getSymbolItemByAddress(loadPointerValue(address2));
         address1 = item1.getAddress(); address2 = item2.getAddress();
-
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
         if(op.equals("or") || op.equals("and")){
@@ -456,12 +479,12 @@ public class Utils {
     }
     public static String loadLValOutput(Token token, String funcName) throws Util.CompileException {
         SymbolItem theSymbolItem = getSymbolItem(token);
-//        System.out.println(token.getValue());
         if(theSymbolItem.getAddress() == 0){
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
         putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex())); // TODO 这里应该是变量吗
         theSymbolItem.setLoadAddress(nowAddress+1);
+
         return "%"+(++nowAddress)+" = load i32, i32* "+((theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress()));
     }
     public static int enterIfStmt(){
@@ -484,6 +507,7 @@ public class Utils {
             outputStr+="i32 ";
 
             SymbolItem item = getSymbolItemByAddress(paramAddrList.get(i));
+            if(item.type == 3) outputStr += "* ";
             outputStr += item.kind == 1?item.getValueInt():"%"+item.getLoadAddress();
             if(i<funcItem.length-1) outputStr+=", ";
 //        "%"+paramAddrList.get(i);
