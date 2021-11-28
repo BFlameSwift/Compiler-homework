@@ -27,7 +27,7 @@ public class SymbolItem {
     public ArrayList<Integer> parametersList = new ArrayList<>();; // 参数类型  可以用作数据的对应维度的大小以及参数的类型
     public ArrayList<Integer> arrayAddrList= new ArrayList<>();;
     public int getValueInt() throws CompileException {
-        if (valueInt == NOT_ASSIGN){
+        if (valueInt == NOT_ASSIGN && kind == 1){
             throw new CompileException("this symbol "+name+" address  " +address+" not assign value!!! cant read");
         }
         return valueInt;
@@ -53,10 +53,10 @@ public class SymbolItem {
             }
         }
         ArrayList<Integer> constArraySizeList = new ArrayList<>();
-        for(int i=0; i<list.size(); i++){
-            constArraySizeList.add(Utils.getSymbolItemByAddress(parametersList.get(i)).getValueInt());
-        }
-        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(constArraySizeList);
+//        for(int i=0; i<list.size(); i++){
+//            constArraySizeList.add(Utils.getSymbolItemByAddress(parametersList.get(i)).getValueInt());
+//        }
+        ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(parametersList);
         int ret = 0;
         int  distination= Utils.allocateConst(0);
         for(int i=0;i<list.size()-1;i++){

@@ -286,6 +286,7 @@ public class Parser {
 
             else{
                 varAddr = Utils.allocateVariable(paramToken,0,1,item.parametersList,function.name);
+//                Utils.storeVariable()
                 midCodeOut.add(Utils.storeVariableOutput(item.getAddress(),varAddr));
             }
             Utils.storeVariable(paramToken,3);
@@ -469,7 +470,6 @@ public class Parser {
         }
         else if(token.getLexcial() == Lexical.LBRACE){
             Token.previousToken();
-//            int blockHasRet = parseBlock();
             return parseBlock();
         }
         else if(token.getLexcial() == Lexical.WHILE_DEC){
