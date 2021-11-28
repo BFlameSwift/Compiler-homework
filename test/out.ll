@@ -42,9 +42,9 @@ define dso_local i32 @fib(i32 %0) {
   %17 = load i32, i32* %2
   %18 = sub i32 %17, 2
   store i32 %18, i32* %16
-  %19 = load i32, i32* %16
+  %19 = load i32, i32* %13
   %20 = call i32 @fib(i32 %19)
-  %21 = load i32, i32* %13
+  %21 = load i32, i32* %16
   %22 = call i32 @fib(i32 %21)
   %23 = add i32 %20, %22
   ret i32 %23

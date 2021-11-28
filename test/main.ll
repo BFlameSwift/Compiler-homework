@@ -32,17 +32,17 @@ store i32 %15, i32* %13
 %18 = sub i32 %17, 2
 store i32 %18, i32* %16
 %19 = load i32, i32* %13
-call void @fib(i32 %19)
-%20 = load i32, i32* %16
-call void @fib(i32 %20)
-%21 = add i32 %0, %0
-ret i32 %21
+%20 = call i32 @fib(i32 %19)
+%21 = load i32, i32* %16
+%22 = call i32 @fib(i32 %21)
+%23 = add i32 %20, %22
+ret i32 %23
 }
 define dso_local i32 @main(){
 %1 = alloca i32 
 store i32 10, i32* %1
 %2 = load i32, i32* %1
-call void @fib(i32 %2)
-call void @putint(i32 %0)
+%3 = call i32 @fib(i32 %2)
+call void @putint(i32 %3)
 ret i32 0
 }

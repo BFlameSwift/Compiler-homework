@@ -306,7 +306,7 @@ public class Parser {
         Utils.enterFunction(funcName); // 进入函数
         int functionAddr = parseFuncParams();
         SymbolItem function = Utils.getSymbolItemByAddress(functionAddr);
-        function.type = (funcDef.getLexcial() == Lexical.IF_DEC?1:0);
+        function.type = (funcDef.getLexcial() == Lexical.INT_DEC?1:0);
         System.out.println(Utils.getSymbolItemByAddress(functionAddr).length);
         Utils.setFunctionName(funcName,Utils.getSymbolItemByAddress(functionAddr));
         Token.exceptNextToken(Lexical.RPAREN);
