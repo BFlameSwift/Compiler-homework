@@ -566,16 +566,18 @@ public class Parser {
 
         if(Token.isUnaryOp(thisLexcial)){
             int coefficient = 1;
+//            Token.previousToken()
             while(Token.isUnaryOp(thisLexcial)){
                 if(thisLexcial == Lexical.AND || thisLexcial== Lexical.MINUS)
                     coefficient *= parseUnaryOp(thisLexcial);
                 else if(thisLexcial == Lexical.NOT){
                     notCount ++;
                 }
-                thisLexcial = Token.nextTokenLexcial("UnaryOp");
+                thisLexcial = Token.nextTokenLexcial("UnaryOp+-!");
+                System.out.println(thisLexcial);
             }
             Token.previousToken();
-            int primaryAddr = parsePrimaryExp();
+            int primaryAddr = parseUnaryExp();
             if(Utils.getSymbolItemByAddress(primaryAddr).isConstant())
                 primaryAddr = Utils.storeConstVariable(null,coefficient* Utils.getSymbolItemByAddress(primaryAddr).getValueInt(),Utils.getNowFunction());
 
