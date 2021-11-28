@@ -54,7 +54,7 @@ public class SymbolItem {
         }
         ArrayList<Integer> constArraySizeList = new ArrayList<>();
         for(int i=0; i<list.size(); i++){
-            constArraySizeList.add(Utils.getSymbolItemByAddress(parametersList.get(i)).getValueInt());
+            constArraySizeList.add(Utils.getSymbolItemByAddress(list.get(i)).getValueInt());
         }
         ArrayList<Integer> satisfiedList = Parser.makeSatisfyList(constArraySizeList);
         int ret = 0;
