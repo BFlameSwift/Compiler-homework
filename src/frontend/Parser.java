@@ -662,7 +662,7 @@ public class Parser {
                 int locationAddr = array.addrListTransLocation((getAddrList));
                 int retAddr = Utils.getArrayElemAddr(array.getAddress(),locationAddr);
 
-                if (dismensionDiff == 0) Utils.getSymbolItemByAddress(retAddr).setPointer();
+                if (dismensionDiff > 0) Utils.getSymbolItemByAddress(retAddr).setPointer();
                 Utils.getSymbolItemByAddress(retAddr).pointerDismension = dismensionDiff;
                 return retAddr;
             }
