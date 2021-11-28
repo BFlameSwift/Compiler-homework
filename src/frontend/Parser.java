@@ -329,7 +329,7 @@ public class Parser {
                 hasRet = true;
                 break;
             }
-            if(strs[0].substring(strs[0].length()-1,strs[0].length()).equals(":") || strs[strs.length-1].substring(strs[strs.length-1].length()-1).equals("{")){
+            if((strs[0].length()>0&& strs[0].substring(strs[0].length()-1,strs[0].length()).equals(":")) || (strs[strs.length-1].length()>0 && strs[strs.length-1].substring(strs[strs.length-1].length()-1).equals("{"))){
                 break;
             }
         }
