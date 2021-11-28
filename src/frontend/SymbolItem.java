@@ -31,10 +31,7 @@ public class SymbolItem {
         }
         return valueInt;
     }
-    public void setPointer(){
-        kind = 0;
-        type = 3;
-    }
+
     public void setValueInt(int valueInt) {
         this.valueInt = valueInt;
     }
@@ -82,7 +79,10 @@ public class SymbolItem {
         return type == 3 &&kind ==0;
 //        return type == 3;
     }
-
+    public void setPointer(){
+        kind = 0;
+        type = 3;
+    }
     public void setLoadAddress(int loadAddress) {
         this.loadAddress = loadAddress;
     }

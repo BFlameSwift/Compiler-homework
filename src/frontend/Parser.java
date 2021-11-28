@@ -627,11 +627,12 @@ public class Parser {
             int value = Integer.parseInt(token.getValue());
             return Utils.storeConstVariable(null,value, Utils.getNowFunction());
         }else if(Token.isIdent(token.getLexcial())){
-            if(Token.getNextToken().getLexcial() != Lexical.LBRACKET){
+            if(Token.getNextToken().getLexcial() != Lexical.LBRACKET && (!(Utils.getSymbolItem(token)).isArray())){
                 SymbolItem lval = Utils.getSymbolItem(token);
-
                 if(lval.kind != 1) {
-                    midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
+
+                        midCodeOut.add(Utils.loadLValOutput(token, Utils.getNowFunction()));
+
                     return Utils.getNowAddress();
                 }
                 return lval.getLoadAddress();
@@ -720,50 +721,50 @@ public class Parser {
 
 
 
-    public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
-        int retAddr = 0;
-//        System.out.println("funcname"+funcName);
-        if("@getint".equals(funcName)){
-            int intValue = 1;
-//            intValue = Utils.scanner.nextInt();
-            int saveAddress = Utils.callFunction(funcName,paramAddrList);
-//            System.out.println("saveaddress"+saveAddress);
-            SymbolItem saveItem = new SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
-            Utils.addressSymbolTable.put(saveAddress,saveItem);
-            return saveAddress;
-        }else if("@getch".equals(funcName)){
-            int intValue = 1;
-
-            int saveAddress = Utils.callFunction(funcName,paramAddrList);
-//            System.out.println("saveaddress"+saveAddress);
-            SymbolItem saveItem = new SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
-            Utils.addressSymbolTable.put(saveAddress,saveItem);
-            return saveAddress;
-        }else if("@putint".equals(funcName)){
-            int saveAddress = Utils.callFunction(funcName,paramAddrList);
-            int address = paramAddrList.get(0);
-            System.out.println("putint:"+ Utils.getSymbolItemByAddress(address).getValueInt());
-            return saveAddress;
-        }else if("@putch".equals(funcName)){
-            int saveAddress = Utils.callFunction(funcName,paramAddrList);
-            int address = paramAddrList.get(0);
-            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
-            return saveAddress;
-        }else if("@puarray".equals(funcName)){
-            int saveAddress = Utils.callFunction(funcName,paramAddrList);
-            int address = paramAddrList.get(0);
+//    public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
+//        int retAddr = 0;
+////        System.out.println("funcname"+funcName);
+//        if("@getint".equals(funcName)){
+//            int intValue = 1;
+////            intValue = Utils.scanner.nextInt();
+//            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+////            System.out.println("saveaddress"+saveAddress);
+//            SymbolItem saveItem = new SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
+//            Utils.addressSymbolTable.put(saveAddress,saveItem);
+//            return saveAddress;
+//        }else if("@getch".equals(funcName)){
+//            int intValue = 1;
+//
+//            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+////            System.out.println("saveaddress"+saveAddress);
+//            SymbolItem saveItem = new SymbolItem(null,0,intValue,Utils.getBlockIndex());  saveItem.setAddress(saveAddress);
+//            Utils.addressSymbolTable.put(saveAddress,saveItem);
+//            return saveAddress;
+//        }else if("@putint".equals(funcName)){
+//            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+//            int address = paramAddrList.get(0);
+//            System.out.println("putint:"+ Utils.getSymbolItemByAddress(address).getValueInt());
+//            return saveAddress;
+//        }else if("@putch".equals(funcName)){
+//            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+//            int address = paramAddrList.get(0);
 //            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
-            return saveAddress;
-        }else if("@getarray".equals(funcName)){
-            int saveAddress = Utils.callFunction(funcName,paramAddrList);
-            int address = paramAddrList.get(0);
-//            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
-            return saveAddress;
-        }
-        else{
-            throw new CompileException("IOFunction error");
-        }
-    }
+//            return saveAddress;
+//        }else if("@puarray".equals(funcName)){
+//            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+//            int address = paramAddrList.get(0);
+////            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
+//            return saveAddress;
+//        }else if("@getarray".equals(funcName)){
+//            int saveAddress = Utils.callFunction(funcName,paramAddrList);
+//            int address = paramAddrList.get(0);
+////            System.out.println("putch:"+((char) Utils.getSymbolItemByAddress(address).getValueInt()));
+//            return saveAddress;
+//        }
+//        else{
+//            throw new CompileException("IOFunction error");
+//        }
+//    }
     public static void deleteComment(ArrayList<Token> tokens)throws CompileException {
         int i;
         for (i=0;i<tokens.size();i++){

@@ -304,7 +304,7 @@ public class Utils {
         }
         arrayItem.setLoadAddress( nowAddress);
         putAddressSymbol(nowAddress,new SymbolItem(null,-2,3,0,null));
-//        String str= "%"+(++nowAddress)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
+//        String str= "%"+(++nowAddrespos)+" = "+"getelementptr "+"i32,i32* "+"%"+arrayItem.getLoadAddress();
 //        putAddressSymbol(nowAddress,new SymbolItem(null,-2,3,0,null));
 
 //        str += arrayItem.isGlobal()?arrayItem.name:arrayItem.getLoadAddress();
@@ -404,7 +404,7 @@ public class Utils {
             SymbolItem theSymbolItem = new SymbolItem(item1.name,0, item1.type,item1.blockIndex);
             putAddressSymbol((++nowAddress),theSymbolItem);
             item1.setLoadAddress(nowAddress);
-            String outStr = "%"+(nowAddress)+" = load i32" +(item1.isPointer()?"*":"")+
+            String outStr = "%"+(nowAddress)+" = load i32" +
                     ", i32* "
                     +((item1.isGlobal())?(item1.name):("%"+item1.getAddress()));
             Parser.midCodeOut.add(outStr);
@@ -485,10 +485,15 @@ public class Utils {
         if(theSymbolItem.getAddress() == 0){
 //            System.out.println("this symbol addr == 0"+theSymbolItem);
         }
-        putAddressSymbol(nowAddress+1,new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex())); // TODO 这里应该是变量吗
+        SymbolItem item = new SymbolItem(null,0,theSymbolItem.getValueInt(),getBlockIndex());
+        putAddressSymbol(nowAddress+1,item); // TODO 这里应该是变量吗
+        if(theSymbolItem.isPointer()|| theSymbolItem.type == 4||theSymbolItem.type ==3){
+            item.setPointer();
+        }
         theSymbolItem.setLoadAddress(nowAddress+1);
-
-        return "%"+(++nowAddress)+" = load i32, i32* "+((theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress()));
+        return "%"+(++nowAddress)+" = load i32" +(theSymbolItem.isPointer()?"*":"")+
+                ", i32* " +(theSymbolItem.isPointer()?"* ":"")
+                +((theSymbolItem.isGlobal())?(theSymbolItem.name):("%"+theSymbolItem.getAddress()));
     }
     public static int enterIfStmt(){
         return ++nowAddress;
