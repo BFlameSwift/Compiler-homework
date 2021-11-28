@@ -99,13 +99,13 @@ public class Parser {
             newList.set(i,newList.get(i)*newList.get(i+1));
         }
         System.out.println("make satisfy list");
-//        String satisfyOutput = "";
-//        for(int i:newList){
+        String satisfyOutput = "";
+        for(int i:newList){
 //            satisfyOutput += i+" ";
-////            System.out.printf("%d ",i);
-//        }
-//        midCodeOut.add(satisfyOutput);
-//        System.out.println("end make ");
+            System.out.printf("%d ",i);
+        }
+        midCodeOut.add(satisfyOutput);
+        System.out.println("end make ");
         return newList;
     }
     public static int parseArrayRead(ArrayList<Integer> dismension,int type) throws CompileException {
@@ -246,7 +246,7 @@ public class Parser {
                 Token.exceptNextToken(Lexical.RBRACKET);
                 dismension.add(0);
                 while(Token.nextTokenLexcial("[") == Lexical.LBRACKET ){
-                    dismension.add(parseConstExp());
+                    dismension.add(Utils.getSymbolItemByAddress(parseConstExp()).getValueInt());
                     Token.exceptNextToken(Lexical.RBRACKET);
                 }
                 paramOut+="i32* %"+Utils.assignedAddress();
