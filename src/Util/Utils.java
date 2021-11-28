@@ -300,6 +300,7 @@ public class Utils {
             Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+"[ "+arrayItem.length+" x i32 ]"+",["+arrayItem.length+" x i32 ]* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getAddress())+", i32 0, i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr));
         }else{
             loadPointerAddress(arrayItem.getAddress());
+//            Parser.midCodeOut.add(locationItem.output());
             Parser.midCodeOut.add("%"+(++nowAddress)+" = getelementptr"+" i32"+", i32* "+(arrayItem.isGlobal()? arrayItem.name:"%"+arrayItem.getLoadAddress())+", i32 "+(locationItem.isConstant()?locationItem.getValueInt():"%"+locationAddr));
 
         }
