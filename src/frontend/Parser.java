@@ -512,9 +512,10 @@ public class Parser {
                     Analysis.replacePreciseStr(midCodeOut,map.get(0),Analysis.LEAVE_ADDRESS,"%"+beginCondLabel);
                 }else if(map.containsKey(1)){
                     Analysis.replacePreciseStr(midCodeOut,map.get(1),Analysis.LEAVE_ADDRESS,"%"+endCycleLabel);
-                }else{
-                    throw new CompileException("not continue break!!!");
                 }
+//                else{
+//                    throw new CompileException("not continue break!!!");
+//                }
             }
         }
         else if(token.getLexcial() == Lexical.CONTINUE_DEC){
