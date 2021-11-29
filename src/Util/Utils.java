@@ -585,8 +585,17 @@ public class Utils {
     }
     public static int readyJump(){
         Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
-
         return nowAddress;
+    }
+    public static int endLor() throws CompileException {
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label "+Analysis.BR_ADDRESS2+", label "+"%"+(nowAddress+1));
+        cycleStack.peek().add(new HashMap(){{put(5,Parser.midCodeOut.size()-1);}});
+        return nextLabel();
+    }
+    public static int endLand() throws CompileException {
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
+        cycleStack.peek().add(new HashMap(){{put(4,Parser.midCodeOut.size()-1);}});
+        return nextLabel();
     }
     public static int nextLabel() throws CompileException{
         Parser.midCodeOut.add((++nowAddress)+":");
