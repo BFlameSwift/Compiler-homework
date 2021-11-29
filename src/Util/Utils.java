@@ -18,7 +18,7 @@ public class Utils {
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
     public static ArrayList<String > allFuncList = new ArrayList<String>();
     public static Map<String, SymbolItem> funcSymbolTable = new HashMap<String, SymbolItem>();
-    public static Stack<ArrayList<HashMap<Integer,Integer>>>cycleStack = new Stack<ArrayList<HashMap<Integer,Integer>>>(); // 循环栈，0 为continue 1：break
+    public static Stack<ArrayList<HashMap<Integer,Integer>>>cycleStack = new Stack<ArrayList<HashMap<Integer,Integer>>>(); // 循环栈，0 为continue 1：break 4 为land 5为lor
     static{
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
@@ -381,17 +381,18 @@ public class Utils {
             putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),false));
             item1.setLoadAddress(nowAddress);
         }
-        return nowAddress;
+        return item1.isCond?nowAddress:address;
     }
     public static int condI32ToI1(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
         if(!item1.isCond){
-            Parser.midCodeOut.add("%"+(++nowAddress)+" = icmp ne i32"+" %"+item1.getLoadAddress()+", 0");
+            midExpCalculate("ne",address,Utils.allocateConst(0));
+//            Parser.midCodeOut.add("%"+(++nowAddress)+" = icmp ne i32"+" %"+item1.getAddress()+", 0");
 //            Parser.midCodeOut.add("%"+(++nowAddress)+"= zext i1 %"+(address)+" to i32");
             putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
             item1.setLoadAddress(nowAddress);
         }
-        return nowAddress;
+        return (!item1.isCond)?nowAddress:address;
     }
     public static int loadPointerAddress(int address) throws CompileException {
         Parser.midCodeOut.add("%" +(++nowAddress)+ " = load i32* , i32* * "+"%"+address);
@@ -420,15 +421,16 @@ public class Utils {
         item1 = Utils.getSymbolItemByAddress(loadPointerValue(address1));item2 = Utils.getSymbolItemByAddress(loadPointerValue(address2));
         address1 = item1.getAddress(); address2 = item2.getAddress();
 //        Parser.midCodeOut.add(item1.output()+item2.output());
+
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         if (objKind == 1)
             objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
-        if(op.equals("or") || op.equals("and")){
-//            condI1ToI32(address1);condI1ToI32(address2);
-            condI32ToI1(address1); condI32ToI1(address2);
-        }
+//        if(op.equals("or") || op.equals("and")){
+////            condI1ToI32(address1);condI1ToI32(address2);
+//            condI32ToI1(address1); condI32ToI1(address2);
+//        }
 
-//        if(item1.isCond && !(op.equals("and")||op.equals("or"))){
+//        if(item1.isCond ){
 //            condI1ToI32(item1.getLoadAddress());
 //        }
         int objAddress = (objKind == 0||(objKind==1&&item1.isCond))?(++nowAddress):(++constAddress);// 将常量与变量计算分区
@@ -439,8 +441,6 @@ public class Utils {
 
             String outStr = "%"+objAddress+" = ";
             outStr += Token.isCond(op)?"icmp "+op+" i32 " :(op+((op.equals("and")||op.equals("or"))?" i1 ":" i32 "));
-
-
             outStr += (item1.kind == 1)?item1.getValueInt():(!item1.isGlobal())?"%"+item1.getLoadAddress():item1.name;
             outStr += ", ";
             outStr += (item2.kind == 1)?item2.getValueInt():(!item2.isGlobal())?"%"+item2.getLoadAddress():item2.name;
@@ -577,16 +577,32 @@ public class Utils {
         if((! item.isCond) || item.isConstant()){// 可能是 if(1+1) 类型，转换为i1类型进行判断
             int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction()); //常量放一个0
             item.isCond = true;
-            int midAddr = midExpCalculate("ne",item.getLoadAddress(),newZeroAddr);
+
+            int midAddr = midExpCalculate("ne",condAddr,newZeroAddr);
             putAddressSymbol(midAddr,new SymbolItem(null,0,item.getValueInt()!=0?1:0,true));//在地址表中放入 item!=0 的item
             return midAddr;// 返回数字是不是零
         }
         return nowAddress;
     }
     public static int readyJump(){
-        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
 
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
         return nowAddress;
+    }
+    public static int endLor() throws CompileException {
+//        Parser.midCodeOut.add("end lor"+nowAddress);
+        condI32ToI1(nowAddress);
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label "+Analysis.BR_ADDRESS1+", label "+"%"+(nowAddress+1));
+        cycleStack.peek().add(new HashMap(){{put(5,Parser.midCodeOut.size()-1);}});
+        return nextLabel();
+    }
+    public static int endLand() throws CompileException {
+//        Parser.midCodeOut.add("end land"+nowAddress);
+        condI32ToI1(nowAddress);
+
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
+        cycleStack.peek().add(new HashMap(){{put(4,Parser.midCodeOut.size()-1);}});
+        return nextLabel();
     }
     public static int nextLabel() throws CompileException{
         Parser.midCodeOut.add((++nowAddress)+":");
@@ -608,4 +624,14 @@ public class Utils {
         putAddressSymbol(constAddress,item);
         return constAddress;
     }
+    public static void backFill(int key,String fillContent,int nextLabel) throws CompileException{
+        List<HashMap<Integer, Integer>> list = Utils.cycleStack.peek(); //全局
+        for (int i=0;i<list.size();i++){
+            HashMap<Integer, Integer> map = list.get(i);
+            if(map.containsKey(key)){
+                Analysis.replacePreciseStr(Parser.midCodeOut,map.get(key),fillContent,"%"+nextLabel);
+            }
+        }
+    }
 }
+

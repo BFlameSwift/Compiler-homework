@@ -427,15 +427,19 @@ public class Parser {
             }
         }
         else if(token.getLexcial() == Lexical.IF_DEC){
+
             Token.exceptNextToken(Lexical.LPAREN);
+            Utils.cycleStack.push(new ArrayList<HashMap<Integer, Integer>>());  //全局栈压栈
             int condAddr = parseCond();
-            System.out.println("condAddr !!!!!"+condAddr);
+
+//            System.out.println("condAddr !!!!!"+condAddr);
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
-            Utils.beforejudgeCondition(condAddr);
+            Utils.beforejudgeCondition(Utils.getNowAddress());
             Utils.readyJump();
             int endLoca =midCodeOut.size() - 1;
             Token.exceptNextToken(Lexical.RPAREN);
-            Utils.nextLabel();
+            int codeLabel = Utils.nextLabel();
+
             int stmtRet = parseStmt();
             int jumpToloca1 =0;
             if(stmtRet == 1 || stmtRet == -1){
@@ -443,10 +447,11 @@ public class Parser {
             }Utils.endBlockJumpOutput(); // 如果stmt中没有ret continue break等结束块语句
             jumpToloca1 = midCodeOut.size() - 1;
 //            midCodeOut.add("br label jumpToEndAddr");
-
+            int endIfLabel = 0;
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
+                endIfLabel = elseAddr;
                  stmtRet = parseStmt();
                 if(stmtRet == 1 || stmtRet == -1){
                     Utils.nextLabel();
@@ -454,6 +459,7 @@ public class Parser {
                     Utils.endBlockJumpOutput();
                 int jumpToloca2 = midCodeOut.size() - 1;
                 int outAddr = Utils.nextLabel();
+
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca1, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca2, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+elseAddr);
@@ -461,11 +467,20 @@ public class Parser {
             
             else{
                 int endAddr = Utils.nextLabel();
+                endIfLabel = endAddr;
 //                midCodeOut.add(endAddr+":");
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca1,Analysis.LEAVE_ADDRESS,"%"+endAddr);
                 Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+endAddr);
             }
-
+            List<HashMap<Integer, Integer>> list = Utils.cycleStack.pop(); //全局
+            for (int i=0;i<list.size();i++){
+                HashMap<Integer, Integer> map = list.get(i);
+                if(map.containsKey(4)){
+                    Analysis.replacePreciseStr(midCodeOut,map.get(4),Analysis.BR_ADDRESS2,"%"+endIfLabel);
+                }else if(map.containsKey(5)){
+                    Analysis.replacePreciseStr(midCodeOut,map.get(5),Analysis.BR_ADDRESS1,"%"+codeLabel);
+                }
+            }
             return 0;
         }
         else if(token.getLexcial() == Lexical.LBRACE){
@@ -704,19 +719,30 @@ public class Parser {
     }
     public static int parseLorExp() throws CompileException {
         int lorAddr = parseLAndExp();
+        if(Token.getNextToken().getLexcial() == Lexical.OR)
+            Utils.endLor();
+//        Utils.endLor();
         while(Token.getNextToken().getLexcial() == Lexical.OR){
+//            Utils.backFill(5,Analysis.BR_ADDRESS1,Utils.getNowAddress());
+            Utils.backFill(4,Analysis.BR_ADDRESS2,Utils.getNowAddress());
             String orOp = Token.nextToken("||").getValue();
             int landAddr = parseLAndExp();
-            lorAddr = Utils.midExpCalculate(orOp,lorAddr,landAddr);
+            if(Token.getNextToken().getLexcial() == Lexical.OR)
+                Utils.endLor();
         }
         return lorAddr;
     }
     public static int parseLAndExp () throws CompileException {
         int landAddr = parseEqExp();
+        if(Token.getNextToken().getLexcial() == Lexical.AND)
+            Utils.endLand();
+//        Utils.endLand();
         while(Token.getNextToken().getLexcial() == Lexical.AND){
             String  andOp = Token.nextToken("&&").getValue();
             int eqAddr = parseEqExp();
-            landAddr = Utils.midExpCalculate(andOp,landAddr,eqAddr);
+            if(Token.getNextToken().getLexcial() == Lexical.AND)
+                Utils.endLand();
+//            landAddr = Utils.midExpCalculate(andOp,landAddr,eqAddr);
         }
         return landAddr;
     }
