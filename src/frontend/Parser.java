@@ -716,7 +716,7 @@ public class Parser {
     }
     public static int parseLorExp() throws CompileException {
         int lorAddr = parseLAndExp();
-        Utils.endLor();
+//        Utils.endLor();
         while(Token.getNextToken().getLexcial() == Lexical.OR){
             Utils.backFill(5,Analysis.BR_ADDRESS1,Utils.getNowAddress());
             Utils.backFill(4,Analysis.BR_ADDRESS2,Utils.getNowAddress());
