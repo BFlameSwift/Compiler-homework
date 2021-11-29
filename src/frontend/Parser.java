@@ -450,6 +450,7 @@ public class Parser {
             if(Token.getNextToken().getLexcial()==Lexical.ELSE_DEC ){
                 Token.exceptNextToken(Lexical.ELSE_DEC);
                 int elseAddr = Utils.nextLabel();
+                endIfLabel = elseAddr;
                  stmtRet = parseStmt();
                 if(stmtRet == 1 || stmtRet == -1){
                     Utils.nextLabel();
@@ -457,7 +458,7 @@ public class Parser {
                     Utils.endBlockJumpOutput();
                 int jumpToloca2 = midCodeOut.size() - 1;
                 int outAddr = Utils.nextLabel();
-                endIfLabel = outAddr;
+
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca1, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replacePreciseStr(midCodeOut,jumpToloca2, Analysis.LEAVE_ADDRESS,"%"+outAddr);
                 Analysis.replacePreciseStr(midCodeOut,endLoca, Analysis.BR_ADDRESS2,"%"+elseAddr);
@@ -475,10 +476,6 @@ public class Parser {
                 HashMap<Integer, Integer> map = list.get(i);
                 if(map.containsKey(4)){
                     Analysis.replacePreciseStr(midCodeOut,map.get(4),Analysis.BR_ADDRESS2,"%"+endIfLabel);
-                }else if(map.containsKey(5)){
-                    Analysis.replacePreciseStr(midCodeOut,map.get(5),Analysis.BR_ADDRESS2,"%"+endIfLabel);
-                }else{
-                    throw new CompileException("not continue break!!!");
                 }
             }
             return 0;
@@ -721,9 +718,13 @@ public class Parser {
         int lorAddr = parseLAndExp();
         Utils.endLor();
         while(Token.getNextToken().getLexcial() == Lexical.OR){
+            Utils.backFill(5,Analysis.BR_ADDRESS1,Utils.getNowAddress());
+            Utils.backFill(4,Analysis.BR_ADDRESS2,Utils.getNowAddress());
             String orOp = Token.nextToken("||").getValue();
             int landAddr = parseLAndExp();
-            Utils.endLor();
+            if(Token.getNextToken().getLexcial() == Lexical.OR)
+                Utils.endLor();
+
 //            lorAddr = Utils.midExpCalculate(orOp,lorAddr,landAddr);
         }
         return lorAddr;

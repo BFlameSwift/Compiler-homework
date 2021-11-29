@@ -590,7 +590,7 @@ public class Utils {
     }
     public static int endLor() throws CompileException {
         condI32ToI1(nowAddress);
-        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label "+Analysis.BR_ADDRESS2+", label "+"%"+(nowAddress+1));
+        Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label "+Analysis.BR_ADDRESS1+", label "+"%"+(nowAddress+1));
         cycleStack.peek().add(new HashMap(){{put(5,Parser.midCodeOut.size()-1);}});
         return nextLabel();
     }
@@ -621,13 +621,11 @@ public class Utils {
         return constAddress;
     }
     public static void backFill(int key,String fillContent,int nextLabel) throws CompileException{
-        List<HashMap<Integer, Integer>> list = Utils.cycleStack.pop(); //全局
+        List<HashMap<Integer, Integer>> list = Utils.cycleStack.peek(); //全局
         for (int i=0;i<list.size();i++){
             HashMap<Integer, Integer> map = list.get(i);
             if(map.containsKey(key)){
                 Analysis.replacePreciseStr(Parser.midCodeOut,map.get(key),fillContent,"%"+nextLabel);
-            }else{
-                throw new CompileException("not continue break!!!");
             }
         }
     }
