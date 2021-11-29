@@ -438,7 +438,8 @@ public class Parser {
             Utils.readyJump();
             int endLoca =midCodeOut.size() - 1;
             Token.exceptNextToken(Lexical.RPAREN);
-            Utils.nextLabel();
+            int codeLabel = Utils.nextLabel();
+
             int stmtRet = parseStmt();
             int jumpToloca1 =0;
             if(stmtRet == 1 || stmtRet == -1){
@@ -476,6 +477,8 @@ public class Parser {
                 HashMap<Integer, Integer> map = list.get(i);
                 if(map.containsKey(4)){
                     Analysis.replacePreciseStr(midCodeOut,map.get(4),Analysis.BR_ADDRESS2,"%"+endIfLabel);
+                }else if(map.containsKey(5)){
+                    Analysis.replacePreciseStr(midCodeOut,map.get(5),Analysis.BR_ADDRESS1,"%"+codeLabel);
                 }
             }
             return 0;
@@ -720,7 +723,7 @@ public class Parser {
             Utils.endLor();
 //        Utils.endLor();
         while(Token.getNextToken().getLexcial() == Lexical.OR){
-            Utils.backFill(5,Analysis.BR_ADDRESS1,Utils.getNowAddress());
+//            Utils.backFill(5,Analysis.BR_ADDRESS1,Utils.getNowAddress());
             Utils.backFill(4,Analysis.BR_ADDRESS2,Utils.getNowAddress());
             String orOp = Token.nextToken("||").getValue();
             int landAddr = parseLAndExp();
