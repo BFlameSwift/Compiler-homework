@@ -735,7 +735,8 @@ public class Parser {
         while(Token.getNextToken().getLexcial() == Lexical.AND){
             String  andOp = Token.nextToken("&&").getValue();
             int eqAddr = parseEqExp();
-            Utils.endLand();
+            if(Token.getNextToken().getLexcial() == Lexical.AND)
+                Utils.endLand();
 //            landAddr = Utils.midExpCalculate(andOp,landAddr,eqAddr);
         }
         return landAddr;
