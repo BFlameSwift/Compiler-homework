@@ -716,6 +716,8 @@ public class Parser {
     }
     public static int parseLorExp() throws CompileException {
         int lorAddr = parseLAndExp();
+        if(Token.getNextToken().getLexcial() == Lexical.OR)
+            Utils.endLor();
 //        Utils.endLor();
         while(Token.getNextToken().getLexcial() == Lexical.OR){
             Utils.backFill(5,Analysis.BR_ADDRESS1,Utils.getNowAddress());
@@ -731,7 +733,9 @@ public class Parser {
     }
     public static int parseLAndExp () throws CompileException {
         int landAddr = parseEqExp();
-        Utils.endLand();
+        if(Token.getNextToken().getLexcial() == Lexical.AND)
+            Utils.endLand();
+//        Utils.endLand();
         while(Token.getNextToken().getLexcial() == Lexical.AND){
             String  andOp = Token.nextToken("&&").getValue();
             int eqAddr = parseEqExp();
