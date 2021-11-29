@@ -23,19 +23,20 @@ br i1 %5, label %6, label %6
 6:
 %7 = call i32 @f()
 %8 = icmp eq i32 %7, 0
-br i1 %8, label %9, label %14
+br i1 %8, label %9, label %15
 9:
 %10 = call i32 @g()
-%11 = icmp ne i32 %2, 0
-br i1 %11, label %12, label %14
-12:
-ret i32 0
+%11= zext i1 %2 to i32
+%12 = icmp ne i32 %11, 0
+br i1 %12, label %13, label %15
 13:
-br label %16
+ret i32 0
 14:
-ret i32 1
+br label %17
 15:
-br label %16
+ret i32 1
 16:
+br label %17
+17:
 ret i32 0
 }
