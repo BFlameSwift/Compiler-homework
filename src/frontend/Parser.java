@@ -729,8 +729,6 @@ public class Parser {
             int landAddr = parseLAndExp();
             if(Token.getNextToken().getLexcial() == Lexical.OR)
                 Utils.endLor();
-
-//            lorAddr = Utils.midExpCalculate(orOp,lorAddr,landAddr);
         }
         return lorAddr;
     }

@@ -18,7 +18,7 @@ public class Utils {
     public static Map<String,HashMap<String, SymbolItem>> allLocalSymbolTable = new HashMap<String,HashMap<String, SymbolItem>>(); // 按照函数存储变量
     public static ArrayList<String > allFuncList = new ArrayList<String>();
     public static Map<String, SymbolItem> funcSymbolTable = new HashMap<String, SymbolItem>();
-    public static Stack<ArrayList<HashMap<Integer,Integer>>>cycleStack = new Stack<ArrayList<HashMap<Integer,Integer>>>(); // 循环栈，0 为continue 1：break
+    public static Stack<ArrayList<HashMap<Integer,Integer>>>cycleStack = new Stack<ArrayList<HashMap<Integer,Integer>>>(); // 循环栈，0 为continue 1：break 4 为land 5为lor
     static{
         blockSymbolTable.add(new HashMap<String, SymbolItem>());
     }
