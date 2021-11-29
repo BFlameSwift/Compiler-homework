@@ -590,14 +590,14 @@ public class Utils {
         return nowAddress;
     }
     public static int endLor() throws CompileException {
-        Parser.midCodeOut.add("end lor"+nowAddress);
+//        Parser.midCodeOut.add("end lor"+nowAddress);
         condI32ToI1(nowAddress);
         Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label "+Analysis.BR_ADDRESS1+", label "+"%"+(nowAddress+1));
         cycleStack.peek().add(new HashMap(){{put(5,Parser.midCodeOut.size()-1);}});
         return nextLabel();
     }
     public static int endLand() throws CompileException {
-        Parser.midCodeOut.add("end land"+nowAddress);
+//        Parser.midCodeOut.add("end land"+nowAddress);
         condI32ToI1(nowAddress);
 
         Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);

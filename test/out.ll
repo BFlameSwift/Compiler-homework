@@ -32,27 +32,26 @@ define dso_local i32 @main() {
 6:                                                ; preds = %3, %3, %0
   %7 = call i32 @f()
   %8 = icmp eq i32 %7, 0
-  br i1 %8, label %9, label %15
+  br i1 %8, label %9, label %14
 
 9:                                                ; preds = %6
   %10 = call i32 @g()
-  %11 = zext i1 %2 to i32
-  %12 = icmp ne i32 %11, 0
-  br i1 %12, label %13, label %15
+  %11 = icmp ne i32 %10, 0
+  br i1 %11, label %12, label %14
 
-13:                                               ; preds = %9
+12:                                               ; preds = %9
   ret i32 0
 
-14:                                               ; No predecessors!
-  br label %17
+13:                                               ; No predecessors!
+  br label %16
 
-15:                                               ; preds = %9, %6
+14:                                               ; preds = %9, %6
   ret i32 1
 
-16:                                               ; No predecessors!
-  br label %17
+15:                                               ; No predecessors!
+  br label %16
 
-17:                                               ; preds = %16, %14
+16:                                               ; preds = %15, %13
   ret i32 0
 }
 
