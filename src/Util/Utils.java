@@ -381,7 +381,7 @@ public class Utils {
             putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),false));
             item1.setLoadAddress(nowAddress);
         }
-        return nowAddress;
+        return item1.isCond?nowAddress:address;
     }
     public static int condI32ToI1(int address) throws CompileException {
         SymbolItem item1 = getSymbolItemByAddress(address);
@@ -392,7 +392,7 @@ public class Utils {
             putAddressSymbol(nowAddress,new SymbolItem(item1.name,item1.kind,item1.getValueInt(),true));
             item1.setLoadAddress(nowAddress);
         }
-        return nowAddress;
+        return (!item1.isCond)?nowAddress:address;
     }
     public static int loadPointerAddress(int address) throws CompileException {
         Parser.midCodeOut.add("%" +(++nowAddress)+ " = load i32* , i32* * "+"%"+address);
@@ -425,14 +425,14 @@ public class Utils {
         int objKind = (item1.kind == 1 && item2.kind == 1)? 1:0,objValue = 0; // 判断新地址的是不是变量 0 是变量，1不是变量
         if (objKind == 1)
             objValue = calculateValue(item1.getValueInt(),op, item2.getValueInt());
-        if(op.equals("or") || op.equals("and")){
-//            condI1ToI32(address1);condI1ToI32(address2);
-            condI32ToI1(address1); condI32ToI1(address2);
-        }
+//        if(op.equals("or") || op.equals("and")){
+////            condI1ToI32(address1);condI1ToI32(address2);
+//            condI32ToI1(address1); condI32ToI1(address2);
+//        }
 
-        if(item1.isCond ){
-            condI1ToI32(item1.getLoadAddress());
-        }
+//        if(item1.isCond ){
+//            condI1ToI32(item1.getLoadAddress());
+//        }
         int objAddress = (objKind == 0||(objKind==1&&item1.isCond))?(++nowAddress):(++constAddress);// 将常量与变量计算分区
         Boolean objIsCond = false;
 //        int objAddress = nowAddress;
@@ -577,7 +577,8 @@ public class Utils {
         if((! item.isCond) || item.isConstant()){// 可能是 if(1+1) 类型，转换为i1类型进行判断
             int newZeroAddr = Utils.storeConstVariable(null,0,Utils.getNowFunction()); //常量放一个0
             item.isCond = true;
-            int midAddr = midExpCalculate("ne",item.getLoadAddress(),newZeroAddr);
+
+            int midAddr = midExpCalculate("ne",condAddr,newZeroAddr);
             putAddressSymbol(midAddr,new SymbolItem(null,0,item.getValueInt()!=0?1:0,true));//在地址表中放入 item!=0 的item
             return midAddr;// 返回数字是不是零
         }
@@ -589,13 +590,16 @@ public class Utils {
         return nowAddress;
     }
     public static int endLor() throws CompileException {
+        Parser.midCodeOut.add("end lor"+nowAddress);
         condI32ToI1(nowAddress);
         Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label "+Analysis.BR_ADDRESS1+", label "+"%"+(nowAddress+1));
         cycleStack.peek().add(new HashMap(){{put(5,Parser.midCodeOut.size()-1);}});
         return nextLabel();
     }
     public static int endLand() throws CompileException {
+        Parser.midCodeOut.add("end land"+nowAddress);
         condI32ToI1(nowAddress);
+
         Parser.midCodeOut.add("br i1 %"+Utils.getNowAddress()+", label %"+(nowAddress+1)+", label "+ Analysis.BR_ADDRESS2);
         cycleStack.peek().add(new HashMap(){{put(4,Parser.midCodeOut.size()-1);}});
         return nextLabel();

@@ -9,81 +9,50 @@ target triple = "x86_64-pc-linux-gnu"
 @.str.3 = private unnamed_addr constant [4 x i8] c" %d\00", align 1
 @.str.4 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
-define dso_local i32 @func(i32 %0) {
-  %2 = alloca i32
-  store i32 %0, i32* %2
-  %3 = load i32, i32* %2
-  %4 = icmp sle i32 %3, 50
-  br i1 %4, label %5, label %8
-
-5:                                                ; preds = %1
-  %6 = load i32, i32* %2
-  call void @putint(i32 %6)
-  ret i32 1
-
-7:                                                ; No predecessors!
-  br label %11
-
-8:                                                ; preds = %1
-  %9 = load i32, i32* %2
-  call void @putint(i32 %9)
-  ret i32 0
-
-10:                                               ; No predecessors!
-  br label %11
-
-11:                                               ; preds = %10, %7
+define dso_local i32 @f() {
+  call void @putint(i32 0)
   ret i32 0
 }
 
+define dso_local i32 @g() {
+  call void @putint(i32 1)
+  ret i32 1
+}
+
 define dso_local i32 @main() {
-  %1 = alloca i32
-  %2 = call i32 @func(i32 0)
-  %3 = icmp eq i32 %2, 1
-  br i1 %3, label %4, label %4
+  %1 = call i32 @f()
+  %2 = icmp ne i32 %1, 0
+  br i1 %2, label %3, label %6
 
-4:                                                ; preds = %0, %0
-  %5 = call i32 @func(i32 50)
-  %6 = icmp eq i32 %5, 1
-  br i1 %6, label %7, label %11
+3:                                                ; preds = %0
+  %4 = call i32 @g()
+  %5 = icmp ne i32 %4, 0
+  br i1 %5, label %6, label %6
 
-7:                                                ; preds = %4
-  %8 = call i32 @func(i32 100)
-  %9 = icmp eq i32 %8, 0
-  br i1 %9, label %10, label %11
+6:                                                ; preds = %3, %3, %0
+  %7 = call i32 @f()
+  %8 = icmp eq i32 %7, 0
+  br i1 %8, label %9, label %15
 
-10:                                               ; preds = %7
-  store i32 0, i32* %1
-  br label %12
+9:                                                ; preds = %6
+  %10 = call i32 @g()
+  %11 = zext i1 %2 to i32
+  %12 = icmp ne i32 %11, 0
+  br i1 %12, label %13, label %15
 
-11:                                               ; preds = %7, %4
-  store i32 1, i32* %1
-  br label %12
+13:                                               ; preds = %9
+  ret i32 0
 
-12:                                               ; preds = %11, %10
-  %13 = call i32 @func(i32 50)
-  %14 = icmp eq i32 %13, 1
-  br i1 %14, label %15, label %18
+14:                                               ; No predecessors!
+  br label %17
 
-15:                                               ; preds = %12
-  %16 = call i32 @func(i32 40)
-  %17 = icmp eq i32 %16, 1
-  br i1 %17, label %18, label %18
+15:                                               ; preds = %9, %6
+  ret i32 1
 
-18:                                               ; preds = %15, %15, %12
-  %19 = call i32 @func(i32 1)
-  %20 = icmp eq i32 %19, 1
-  br i1 %20, label %21, label %22
+16:                                               ; No predecessors!
+  br label %17
 
-21:                                               ; preds = %18
-  store i32 0, i32* %1
-  br label %23
-
-22:                                               ; preds = %18
-  store i32 1, i32* %1
-  br label %23
-
-23:                                               ; preds = %22, %21
+17:                                               ; preds = %16, %14
   ret i32 0
 }
 

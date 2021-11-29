@@ -434,7 +434,7 @@ public class Parser {
 
 //            System.out.println("condAddr !!!!!"+condAddr);
             SymbolItem thisAddrItem = Utils.getSymbolItemByAddress(condAddr);
-            Utils.beforejudgeCondition(condAddr);
+            Utils.beforejudgeCondition(Utils.getNowAddress());
             Utils.readyJump();
             int endLoca =midCodeOut.size() - 1;
             Token.exceptNextToken(Lexical.RPAREN);
