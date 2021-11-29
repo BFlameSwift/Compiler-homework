@@ -14,32 +14,37 @@ ret i32 1
 }
 define dso_local i32 @main(){
 %1 = call i32 @f()
-br i1 %1, label %2, label %17
-2:
-%3 = call i32 @g()
-br i1 %3, label %4, label %17
-4:
-br i1 %4, label %17, label %5
-5:
-%6 = call i32 @f()
-%7 = icmp eq i32 %6, 0
-br i1 %7, label %8, label %17
+%2 = icmp ne i32 %1, 0
+br i1 %2, label %3, label %22
+3:
+%4 = call i32 @g()
+%5 = icmp ne i32 %4, 0
+br i1 %5, label %6, label %22
+6:
+%7 = icmp ne i32 %6, 0
+br i1 %7, label %22, label %8
 8:
-%9 = call i32 @g()
-br i1 %9, label %10, label %17
-10:
-br i1 %10, label %17, label %11
+%9 = call i32 @f()
+%10 = icmp eq i32 %9, 0
+br i1 %10, label %11, label %22
 11:
-%12 = icmp ne i32 %1, 0
-br i1 %12, label %13, label %15
-13:
-ret i32 0
+%12 = call i32 @g()
+%13 = icmp ne i32 %12, 0
+br i1 %13, label %14, label %22
 14:
-br label %17
-15:
-ret i32 1
+%15 = icmp ne i32 %14, 0
+br i1 %15, label %22, label %16
 16:
-br label %17
-17:
+%17 = icmp ne i32 %2, 0
+br i1 %17, label %18, label %20
+18:
+ret i32 0
+19:
+br label %22
+20:
+ret i32 1
+21:
+br label %22
+22:
 ret i32 0
 }
