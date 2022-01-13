@@ -4,7 +4,19 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Parser {
-    public static ArrayList<String> midCodeOut = new ArrayList<String>();
+    public static ArrayList<String> output = new ArrayList<String>();
+    public static void initIOFunctions() {
+        output.add("declare i32 @getint()");
+        output.add("declare i32 @getch()");
+        output.add("declare void @putint(i32)");
+        output.add("declare void @putch(i32)");
+        SymbolItem getint = new SymbolItem("@getint",2,0,1,0);
+        SymbolItem getch = new SymbolItem("@getch",2,0,1,0);
+        SymbolItem putint = new SymbolItem("@putint",2,0,0,1);
+        SymbolItem putch = new SymbolItem("@putch",2,0,0,1);
+        Utils.allFuncList.add("@getint");Utils.allFuncList.add("@putint");Utils.allFuncList.add("@getch");Utils.allFuncList.add("@putch");
+        Utils.funcSymbolTable.put("@getint",getint); Utils.funcSymbolTable.put("@putint",putint); Utils.funcSymbolTable.put("@getch",getch);Utils.funcSymbolTable.put("@putch",putch);
+    }
     //    CompUnit     -> [CompUnit] (Decl | FuncDef)
     public static void parseCompUnit()throws CompileException {
         int lexcial = Token.getNextToken().getLexcial();
@@ -39,7 +51,9 @@ public class Parser {
             parseConstDef();
         }
         Token.previousToken();
+
         Token.exceptNextToken(Lexical.SEMICOLON);
+
     }
     //    BType        -> 'int'
     public static void parseBType() throws CompileException { // 检测Bype 只有int
@@ -53,17 +67,14 @@ public class Parser {
             throw new CompileException("Parser const def Error is not Ident");
         }
         Token.exceptNextToken(Lexical.ASSIGN);
+
         int valueConstInitvalAddress = parseConstInitVal();
         SymbolItem constItem = Utils.getSymbolItemByAddress(valueConstInitvalAddress);
         if(constItem.kind == 0){
             throw new CompileException("const cant assign by var");
         }
-        if(Utils.isGlobal()){
-            Utils.allocateGlobalVariable(identToken,constItem.getValueInt(),1,false);
-        }else{
-            Utils.storeConstVariable(identToken.getValue(),constItem.getValueInt(),Utils.getNowFunction());
-        }
 
+        Utils.storeConstVariable(identToken.getValue(),constItem.valueInt,"main");
 
     }
     // ConstInitVal -> ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
@@ -91,105 +102,34 @@ public class Parser {
     // VarDef   -> Ident { '[' ConstExp ']' }  | Ident { '[' ConstExp ']' } '=' InitVal
     public static void parseVarDef() throws CompileException {
         Token identToken = Token.nextToken("ident");
-        int varAddr = 0;
+        int varAddr = Utils.allocateVariable(identToken,0,false);
+        output.add("%"+varAddr+" = alloca i32");
         if(!Token.isAssign(Token.nextTokenLexcial("="))){
-            if(Utils.isGlobal()){
-                Utils.allocateGlobalVariable(identToken,0,0,true);
-            }else{
-                varAddr = Utils.allocateVariable(identToken,0,Utils.getNowFunction());
-                midCodeOut.add(Utils.allocateVariableOutput(varAddr)); // 输出中间代码
-            }
             Token.previousToken();
             return;
         }
         int valueAddr = parseInitVal();
-        if(Utils.isGlobal()) {
-            Utils.allocateGlobalVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt(),0,false);
-            return;
-        }
-        varAddr = Utils.allocateVariable(identToken,0,Utils.getNowFunction());
-        varAddr = Utils.storeVariable(identToken,Utils.getSymbolItemByAddress(valueAddr).getValueInt());
-        midCodeOut.add(Utils.storeVariableOutput(valueAddr,varAddr));
-        return;
-    }
-    public static int parseInitVal() throws CompileException {
-        return parseExp();
-    }
-    // FuncDef      -> FuncType Ident '(' [FuncFParams] ')' Block
-    public static Boolean parseFuncDef()throws CompileException {
-        Token funcDef = Token.nextToken("FuncDef");
-        String funcName = parseIdent();
-        // 如果下一个不是函数定义，则可能是变量定义，先回退
-        if(Token.getNextToken().getLexcial() != Lexical.LPAREN) {
-            Token.previousToken();Token.previousToken(); return false;
-        }
-
-        midCodeOut.add("define dso_local i32"+funcName);
-        Token.exceptNextToken(Lexical.LPAREN);
-        // TODO 函数参数
-        Token.exceptNextToken(Lexical.RPAREN);
-        Utils.enterFunction(funcName); // 进入函数
-        midCodeOut.add("()");
-        parseBlock();
-        return true;
-    }
-
-    public static String parseIdent()throws CompileException {
-        Token.exceptNextToken(Lexical.IDENT);
-//        midCodeOut.add(Token.getPreviousToken().getValue());
-        return Token.getPreviousToken().getValue(); // 获取标识符的名字
-    }
-    // Block        -> '{' { BlockItem } '}'
-    public static void parseBlock()throws CompileException {
-        Utils.enterBlock(); //blockindex ++;
-        Token.exceptNextToken(Lexical.LBRACE);   midCodeOut.add("{");
-        while (!Token.judgeNextToken(Lexical.RBRACE)) {
-            Token.previousToken();
-            parseBlockItem();
-        }
-        midCodeOut.add("}");
-    }
-    // BlockItem    -> Decl | Stmt
-    public static void parseBlockItem() throws CompileException {
-        if(Token.isDecl(Token.nextTokenLexcial("decl"))){
-            Token.previousToken();
-            parseDecl();
-        }else{
-            Token.previousToken();
-            parseStmt();
-        }
-    }
-    //Stmt         -> LVal '=' Exp ';'
-    //                | [Exp] ';'
-    //                | Block
-    //                | 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
-    //                | 'while' '(' Cond ')' Stmt
-    //                | 'break' ';'
-    //                | 'continue' ';'
-    //                | 'return' [Exp] ';'
-    public static void parseStmt()throws CompileException {
-        Token token = Token.nextToken("exp or Lval = Exp or return ");
-        if(token.judgeThis(Lexical.RETURN_DEC)){
             int expAddress = parseExp();
             SymbolItem retSymbolItem = Utils.getSymbolItemByAddress(expAddress);
 //            System.out.println("ret exp address = "+expAddress);
             String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.getValueInt()    :    "%"+retSymbolItem.getAddress();
             midCodeOut.add("ret i32 "+retStr);
+            String retStr = (retSymbolItem.kind == 1)  ?  ""+retSymbolItem.valueInt    :    "%"+retSymbolItem.getAddress();
+            output.add("ret i32 "+retStr);
             Token.exceptNextToken(Lexical.SEMICOLON);
         }
         else if(Token.isIdent(token.getLexcial())){
             //TODO 如果找不到这个变量
            if(Token.isAssign(Token.nextTokenLexcial("="))){
-           //SymbolItem theSymbolItem = Utils.getSymbolItem(token,Utils.getNowFunction());
+//               SymbolItem theSymbolItem = Utils.getSymbolItem(token,"main");
                int expAddr = parseExp();
-               int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).getValueInt());
-               midCodeOut.add(Utils.storeVariableOutput(expAddr,varAddr));
+               int varAddr = Utils.storeVariable(token,Utils.getSymbolItemByAddress(expAddr).valueInt);
+               output.add(Utils.storeVariableOutput(expAddr,varAddr));
                Token.exceptNextToken(Lexical.SEMICOLON);
            }else {
                Token.previousToken();Token.previousToken();
-               if(!Token.isSemicolon(Token.getNextToken().getLexcial())) {
-                   parseExp();
-               }
+               if(!Token.isSemicolon(Token.getNextToken().getLexcial()))
+                    parseExp();
                Token.exceptNextToken(Lexical.SEMICOLON);
            }
         }else{
@@ -208,7 +148,7 @@ public class Parser {
             String op = Token.getPreviousToken().getValue();
 //            System.out.println("this op:"+op);
             int mulExpAddress = parseMulExp();
-            if("add".equals(op) || "sub".equals(op)) {
+            if(op.equals("add") || op.equals("sub")) {
                 addExpAddress = Utils.midExpCalculate(op,addExpAddress,mulExpAddress);
             }else{
                 throw new IllegalArgumentException("not - +");
@@ -223,7 +163,7 @@ public class Parser {
         while(Token.isLevel3Operator(Token.nextTokenLexcial("* / %"))){
             String op = Token.getPreviousToken().getValue();
             int unaryExpAddress = parseUnaryExp();
-            if("mul".equals(op) || "sdiv".equals(op)|| "srem".equals(op)) {
+            if(op.equals("mul") || op.equals("sdiv")|| op.equals("srem")) {
                 mulExpAddress = Utils.midExpCalculate(op,mulExpAddress,unaryExpAddress);
             }else{
                 throw new IllegalArgumentException("not * / %");
@@ -247,9 +187,8 @@ public class Parser {
             return Utils.storeConstVariable(null,coefficient*Utils.getSymbolItemByAddress(parsePrimaryExp()).getValueInt(),Utils.getNowFunction());
         }else if(Token.isIdent(thisLexcial)&& Token.isLParen(Token.getNextToken().getLexcial())){
 
-            if(!Utils.funcSymbolTable.containsKey(thisToken.getValue())) {
+            if(!Utils.funcSymbolTable.containsKey(thisToken.getValue()))
                 throw new CompileException("Parse dont hava this func "+thisToken.getValue());
-            }
             SymbolItem funcItem = Utils.funcSymbolTable.get(thisToken.getValue());
             Token.nextToken("(");
             ArrayList<Integer> paramAddrList = new ArrayList<>();
@@ -284,11 +223,10 @@ public class Parser {
             int value = Integer.parseInt(token.getValue());
             return Utils.storeConstVariable(null,value,Utils.getNowFunction());
         }else if(Token.isIdent(token.getLexcial())){
-            SymbolItem lval = Utils.getSymbolItem(token,Utils.getNowFunction());
-            if(!lval.isConstant()) {
-                midCodeOut.add(Utils.loadLValOutput(token,Utils.getNowFunction()));
-            }
-//            output.add(Utils.loadLValOutput(token,Utils.getNowFunction()));
+            SymbolItem lval = Utils.getSymbolItem(token,"main");
+            if(!lval.isConstant())
+                output.add(Utils.loadLValOutput(token,"main"));
+//            output.add(Utils.loadLValOutput(token,"main"));
             return lval.getLoadAddress();
 //            return Utils.getIdentLVal(token,Utils.getNowFunction());
         }
@@ -309,7 +247,7 @@ public class Parser {
     public static int processIOFunc(String funcName,ArrayList<Integer> paramAddrList) throws CompileException {
         int retAddr = 0;
 //        System.out.println("funcname"+funcName);
-        if("@getint".equals(funcName)){
+        if(funcName.equals("@getint")){
             int intValue = 1;
 //            intValue = Utils.scanner.nextInt();
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
@@ -317,7 +255,7 @@ public class Parser {
             SymbolItem saveItem = new SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
-        }else if("@getch".equals(funcName)){
+        }else if(funcName.equals("@getch")){
             int intValue = 1;
 
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
@@ -325,12 +263,12 @@ public class Parser {
             SymbolItem saveItem = new SymbolItem(null,0,intValue);  saveItem.setAddress(saveAddress);
             Utils.addressSymbolTable.put(saveAddress,saveItem);
             return saveAddress;
-        }else if("@putint".equals(funcName)){
+        }else if(funcName.equals("@putint")){
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
             int address = paramAddrList.get(0);
             System.out.println("putint:"+Utils.getSymbolItemByAddress(address).getValueInt());
             return saveAddress;
-        }else if("@putch".equals(funcName)){
+        }else if(funcName.equals("@putch")){
             int saveAddress = Utils.callFunction(funcName,paramAddrList);
             int address = paramAddrList.get(0);
             System.out.println("putch:"+((char)Utils.getSymbolItemByAddress(address).getValueInt()));
@@ -352,9 +290,8 @@ public class Parser {
             }
         }
         for (i=0; i<tokens.size(); i++) {// 词法分析异常
-            if (tokens.get(i).getLexcial()<0) {
+            if (tokens.get(i).getLexcial()<0)
                 throw new CompileException("Lexical Error The String is "+tokens.get(i).getValue());
-            }
         }
     }
     public static void outputFile(String file,ArrayList<String> array)  {
@@ -364,8 +301,8 @@ public class Parser {
             out = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(file, false)));
 //            out.write(conent+"\r\n");
-            for(int i=0;i<midCodeOut.size();i++){
-                out.write(midCodeOut.get(i)+"\r\n");
+            for(int i=0;i<output.size();i++){
+                out.write(output.get(i)+"\r\n");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -381,7 +318,7 @@ public class Parser {
         Lexical.makeTokenList(input);
     }
     public static void main(String[] args) throws CompileException,FileNotFoundException {
-        Utils.initIOFunctions();
+        initIOFunctions();
         lexicalAnalysis(args[0]);
         try {
             parseCompUnit();
@@ -393,9 +330,9 @@ public class Parser {
             }
             System.exit(-1);
         }
-        for(String str : midCodeOut){
+        for(String str : output){
             System.out.println(str);
-        } outputFile(args[1],midCodeOut );
+        } outputFile(args[1],output );
         System.exit(0);
     }
 }

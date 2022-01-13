@@ -23,18 +23,6 @@ public class Utils {
     private static int thisFunctionBlockIndex = -1;
     private static int constAddress = -100000;
     private static int nowAddress = 0;
-    private static final String DEFAULT_GLOABL_FUNCTION_NAME = "lyTxdy'sDefaultGlobalName"; //初始化没进入函数时候的名称
-    private static String nowFunctionName = DEFAULT_GLOABL_FUNCTION_NAME ;
-    public static String getNowFunction(){ // 获取当前函数名称，从而对变量找准位置
-        return nowFunctionName;
-    }
-    public static Boolean isGlobal(){
-        return nowFunctionName.equals(DEFAULT_GLOABL_FUNCTION_NAME);
-    }
-    public static void enterFunction(String funcName){
-        nowFunctionName = funcName;
-        thisFunctionBlockIndex = blockIndex+1; // 先遇到函数头在进入函数的块 所以是+1s
-    }
 
     public static int getNowAddress() {
         return nowAddress;
@@ -47,53 +35,17 @@ public class Utils {
     public static int getBlockIndex() {
         return blockIndex;
     }
-    public static String allocateVariableOutput(int varialeAddr){
-        return "%"+varialeAddr+" = alloca i32";
-    }
-    public static void putGlobalInBlock0(String symbolName,SymbolItem symbolItem){
-        try{
-            blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
-        }catch(IndexOutOfBoundsException ie){
-            HashMap<String,SymbolItem> map = new HashMap<String,SymbolItem>();
-            blockSymbolTable.add(map);
-            blockSymbolTable.get(0).put(symbolItem.name,symbolItem);
-        }
-    }
-    public static void judgeVariableNameIsLegal(String variableName) throws CompileException{
-        if(!Lexical.isIdentifier(variableName.substring(1))){ // 名字是@+identName
-            throw new CompileException("variable Name is not ident name"); // 按道理不应该出现。判断变量名字是不是ident形式
+    public static int allocateVariable(Token token,int kind,Boolean isGolbal) throws CompileException {
 
-        }else if(Lexical.TOKEN_LIST.indexOf(variableName)>=Lexical.CONST_DEC && Lexical.TOKEN_LIST.indexOf(variableName)<=Lexical.RETURN_DEC){
-            // 如果变量名字是保留字的话,  不过由于已经识别为了保留字，例如return 会被转化为Return 详见lexical文件 所以要在TOkenlist的名字中找
-            throw new CompileException("Variable name is Reserved words");
-        }// TODO 区域内已经存在同名变量
-
-    }
-    public static String allocateGlobalVariableOutput(Token token,int value,int kind,Boolean isCommon){
-        String retStr = "";
-        retStr += token.getValue(); retStr += " = ";
-        retStr += isCommon?"common ":""; retStr += "dso_local ";
-        retStr += kind == 0?"global i32 ":"constant i32 ";
-        retStr += value+", align 4";
-        return retStr;
-    }
-    public static void allocateGlobalVariable(Token token,int value,int kind,Boolean isCommon) throws CompileException {
-        // 声明全局变量，value 为数值，king种类， common是否初始化了数值
-        String symbolName = token.getValue();
-        SymbolItem symbolItem =  new SymbolItem(symbolName,kind,value);
-        if(globalSymbolTable.containsKey(symbolName)){
-            throw new CompileException("this variable name"+symbolName+"has been allocate");
-        }globalSymbolTable.put(symbolName,symbolItem);
-        putGlobalInBlock0(symbolName,symbolItem);
-        Parser.midCodeOut.add(allocateGlobalVariableOutput(token,value,kind,isCommon));
-    }
-    public static int allocateVariable(Token token,int kind,String funcName) throws CompileException {
+        nowAddress ++;
         String symbolName = token.getValue();
         judgeVariableNameIsLegal(symbolName);
         SymbolItem symbolItem =  new SymbolItem(symbolName,kind);
         symbolItem.setAddress(nowAddress);
-        nowAddress ++;
-        Parser.midCodeOut.add(allocateVariableOutput(nowAddress)); // 输出声明局部变量的中间代码
+        if(isGolbal){
+            globalSymbolTable.put(symbolName, symbolItem);
+            return nowAddress;
+        }
         //TODO 根据不同函数进入不同的Map块
         putAddressSymbol(nowAddress,symbolItem);
         putallocalSymbolTable(symbolItem,funcName);
@@ -153,13 +105,15 @@ public class Utils {
             throw new CompileException("This ident "+token.getValue()+"is not a variable");
         }return item;
     }
-    public static int storeVariable(Token token,int value) throws CompileException {
-        // TODO 自下向上查找变量 而后区分出不同类型的变量并赋值
+// 自小块向大块赋值
+    public static int storeVariable(Token token,int value){
+        // 自下向上查找变量 而后区分出不同类型的变量并赋值
         // TODO 暂时认为只有一个块
-        SymbolItem symbolItem = new SymbolItem(null,-1); // 随便初始化一个。。后面会覆盖掉
-        symbolItem = getSymbolVariable(token);
-        if(symbolItem.isConstant()){
-            throw new CompileException("Constant cant be store value");
+        SymbolItem symbolItem = new SymbolItem(token.getValue(),10);
+        try{
+            symbolItem = blockSymbolTable.get(blockIndex).get(token.getValue());
+        }catch(Exception e){
+            e.printStackTrace();
         }
         symbolItem.setValueInt(value);
         return symbolItem.getAddress();
@@ -194,8 +148,8 @@ public class Utils {
             String outStr = "%"+objAddress+" = "+op+" i32 ";
             outStr += (item1.kind == 1)?item1.getValueInt():"%"+item1.getLoadAddress();
             outStr += ", ";
-            outStr += (item2.kind == 1)?item2.getValueInt():"%"+item2.getLoadAddress();
-            Parser.midCodeOut.add(outStr);
+            outStr += (item2.kind == 1)?item2.valueInt:"%"+item2.getLoadAddress();
+            Parser.output.add(outStr);
         }
         putAddressSymbol(objAddress,new SymbolItem(null,objKind,objValue));
 
@@ -263,7 +217,7 @@ public class Utils {
 //        "%"+paramAddrList.get(i);
 //            outputStr += " ";
         }outputStr+=")";
-        Parser.midCodeOut.add(outputStr);
+        Parser.output.add(outputStr);
         return funcItem.type == 1?nowAddress:0;
     }
 
@@ -282,16 +236,4 @@ public class Utils {
        return ret;
     }
 
-    public static void initIOFunctions() {
-        Parser.midCodeOut.add("declare i32 @getint()");
-        Parser.midCodeOut.add("declare i32 @getch()");
-        Parser.midCodeOut.add("declare void @putint(i32)");
-        Parser.midCodeOut.add("declare void @putch(i32)");
-        SymbolItem getint = new SymbolItem("@getint",2,0,1,0);
-        SymbolItem getch = new SymbolItem("@getch",2,0,1,0);
-        SymbolItem putint = new SymbolItem("@putint",2,0,0,1);
-        SymbolItem putch = new SymbolItem("@putch",2,0,0,1);
-        allFuncList.add("@getint");allFuncList.add("@putint");allFuncList.add("@getch");allFuncList.add("@putch");
-        funcSymbolTable.put("@getint",getint); funcSymbolTable.put("@putint",putint); funcSymbolTable.put("@getch",getch);funcSymbolTable.put("@putch",putch);
-    }
 }
